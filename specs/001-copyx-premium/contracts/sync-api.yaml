@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Copyx Sync API
+  version: 1.0.0
+  description: Minimal API for syncing encrypted user data blobs.
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: JWT Token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /sync/push:
+    post:
+      summary: Upload encrypted data blob
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                blob:
+                  type: string
+                  description: Base64 encoded encrypted JSON
+                timestamp:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Sync successful
+
+  /sync/pull:
+    get:
+      summary: Download latest encrypted data blob
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blob:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
