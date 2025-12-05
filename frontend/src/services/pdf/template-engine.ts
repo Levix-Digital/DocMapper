@@ -1,12 +1,12 @@
 import { PDFDocument } from 'pdf-lib';
 import JsBarcode from 'jsbarcode';
 import { CMRData } from '../../modules/cmr/types';
-import { IKEA_RECEIPT_TEMPLATE_BASE64 } from './assets';
+import { SHIPMENT_DOC_TEMPLATE_BASE64 } from './assets';
 
-export const generateReceiptPdf = async (data: CMRData): Promise<Uint8Array> => {
+export const generateShipmentDocsPdf = async (data: CMRData): Promise<Uint8Array> => {
     // 1. Load the template
     // We need to clean whitespace from the base64 string
-    const cleanBase64 = IKEA_RECEIPT_TEMPLATE_BASE64.replace(/\s/g, '');
+    const cleanBase64 = SHIPMENT_DOC_TEMPLATE_BASE64.replace(/\s/g, '');
     const pdfDoc = await PDFDocument.load(cleanBase64);
 
     // 2. Fill the form

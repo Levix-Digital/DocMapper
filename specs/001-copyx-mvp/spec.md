@@ -7,9 +7,9 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Generate IKEA Receipt from CMR (Priority: P1)
+### User Story 1 - Generate Shipment Document from CMR (Priority: P1)
 
-As a logistics operator, I want to upload a CMR PDF and automatically generate an IKEA delivery receipt so that I don't have to manually type the data.
+As a logistics operator, I want to upload a CMR PDF and automatically generate a shipment document so that I don't have to manually type the data.
 
 **Why this priority**: Core value proposition. Eliminates manual data entry.
 
@@ -18,14 +18,14 @@ As a logistics operator, I want to upload a CMR PDF and automatically generate a
 **Acceptance Scenarios**:
 
 1. **Given** a CMR PDF with a "Shipment: 12345" label, **When** I upload it, **Then** the generated PDF has "12345" in the "Shipment Number" field.
-2. **Given** a CMR PDF with multiple pages, **When** I upload it, **Then** I see a list of generated receipts for each valid page.
+2. **Given** a CMR PDF with multiple pages, **When** I upload it, **Then** I see a list of generated shipment documents for each valid page.
 3. **Given** a PDF with no recognizable CMR data, **When** I upload it, **Then** the system notifies me that no documents were generated.
 
 ---
 
 ### User Story 2 - Batch Download (Priority: P2)
 
-As an operator, I want to download all generated receipts as a ZIP file so that I can save time when processing large batches.
+As an operator, I want to download all generated shipment documents as a ZIP file so that I can save time when processing large batches.
 
 **Why this priority**: Essential for efficiency with multi-page CMRs.
 
@@ -33,7 +33,7 @@ As an operator, I want to download all generated receipts as a ZIP file so that 
 
 **Acceptance Scenarios**:
 
-1. **Given** multiple generated receipts, **When** I click "Download All as ZIP", **Then** a `.zip` file is downloaded containing all individual PDFs.
+1. **Given** multiple generated shipment documents, **When** I click "Download All as ZIP", **Then** a `.zip` file is downloaded containing all individual PDFs.
 2. **Given** the ZIP file, **When** I extract it, **Then** it includes a CSV summary of the extracted data.
 
 ## Requirements *(mandatory)*
