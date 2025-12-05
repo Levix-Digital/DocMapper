@@ -11,7 +11,7 @@ Extends the current `ProcessingResult` to support better UI feedback.
 | Field | Type | Description |
 |-------|------|-------------|
 | `fileName` | `string` | Name of the processed file. |
-| `blob` | `Blob` | The generated receipt PDF. |
+| `blob` | `Blob` | The generated shipment document PDF. |
 | `data` | `CMRData` | Extracted data payload. |
 | `status` | `enum` | **New**: `SUCCESS`, `ERROR`, `PENDING`. |
 | `errorMsg` | `string?` | Optional error detail. |

@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto space-y-8">
     <!-- Header Section -->
     <div class="text-center space-y-2">
-      <h1 class="text-4xl font-bold font-heading text-gray-900 dark:text-white">Generate Receipts</h1>
+      <h1 class="text-4xl font-bold font-heading text-gray-900 dark:text-white">Document Processor</h1>
       <p class="text-gray-500 dark:text-gray-400">Secure, client-side generation. No data leaves your machine.</p>
     </div>
 
@@ -62,7 +62,7 @@
       <div class="flex justify-between items-end border-b border-gray-200 dark:border-gray-800 pb-4">
         <div>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">Output Stream</h2>
-          <p class="text-sm text-gray-500">{{ results.length }} receipts generated</p>
+          <p class="text-sm text-gray-500">{{ results.length }} documents generated</p>
         </div>
         <Button variant="primary" @click="downloadAll">
             <template #icon><Download class="w-4 h-4" /></template>
@@ -109,7 +109,7 @@ import { UploadCloud, FileCheck, Download, Loader2, AlertCircle } from 'lucide-v
 import Card from '../components/ui/Card.vue';
 import Button from '../components/ui/Button.vue';
 import { extractCMRData } from '../modules/cmr/extractor';
-import { generateReceiptPdf } from '../services/pdf/template-engine';
+import { generateShipmentDocsPdf } from '../services/pdf/template-engine';
 import { ProcessingResult } from '../modules/cmr/types';
 
 // Set worker source using Vite's ?url import for reliable local loading
@@ -159,7 +159,7 @@ const processFiles = async (files: File[]) => {
 
         if (data.shipment) {
           try {
-            const pdfBytes = await generateReceiptPdf(data);
+            const pdfBytes = await generateShipmentDocsPdf(data);
              // CAST: Avoiding TS2322 by casting pdfBytes (Uint8Array) to any or specifically acceptable type
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
             
@@ -176,7 +176,7 @@ const processFiles = async (files: File[]) => {
     }
     
     if (results.value.length === 0) {
-      error.value = "No valid CMR data found in the uploaded files. Ensure format matches IKEA standard.";
+      error.value = "No valid CMR data found in the uploaded files. Ensure format matches standard.";
     }
 
   } catch (err: any) {
@@ -206,6 +206,6 @@ const downloadAll = async () => {
   zip.file("summary.csv", csvHeader + csvRows);
 
   const content = await zip.generateAsync({ type: "blob" });
-  saveAs(content, "ikea_receipts.zip");
+  saveAs(content, "documents.zip");
 };
 </script>

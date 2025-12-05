@@ -5,7 +5,7 @@
 
 ## Summary
 
-Port the client-side logic from the `ikea-sdgen-main` reference application to the Copyx Vue 3 codebase. This involves replacing the current Tesseract-based extraction with the verified Regex logic, implementing PDF generation using `pdf-lib` with the embedded template, and simplifying the UI to a direct drag-and-drop workflow.
+Port the client-side logic from the reference application to the Copyx Vue 3 codebase. This involves replacing the current Tesseract-based extraction with the verified Regex logic, implementing PDF generation using `pdf-lib` with the embedded template, and simplifying the UI to a direct drag-and-drop workflow.
 
 ## Technical Context
 

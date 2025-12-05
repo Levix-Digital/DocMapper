@@ -33,7 +33,7 @@
 
 **Checkpoint**: Core logic (Extraction + Generation) ready.
 
-## Phase 3: User Story 1 - Generate IKEA Receipt from CMR (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Generate Standard Shipment Document from CMR (Priority: P1) 🎯 MVP
 
 **Goal**: Upload CMR, Extract Data, Generate PDF, and Download.
 

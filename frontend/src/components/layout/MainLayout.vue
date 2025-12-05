@@ -73,7 +73,7 @@ const toggleTheme = () => {
     <!-- Footer -->
     <footer class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-            <p>&copy; {{ new Date().getFullYear() }} Copyx. All rights reserved.</p>
+            <p>&copy; {{ new Date().getFullYear() }} Levix Digital. All rights reserved.</p>
             <div class="flex gap-4 mt-2 md:mt-0">
                 <a href="#" class="hover:text-brand-purple transition-colors">Privacy Policy</a>
                 <a href="#" class="hover:text-brand-purple transition-colors">Terms of Service</a>
@@ -85,15 +85,15 @@ const toggleTheme = () => {
     <!-- Help Modal -->
     <Modal :show="showHelp" title="How to use Copyx" @close="showHelp = false">
         <div class="space-y-4 text-gray-600 dark:text-gray-300">
-            <p>Copyx generates standard IKEA receipts from CMR transport documents securely in your browser.</p>
+            <p>Copyx generates standard delivery documents from CMR transport documents securely in your browser.</p>
             
             <div class="space-y-2">
                 <h4 class="font-bold text-gray-900 dark:text-white">Instructions:</h4>
                 <ol class="list-decimal list-inside space-y-1 ml-1">
                     <li>Drag and drop your <strong>CMR PDF</strong> files into the drop zone.</li>
                     <li>Wait for the secure local processing to complete.</li>
-                    <li>Review the generated receipts in the list.</li>
-                    <li>Click <strong>Download All</strong> to get a ZIP package with all receipts.</li>
+                    <li>Review the generated documents in the list.</li>
+                    <li>Click <strong>Download All</strong> to get a ZIP package with all documents.</li>
                 </ol>
             </div>
 
