@@ -1,61 +1,45 @@
 ---
-description: Spec-Kit Workflow for feature specification, planning, and implementation
+description: SpecKit Workflow
 ---
 
-# Spec-Kit Workflow
+# SpecKit Workflow
 
-The Spec-Kit workflow provides a structured approach to feature development, from specification to implementation.
+This workflow guides you through the process of specifying, planning, and implementing features using the SpecKit agentic framework.
 
-## Commands
+## 1. Specification & Analysis
 
-The following commands are available in `.gemini/commands`:
+First, precise the requirements and analyze the technical context.
 
-### 1. Specify Feature
-Create or update a feature specification from a natural language description.
-- **Command**: `/speckit.specify`
-- **Usage**: `/speckit.specify [feature description]`
-- **Input**: Natural language description of the feature.
-- **Output**: A new branch and a `spec.md` file.
+```bash
+# Refine the feature specification
+/speckit.specify
+```
 
-### 2. Clarify Requirements
-Clarify ambiguities in the specification.
-- **Command**: `/speckit.clarify`
-- **Usage**: `/speckit.clarify`
-- **Prerequisite**: A `spec.md` file must exist.
+```bash
+# Analyze the codebase and requirements
+/speckit.analyze
+```
 
-### 3. Plan Implementation
-Create a technical implementation plan.
-- **Command**: `/speckit.plan`
-- **Usage**: `/speckit.plan`
-- **Prerequisite**: A completed `spec.md`.
+## 2. Planning
 
-### 4. Create Tasks
-Break down the plan into actionable tasks.
-- **Command**: `/speckit.tasks`
-- **Usage**: `/speckit.tasks`
-- **Prerequisite**: A completed `plan.md`.
+Create a detailed implementation plan based on the specification.
 
-### 5. Analyze Consistency
-Analyze consistency across spec, plan, and tasks.
-- **Command**: `/speckit.analyze`
-- **Usage**: `/speckit.analyze`
-- **Prerequisite**: `spec.md`, `plan.md`, and `tasks.md`.
+```bash
+# Generate implementation plan
+/speckit.plan
+```
 
-### 6. Implement Feature
-Start the implementation process.
-- **Command**: `/speckit.implement`
-- **Usage**: `/speckit.implement`
+## 3. Implementation
 
-### Other Utilities
-- `/speckit.checklist`: Generate checklists.
-- `/speckit.constitution`: Manage project constitution.
-- `/speckit.taskstoissues`: Convert tasks to issues.
+Execute the plan and generate code.
 
-## Workflow Steps
+```bash
+# Implement the changes
+/speckit.implement
+```
 
-1. **Start a new feature**: Use `/speckit.specify` with a description.
-2. **Refine the spec**: Use `/speckit.clarify` if needed.
-3. **Plan the technical approach**: Run `/speckit.plan`.
-4. **Generate tasks**: Run `/speckit.tasks`.
-5. **Validate artifacts**: Run `/speckit.analyze` to ensure consistency.
-6. **Implement**: Use `/speckit.implement` to start coding.
+## Auxiliary Commands
+
+- **/speckit.checklist**: Generate a checklist for the project.
+- **/speckit.clarify**: Ask clarifying questions to resolve ambiguities.
+- **/speckit.tasks**: Break down the plan into specific tasks.
