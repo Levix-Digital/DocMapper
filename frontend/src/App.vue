@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Editor from './views/Editor.vue'
+import MainLayout from './components/layout/MainLayout.vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <MainLayout>
     <Editor />
-  </div>
+  </MainLayout>
 </template>
