@@ -1,51 +1,50 @@
-<!--
-SYNC IMPACT REPORT
-- Version change: Template -> 1.0.0
-- Modified principles: Defined Principles I-V based on Copyx Spec.
-- Added sections: Technology Stack & Constraints, Development Workflow.
-- Templates requiring updates: 
-  - .specify/templates/plan-template.md (Check for alignment with Privacy-First)
-  - .specify/templates/spec-template.md (Ensure modularity sections are present)
--->
-# Copyx Constitution
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### I. Privacy-First (Client-Side Processing)
-All parsing, extraction, and data handling **MUST** occur in the browser (client-side). Personal or shipment data **MUST NOT** be stored on servers. The backend is strictly limited to user accounts, template metadata, mapping configurations, and user preferences.
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-### II. Modular Document Architecture
-The system **MUST** be built as a set of independent document modules (e.g., CMR, BOL, PARS). Each module **MUST** implement a standard interface containing its own extractor, field schema, validator, mapping definitions, and exporters. Adding a new document type **MUST NOT** require changes to the core engine.
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
 
-### III. User-Driven Flexibility
-The system **MUST** avoid hardcoded document layouts for output. Users **MUST** be able to define their own templates and mappings. The architecture **MUST** support dynamic mapping of extracted fields to user-provided PDF templates.
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### IV. Offline-First PWA
-The application **MUST** be a Progressive Web App (PWA) capable of functioning offline. All heavy operations, including OCR (Tesseract.js) and PDF generation (pdf-lib), **MUST** run locally on the user's device.
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-### V. Visual Excellence & Usability
-The interface **MUST** utilize a split-screen design (PDF Viewer vs. Editable Form) to maximize verification efficiency. The design **MUST** be premium, responsive, and utilize modern UI patterns (Vue 3 + TypeScript) to ensure a high-quality user experience.
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
-## Technology Stack & Constraints
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
-- **Frontend:** Vue 3 (Composition API) + TypeScript.
-- **Backend:** NodeJS + TypeScript (strictly for metadata/auth).
-- **Local Storage:** IndexedDB (via Dexie.js) for saving extraction profiles and work-in-progress.
-- **PDF Processing:** pdf.js (parsing), pdf-lib (generation/modification).
-- **OCR:** Tesseract.js (in-browser).
-- **Validation:** Zod for runtime schema validation.
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
-## Development Workflow
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-- **Module Implementation:** New document types must be implemented by creating a new module adhering to the `DocumentModule` interface.
-- **Strict Typing:** All code **MUST** be written in TypeScript with strict mode enabled.
-- **Testing:** Unit tests **MUST** be written for extractors and validators.
-- **Verification:** Changes to the core engine **MUST** be verified against all existing document modules to ensure no regressions.
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-- This constitution supersedes all other technical decisions and architectural choices.
-- Amendments to these principles require a formal version bump and a consistency check across all dependent modules and templates.
-- Any deviation from the "Privacy-First" principle requires explicit user consent and clear UI indication (e.g., for optional cloud AI features).
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-02 | **Last Amended**: 2025-12-02
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
