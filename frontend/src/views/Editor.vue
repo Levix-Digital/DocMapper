@@ -72,10 +72,9 @@ import { extractCMRData } from '../modules/cmr/extractor';
 import { generateReceiptPdf } from '../services/pdf/template-engine';
 import { ProcessingResult } from '../modules/cmr/types';
 
-// Set worker source (using local file if possible, or CDN as fallback/default setup)
-// Adjust path as needed based on your build setup. 
-// For Vite, usually: import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Set worker source using Vite's ?url import for reliable local loading
+import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
 const isProcessing = ref(false);
 const error = ref<string | null>(null);
