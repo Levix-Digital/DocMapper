@@ -44,7 +44,7 @@
                 <p class="text-sm text-gray-500">Decrypting matrix patterns</p>
             </div>
             <div v-else>
-                <p class="text-xl font-medium text-gray-900 dark:text-white">Drop CMR PDFs here</p>
+                <p class="text-xl font-medium text-gray-900 dark:text-white">Drop source PDF here</p>
                 <p class="text-sm text-gray-500">or click to browse filesystem</p>
             </div>
         </div>

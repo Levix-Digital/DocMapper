@@ -37,12 +37,12 @@ const toggleTheme = () => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         <!-- Logo -->
-        <div class="flex items-center gap-2">
+        <a href="/" class="flex items-center gap-2">
             <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-purple to-brand-green flex items-center justify-center text-white font-bold font-heading">
                 C
             </div>
             <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-heading">Copyx</span>
-        </div>
+        </a>
 
         <!-- Controls -->
         <div class="flex items-center gap-2">
