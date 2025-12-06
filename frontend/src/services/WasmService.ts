@@ -1,4 +1,5 @@
 import { instantiate } from "@assemblyscript/loader";
+import LicenseService from "./license-service";
 
 interface WasmModule {
     processDocument(docType: number, content: number): number;
@@ -30,6 +31,9 @@ export class WasmService {
         if (this.loadingPromise) return this.loadingPromise;
 
         this.loadingPromise = (async () => {
+            if (!LicenseService.isLicenseValid()) {
+                throw new Error("Security Module Missing: License Invalid");
+            }
             try {
                 // Load from the public URL (Vite serves it) or imported URL
                 // We use ?url to get the asset path
