@@ -26,6 +26,9 @@
         "src/**/*.tsx",
         "src/**/*.vue"
     ],
+    "exclude": [
+        "src/modules/core-wasm/assembly"
+    ],
     "references": [
         {
             "path": "./tsconfig.node.json"
