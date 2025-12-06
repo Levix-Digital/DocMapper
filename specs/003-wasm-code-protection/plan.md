@@ -77,3 +77,8 @@ To support future document types (BOL, Invoices), we use a strict Strategy Patte
 ### Phase 4: Cleanup
 - **CRITICAL**: Delete `frontend/src/modules/cmr/extractor.ts`.
 - Verify no TypeScript source logic remains exposed.
+
+### Phase 5: Production Hardening
+- Update `vite.config.ts` to use `terser` for aggressive minification.
+- Disable source maps in production builds to hide original source code.
+

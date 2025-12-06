@@ -40,6 +40,7 @@ As a developer, I want a modular "Strategy Pattern" architecture in the WASM mod
 
 - **TC-001**: Output binary size should remain small (Target < 50KB for the logic module).
 - **TC-002**: Browser compatibility must support standard WebAssembly (modern browsers).
+- **TC-003**: **Production Hardening**: Production builds MUST have minification enabled (Terser) and source maps disabled to prevent easy reverse engineering of the TypeScript glue code.
 
 ## Quantity Entities
 
