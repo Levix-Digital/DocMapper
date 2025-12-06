@@ -127,3 +127,4 @@ Thumbs.db
 
 # Project specific
 temp-assets/
+frontend/src/modules/core-wasm/build/
