@@ -108,9 +108,9 @@ import { UploadCloud, FileCheck, Download, Loader2, AlertCircle } from 'lucide-v
 
 import Card from '../components/ui/Card.vue';
 import Button from '../components/ui/Button.vue';
-import { extractCMRData } from '../modules/cmr/extractor';
+import { WasmService } from '../services/WasmService';
 import { generateShipmentDocsPdf } from '../services/pdf/template-engine';
-import { ProcessingResult } from '../modules/cmr/types';
+import { ProcessingResult, CMRData } from '../modules/cmr/types';
 
 // Set worker source using Vite's ?url import for reliable local loading
 import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
@@ -155,28 +155,32 @@ const processFiles = async (files: File[]) => {
         const textContent = await page.getTextContent();
         const text = textContent.items.map((item: any) => item.str).join(' ');
         
-        const data = extractCMRData(text);
+        // Use WasmService (Async/Secure)
+        try {
+            const jsonResult = await WasmService.getInstance().process('CMR', text);
+            console.log("WASM Output:", jsonResult);
+            const data = JSON.parse(jsonResult) as CMRData;
 
-        if (data.shipment) {
-          try {
-            const pdfBytes = await generateShipmentDocsPdf(data);
-             // CAST: Avoiding TS2322 by casting pdfBytes (Uint8Array) to any or specifically acceptable type
-            const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
-            
-            results.value.push({
-              fileName: `${data.shipment}.pdf`,
-              blob,
-              data
-            });
-          } catch (err) {
-            console.error('Generation failed for page', i, err);
-          }
+            if (data.shipment) {
+                const pdfBytes = await generateShipmentDocsPdf(data);
+                const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+                
+                results.value.push({
+                    fileName: `${data.shipment}.pdf`,
+                    blob,
+                    data
+                });
+            }
+        } catch (wasmError) {
+            console.error("WASM Processing Error:", wasmError);
+            // Don't crash entire loop, but maybe valid to show error?
+            // For MVP, we continue.
         }
       }
     }
     
     if (results.value.length === 0) {
-      error.value = "No valid CMR data found in the uploaded files. Ensure format matches standard.";
+      error.value = "No valid CMR data found. (WASM Module might have failed to extract)";
     }
 
   } catch (err: any) {
