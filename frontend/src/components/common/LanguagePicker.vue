@@ -49,18 +49,18 @@ function toggleDropdown() {
 
 async function handleRowClick(langCode: string) {
   const norm = langCode.toLowerCase();
+  // Language MUST be downloaded before it can be selected in the picker
+  if (!isDownloaded(norm)) {
+    return;
+  }
+
   if (norm === currentLanguage.value.toLowerCase()) {
     isOpen.value = false;
     return;
   }
 
-  // If not downloaded yet, clicking the row downloads and applies it
-  if (!isDownloaded(norm)) {
-    await changeLanguage(langCode);
-  } else {
-    await changeLanguage(langCode);
-    isOpen.value = false;
-  }
+  await changeLanguage(langCode);
+  isOpen.value = false;
 }
 
 async function handleDownloadClick(langCode: string) {
@@ -143,12 +143,15 @@ onBeforeUnmount(() => {
             v-for="lang in filteredLanguages"
             :key="lang.code"
             @click="handleRowClick(lang.code)"
-            class="group w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-all cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/60"
-            :class="
+            class="group w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-all"
+            :class="[
               currentLanguage.toLowerCase() === lang.code.toLowerCase()
-                ? 'bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple dark:text-purple-300 font-semibold'
-                : 'text-gray-700 dark:text-gray-200'
-            "
+                ? 'bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple dark:text-purple-300 font-semibold cursor-pointer'
+                : isDownloaded(lang.code)
+                  ? 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 cursor-pointer'
+                  : 'text-gray-400 dark:text-gray-500 opacity-60 cursor-not-allowed select-none bg-transparent'
+            ]"
+            :title="!isDownloaded(lang.code) ? t('common.downloadToEnable') : undefined"
           >
             <!-- Left: Flag & Names -->
             <div class="flex items-center gap-2.5 min-w-0 flex-1 pr-3">
@@ -191,12 +194,13 @@ onBeforeUnmount(() => {
               <!-- STATE 3: NOT DOWNLOADED (Download button) -->
               <template v-else>
                 <button
+                  type="button"
                   @click.stop="handleDownloadClick(lang.code)"
-                  class="w-[92px] h-6 inline-flex items-center justify-center gap-1.5 text-[10px] font-medium text-gray-600 dark:text-gray-300 hover:text-brand-purple dark:hover:text-purple-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-700 transition-colors shadow-2xs"
+                  class="w-[92px] h-6 inline-flex items-center justify-center gap-1.5 text-[10px] font-medium text-gray-700 dark:text-gray-200 hover:text-white hover:bg-brand-purple dark:hover:bg-brand-purple bg-white dark:bg-gray-700 rounded-full border border-gray-300 dark:border-gray-600 transition-all shadow-sm cursor-pointer"
                   :title="t('common.download')"
                 >
-                  <Download class="w-3.5 h-3.5 text-brand-purple dark:text-purple-300 shrink-0" />
-                  <span class="truncate">{{ t('common.download') }}</span>
+                  <Download class="w-3.5 h-3.5 text-brand-purple group-hover:text-white shrink-0" />
+                  <span class="truncate font-semibold">{{ t('common.download') }}</span>
                 </button>
               </template>
             </div>

@@ -234,6 +234,7 @@
     "downloading": "Downloading...",
     "download": "Download",
     "active": "Active",
+    "downloadToEnable": "Download pack to enable language",
     "deletePack": "Delete pack"
   }
 }
