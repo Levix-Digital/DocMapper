@@ -94,31 +94,10 @@ export async function stampDestinationPdf(options: StampOptions): Promise<Uint8A
   const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  // If the document has AcroForm fields (like legacy shipment checklist), fill them
+  // Flatten any AcroForm fields cleanly to prevent interactive widgets or duplicate values
+  // from conflicting with or double-rendering over the visual coordinate mappings.
   try {
     const form = pdfDoc.getForm();
-    const shipmentVal = extractedValues['Shipment Number'] || extractedValues['Shipment'] || '';
-    const shipmentLastPart = shipmentVal ? shipmentVal.split('-').pop() : '';
-    const sealVal = extractedValues['Seal Number'] || extractedValues['Seal'] || '';
-    const trailerVal = extractedValues['Transport ID / Trailer'] || extractedValues['Trailer'] || '';
-    const consignmentsVal = extractedValues['Consignment Number'] || extractedValues['Consignments'] || '';
-
-    const safeSetText = (fieldName: string, val: string | undefined) => {
-      try {
-        if (val) form.getTextField(fieldName).setText(val);
-      } catch (_) {}
-    };
-
-    if (shipmentLastPart) safeSetText('shipment_number', shipmentLastPart);
-    if (consignmentsVal) safeSetText('consignment_number', consignmentsVal);
-    if (trailerVal) {
-      safeSetText('transport_identification', trailerVal);
-      safeSetText('container_number', trailerVal);
-      safeSetText('carrier_id', `Carrier Id: ${trailerVal}`);
-    }
-    if (sealVal) safeSetText('seal_number', sealVal);
-    if (shipmentLastPart) safeSetText('shipment_manifest', shipmentLastPart);
-
     form.flatten();
   } catch (_) {
     // Non-acroform template, proceed to visual coordinate stamping

@@ -237,11 +237,11 @@ const draftBoxStyle = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-6 w-full">
+  <div class="flex flex-col lg:flex-row gap-6 items-start w-full min-w-0">
     <!-- Main Template Canvas Area -->
-    <div class="flex-grow flex flex-col items-center bg-gray-100 dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
+    <div class="flex-1 min-w-0 w-full overflow-hidden flex flex-col bg-gray-100 dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
       <!-- Toolbar -->
-      <div class="flex items-center justify-between w-full max-w-4xl mb-4 px-2">
+      <div class="flex items-center justify-between w-full mb-4 px-2 flex-shrink-0">
         <!-- Page Nav -->
         <div class="flex items-center gap-2">
           <button

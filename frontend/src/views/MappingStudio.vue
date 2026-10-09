@@ -513,7 +513,7 @@ async function generateSamplePreview() {
     </div>
 
     <!-- TAB 2: Destination Placement -->
-    <div v-else-if="activeTab === 'destination'">
+    <div v-else-if="activeTab === 'destination'" class="w-full min-w-0">
       <DestinationPlacementCanvas
         :fields="currentProfile.fields"
         :destinationMappings="currentProfile.destinationMappings"
@@ -559,7 +559,7 @@ async function generateSamplePreview() {
 
       <!-- PDF Preview Iframe -->
       <div v-if="previewPdfBlobUrl" class="w-full h-[700px] rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl bg-white">
-        <iframe :src="previewPdfBlobUrl" class="w-full h-full border-0"></iframe>
+        <iframe :key="previewPdfBlobUrl || 'preview'" :src="previewPdfBlobUrl" class="w-full h-full border-0"></iframe>
       </div>
       <div v-else class="text-center py-20 text-gray-400 text-sm">
         Click "Re-render Preview" to compile and preview the destination document.
