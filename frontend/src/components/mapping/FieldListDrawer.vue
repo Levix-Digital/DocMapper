@@ -10,7 +10,7 @@ import {
   Layers,
   ExternalLink
 } from 'lucide-vue-next';
-import type { FieldDefinition, FieldDataType } from '../../types/mapping';
+import type { FieldDefinition, FieldDataType, BoundingBox } from '../../types/mapping';
 import {
   getStoredApiKey,
   setStoredApiKey,
@@ -124,6 +124,50 @@ function handleAiButtonClick(field: FieldDefinition) {
 }
 
 
+function updateFieldName(field: FieldDefinition, newName: string) {
+  if (!newName.trim()) return;
+  emit('updateField', {
+    ...field,
+    name: newName.trim(),
+  });
+}
+
+function updateFieldDataType(field: FieldDefinition, newType: FieldDataType) {
+  emit('updateField', {
+    ...field,
+    dataType: newType,
+  });
+}
+
+function updateBoxCoord(field: FieldDefinition, type: 'value' | 'label', prop: keyof BoundingBox, val: number) {
+  const current = type === 'value' ? field.valueBox : field.labelBox;
+  if (!current) return;
+  const updated: BoundingBox = {
+    ...current,
+    [prop]: Number(Math.max(val, 0).toFixed(2)),
+  };
+  emit('updateField', {
+    ...field,
+    [type === 'value' ? 'valueBox' : 'labelBox']: updated,
+  });
+}
+
+function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, dy: number) {
+  const current = type === 'value' ? field.valueBox : field.labelBox;
+  if (!current) return;
+  const newX = Math.min(Math.max(current.x + dx, 0), 100 - current.width);
+  const newY = Math.min(Math.max(current.y + dy, 0), 100 - current.height);
+  const updated: BoundingBox = {
+    ...current,
+    x: Number(newX.toFixed(2)),
+    y: Number(newY.toFixed(2)),
+  };
+  emit('updateField', {
+    ...field,
+    [type === 'value' ? 'valueBox' : 'labelBox']: updated,
+  });
+}
+
 </script>
 
 <template>
@@ -179,12 +223,20 @@ function handleAiButtonClick(field: FieldDefinition) {
       >
         <!-- Field Header -->
         <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-grow min-w-0 mr-2">
             <span
               class="w-3.5 h-3.5 rounded-full flex-shrink-0"
               :style="{ backgroundColor: field.color }"
             ></span>
-            <span class="font-semibold text-gray-900 dark:text-white text-sm">
+            <input
+              v-if="selectedFieldId === field.id"
+              :value="field.name"
+              @change="updateFieldName(field, ($event.target as HTMLInputElement).value)"
+              class="font-semibold text-gray-900 dark:text-white text-sm bg-transparent border-b border-brand-purple/40 focus:border-brand-purple focus:outline-none px-1 py-0.5 rounded w-full"
+              title="Clique para editar o nome do campo"
+              @click.stop
+            />
+            <span v-else class="font-semibold text-gray-900 dark:text-white text-sm truncate">
               {{ field.name }}
             </span>
           </div>
@@ -239,6 +291,105 @@ function handleAiButtonClick(field: FieldDefinition) {
               {{ field.valueBox ? `p.${field.valueBox.page}` : 'None' }}
             </span>
           </button>
+        </div>
+
+        <!-- Field Data Type Selector & Dimensions Inspector -->
+        <div v-if="selectedFieldId === field.id" class="p-2.5 my-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 space-y-2 text-xs" @click.stop>
+          <div class="flex items-center justify-between gap-2">
+            <label class="text-[11px] font-semibold text-gray-700 dark:text-gray-300">
+              Tipo do Campo:
+            </label>
+            <select
+              :value="field.dataType || 'alphanumeric'"
+              @change="updateFieldDataType(field, ($event.target as HTMLSelectElement).value as FieldDataType)"
+              class="px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-brand-purple"
+            >
+              <option value="alphanumeric">Alfanumérico (letras e números)</option>
+              <option value="text">Texto Geral</option>
+              <option value="date">Data</option>
+              <option value="number">Numérico</option>
+              <option value="multiline">Multilinhas</option>
+            </select>
+          </div>
+
+          <!-- Value Box Coordinate Editor -->
+          <div v-if="field.valueBox" class="pt-2 border-t border-purple-100 dark:border-purple-900/30 space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-semibold text-gray-600 dark:text-gray-400">
+              <span>Dimensões da Value Box (pág. {{ field.valueBox.page }}):</span>
+              <div class="flex items-center gap-1">
+                <button
+                  @click="nudgeBox(field, 'value', -0.5, 0)"
+                  class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
+                  title="Mover para esquerda"
+                >←</button>
+                <button
+                  @click="nudgeBox(field, 'value', 0, -0.5)"
+                  class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
+                  title="Mover para cima"
+                >↑</button>
+                <button
+                  @click="nudgeBox(field, 'value', 0, 0.5)"
+                  class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
+                  title="Mover para baixo"
+                >↓</button>
+                <button
+                  @click="nudgeBox(field, 'value', 0.5, 0)"
+                  class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
+                  title="Mover para direita"
+                >→</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+              <div>
+                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">X (%)</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  :value="field.valueBox.x"
+                  @change="updateBoxCoord(field, 'value', 'x', +($event.target as HTMLInputElement).value)"
+                  class="w-full text-center px-1 py-0.5 text-[11px] font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Y (%)</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  :value="field.valueBox.y"
+                  @change="updateBoxCoord(field, 'value', 'y', +($event.target as HTMLInputElement).value)"
+                  class="w-full text-center px-1 py-0.5 text-[11px] font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Larg (%)</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  max="100"
+                  :value="field.valueBox.width"
+                  @change="updateBoxCoord(field, 'value', 'width', +($event.target as HTMLInputElement).value)"
+                  class="w-full text-center px-1 py-0.5 text-[11px] font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Alt (%)</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  max="100"
+                  :value="field.valueBox.height"
+                  @change="updateBoxCoord(field, 'value', 'height', +($event.target as HTMLInputElement).value)"
+                  class="w-full text-center px-1 py-0.5 text-[11px] font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Detected Text Preview -->

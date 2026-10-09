@@ -43,6 +43,14 @@ const isDrawing = ref(false);
 const drawStart = ref<{ x: number; y: number } | null>(null);
 const drawCurrent = ref<{ x: number; y: number } | null>(null);
 
+// Moving state
+const movingTarget = ref<{
+  fieldId: string;
+  type: 'value' | 'label';
+  initialBox: BoundingBox;
+  startCoords: { x: number; y: number };
+} | null>(null);
+
 // Resizing state
 const resizingTarget = ref<{
   fieldId: string;
@@ -202,6 +210,8 @@ function onMouseMove(e: MouseEvent) {
     drawCurrent.value = { x: coords.xPercent, y: coords.yPercent };
   } else if (resizingTarget.value) {
     handleResizing(coords.xPercent, coords.yPercent);
+  } else if (movingTarget.value) {
+    handleMoving(coords.xPercent, coords.yPercent);
   }
 }
 
@@ -232,6 +242,43 @@ function onMouseUp() {
   drawStart.value = null;
   drawCurrent.value = null;
   resizingTarget.value = null;
+  movingTarget.value = null;
+}
+
+function startMove(
+  e: MouseEvent,
+  fieldId: string,
+  type: 'value' | 'label',
+  box: BoundingBox
+) {
+  if (props.activeDrawingType !== 'none') return;
+  e.stopPropagation();
+  emit('selectField', fieldId);
+  const coords = getRelativeCoords(e);
+  if (!coords) return;
+  movingTarget.value = {
+    fieldId,
+    type,
+    initialBox: { ...box },
+    startCoords: { x: coords.xPercent, y: coords.yPercent },
+  };
+}
+
+function handleMoving(currX: number, currY: number) {
+  if (!movingTarget.value) return;
+  const { fieldId, type, initialBox, startCoords } = movingTarget.value;
+  const deltaX = currX - startCoords.x;
+  const deltaY = currY - startCoords.y;
+
+  const newX = Math.min(Math.max(initialBox.x + deltaX, 0), 100 - initialBox.width);
+  const newY = Math.min(Math.max(initialBox.y + deltaY, 0), 100 - initialBox.height);
+
+  const updatedBox: BoundingBox = {
+    ...initialBox,
+    x: Number(newX.toFixed(2)),
+    y: Number(newY.toFixed(2)),
+  };
+  emit('updateBox', fieldId, type, updatedBox);
 }
 
 // Start resize from handle
@@ -433,6 +480,8 @@ const draftBoxStyle = computed(() => {
               :stroke="item.field.color"
               :stroke-width="item.isSelected ? 2.5 : 1.5"
               :stroke-dasharray="item.type === 'label' ? '4,4' : 'none'"
+              :class="activeDrawingType === 'none' ? 'cursor-move' : 'cursor-crosshair'"
+              @mousedown="startMove($event, item.field.id, item.type, item.box)"
             />
 
             <!-- Tag Label -->

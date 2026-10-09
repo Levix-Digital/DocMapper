@@ -41,6 +41,18 @@ const selectedMappingId = ref<string | null>(null);
 const activeFieldIdToPlace = ref<string | null>(null);
 const defaultRenderFormat = ref<RenderFormat>('TEXT');
 
+// Moving state
+const movingMappingId = ref<string | null>(null);
+const moveStartCoords = ref<{ x: number; y: number } | null>(null);
+const moveInitialBox = ref<BoundingBox | null>(null);
+
+// Resizing state
+const resizingMapping = ref<{
+  mappingId: string;
+  handle: 'nw' | 'ne' | 'se' | 'sw';
+  initialBox: BoundingBox;
+} | null>(null);
+
 // Drawing state
 const isDrawing = ref(false);
 const drawStart = ref<{ x: number; y: number } | null>(null);
@@ -174,9 +186,16 @@ function onMouseDown(e: MouseEvent) {
 }
 
 function onMouseMove(e: MouseEvent) {
-  if (!isDrawing.value || !drawStart.value) return;
   const coords = getRelativeCoords(e);
-  if (coords) drawCurrent.value = { x: coords.xPercent, y: coords.yPercent };
+  if (!coords) return;
+
+  if (isDrawing.value && drawStart.value) {
+    drawCurrent.value = { x: coords.xPercent, y: coords.yPercent };
+  } else if (movingMappingId.value && moveStartCoords.value && moveInitialBox.value) {
+    handleMovingMapping(coords.xPercent, coords.yPercent);
+  } else if (resizingMapping.value) {
+    handleResizingMapping(coords.xPercent, coords.yPercent);
+  }
 }
 
 function onMouseUp() {
@@ -215,6 +234,139 @@ function onMouseUp() {
   isDrawing.value = false;
   drawStart.value = null;
   drawCurrent.value = null;
+  movingMappingId.value = null;
+  moveStartCoords.value = null;
+  moveInitialBox.value = null;
+  resizingMapping.value = null;
+}
+
+function startMoveMapping(e: MouseEvent, mapping: DestinationFieldMapping) {
+  if (activeFieldIdToPlace.value) return;
+  e.stopPropagation();
+  selectedMappingId.value = mapping.id;
+  const coords = getRelativeCoords(e);
+  if (!coords) return;
+
+  movingMappingId.value = mapping.id;
+  moveStartCoords.value = { x: coords.xPercent, y: coords.yPercent };
+  moveInitialBox.value = { ...mapping.targetBox };
+}
+
+function handleMovingMapping(currX: number, currY: number) {
+  if (!movingMappingId.value || !moveStartCoords.value || !moveInitialBox.value) return;
+  const mapping = props.destinationMappings.find(m => m.id === movingMappingId.value);
+  if (!mapping) return;
+
+  const deltaX = currX - moveStartCoords.value.x;
+  const deltaY = currY - moveStartCoords.value.y;
+
+  const newX = Math.min(Math.max(moveInitialBox.value.x + deltaX, 0), 100 - moveInitialBox.value.width);
+  const newY = Math.min(Math.max(moveInitialBox.value.y + deltaY, 0), 100 - moveInitialBox.value.height);
+
+  emit('updateMapping', {
+    ...mapping,
+    targetBox: {
+      ...moveInitialBox.value,
+      x: Number(newX.toFixed(2)),
+      y: Number(newY.toFixed(2)),
+    },
+  });
+}
+
+function startResizeMapping(
+  e: MouseEvent,
+  mapping: DestinationFieldMapping,
+  handle: 'nw' | 'ne' | 'se' | 'sw'
+) {
+  e.stopPropagation();
+  selectedMappingId.value = mapping.id;
+  resizingMapping.value = {
+    mappingId: mapping.id,
+    handle,
+    initialBox: { ...mapping.targetBox },
+  };
+}
+
+function handleResizingMapping(currX: number, currY: number) {
+  if (!resizingMapping.value) return;
+  const { mappingId, handle, initialBox } = resizingMapping.value;
+  const mapping = props.destinationMappings.find(m => m.id === mappingId);
+  if (!mapping) return;
+
+  let newX = initialBox.x;
+  let newY = initialBox.y;
+  let newW = initialBox.width;
+  let newH = initialBox.height;
+
+  if (handle === 'nw') {
+    newW = initialBox.x + initialBox.width - currX;
+    newH = initialBox.y + initialBox.height - currY;
+    newX = currX;
+    newY = currY;
+  } else if (handle === 'ne') {
+    newW = currX - initialBox.x;
+    newH = initialBox.y + initialBox.height - currY;
+    newY = currY;
+  } else if (handle === 'se') {
+    newW = currX - initialBox.x;
+    newH = currY - initialBox.y;
+  } else if (handle === 'sw') {
+    newW = initialBox.x + initialBox.width - currX;
+    newX = currX;
+    newH = currY - initialBox.y;
+  }
+
+  if (newW > 0.5 && newH > 0.5) {
+    emit('updateMapping', {
+      ...mapping,
+      targetBox: {
+        ...initialBox,
+        x: Number(Math.max(newX, 0).toFixed(2)),
+        y: Number(Math.max(newY, 0).toFixed(2)),
+        width: Number(newW.toFixed(2)),
+        height: Number(newH.toFixed(2)),
+      },
+    });
+  }
+}
+
+function updateMappingBoxProp(prop: keyof BoundingBox, val: number) {
+  if (!selectedMapping.value) return;
+  const current = selectedMapping.value.targetBox;
+  const updated: BoundingBox = {
+    ...current,
+    [prop]: Number(Math.max(val, 0).toFixed(2)),
+  };
+  emit('updateMapping', {
+    ...selectedMapping.value,
+    targetBox: updated,
+  });
+}
+
+function nudgeMapping(dx: number, dy: number) {
+  if (!selectedMapping.value) return;
+  const current = selectedMapping.value.targetBox;
+  const newX = Math.min(Math.max(current.x + dx, 0), 100 - current.width);
+  const newY = Math.min(Math.max(current.y + dy, 0), 100 - current.height);
+  emit('updateMapping', {
+    ...selectedMapping.value,
+    targetBox: {
+      ...current,
+      x: Number(newX.toFixed(2)),
+      y: Number(newY.toFixed(2)),
+    },
+  });
+}
+
+function changeMappingPage(newPage: number) {
+  if (!selectedMapping.value) return;
+  emit('updateMapping', {
+    ...selectedMapping.value,
+    targetBox: {
+      ...selectedMapping.value.targetBox,
+      page: newPage,
+    },
+  });
 }
 
 const draftBoxStyle = computed(() => {
@@ -342,10 +494,9 @@ const draftBoxStyle = computed(() => {
             <g
               v-for="mapping in currentMappingsOnPage"
               :key="mapping.id"
-              @mousedown.stop="selectedMappingId = mapping.id"
-              class="cursor-pointer group"
+              class="group"
             >
-              <!-- Target Box -->
+              <!-- Target Box (Draggable) -->
               <rect
                 :x="(mapping.targetBox.x * canvasWidth) / 100"
                 :y="(mapping.targetBox.y * canvasHeight) / 100"
@@ -355,6 +506,8 @@ const draftBoxStyle = computed(() => {
                 :fill-opacity="selectedMappingId === mapping.id ? 0.35 : 0.18"
                 :stroke="fieldMap.get(mapping.fieldId)?.color || '#6366f1'"
                 :stroke-width="selectedMappingId === mapping.id ? 2.5 : 1.5"
+                :class="!activeFieldIdToPlace ? 'cursor-move' : 'cursor-default'"
+                @mousedown="startMoveMapping($event, mapping)"
               />
 
               <!-- Format Badge / Text -->
@@ -364,10 +517,58 @@ const draftBoxStyle = computed(() => {
                 :fill="fieldMap.get(mapping.fieldId)?.color || '#6366f1'"
                 font-size="11"
                 font-weight="bold"
-                class="font-sans select-none drop-shadow-sm"
+                class="font-sans select-none drop-shadow-sm pointer-events-none"
               >
                 [{{ mapping.renderFormat }}] {{ fieldMap.get(mapping.fieldId)?.name || 'Field' }}
               </text>
+
+              <!-- Corner Resize Handles (Visible when selected) -->
+              <template v-if="selectedMappingId === mapping.id && !activeFieldIdToPlace">
+                <!-- NW Handle -->
+                <circle
+                  :cx="(mapping.targetBox.x * canvasWidth) / 100"
+                  :cy="(mapping.targetBox.y * canvasHeight) / 100"
+                  r="5"
+                  fill="#ffffff"
+                  :stroke="fieldMap.get(mapping.fieldId)?.color || '#6366f1'"
+                  stroke-width="2"
+                  class="cursor-nwse-resize pointer-events-auto"
+                  @mousedown.stop="startResizeMapping($event, mapping, 'nw')"
+                />
+                <!-- NE Handle -->
+                <circle
+                  :cx="((mapping.targetBox.x + mapping.targetBox.width) * canvasWidth) / 100"
+                  :cy="(mapping.targetBox.y * canvasHeight) / 100"
+                  r="5"
+                  fill="#ffffff"
+                  :stroke="fieldMap.get(mapping.fieldId)?.color || '#6366f1'"
+                  stroke-width="2"
+                  class="cursor-nesw-resize pointer-events-auto"
+                  @mousedown.stop="startResizeMapping($event, mapping, 'ne')"
+                />
+                <!-- SE Handle -->
+                <circle
+                  :cx="((mapping.targetBox.x + mapping.targetBox.width) * canvasWidth) / 100"
+                  :cy="((mapping.targetBox.y + mapping.targetBox.height) * canvasHeight) / 100"
+                  r="5"
+                  fill="#ffffff"
+                  :stroke="fieldMap.get(mapping.fieldId)?.color || '#6366f1'"
+                  stroke-width="2"
+                  class="cursor-nwse-resize pointer-events-auto"
+                  @mousedown.stop="startResizeMapping($event, mapping, 'se')"
+                />
+                <!-- SW Handle -->
+                <circle
+                  :cx="(mapping.targetBox.x * canvasWidth) / 100"
+                  :cy="((mapping.targetBox.y + mapping.targetBox.height) * canvasHeight) / 100"
+                  r="5"
+                  fill="#ffffff"
+                  :stroke="fieldMap.get(mapping.fieldId)?.color || '#6366f1'"
+                  stroke-width="2"
+                  class="cursor-nesw-resize pointer-events-auto"
+                  @mousedown.stop="startResizeMapping($event, mapping, 'sw')"
+                />
+              </template>
             </g>
 
             <!-- Draft Box -->
@@ -522,8 +723,100 @@ const draftBoxStyle = computed(() => {
           />
         </div>
 
-        <div class="text-[11px] text-gray-400 font-mono">
-          Coords: ({{ selectedMapping.targetBox.x }}%, {{ selectedMapping.targetBox.y }}%) • {{ selectedMapping.targetBox.width }}% × {{ selectedMapping.targetBox.height }}%
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+              Posição e Tamanho (Template):
+            </label>
+            <div v-if="totalPages > 1" class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400">Pág:</span>
+              <select
+                :value="selectedMapping.targetBox.page || 1"
+                @change="changeMappingPage(Number(($event.target as HTMLSelectElement).value))"
+                class="px-1.5 py-0.5 text-[11px] rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              >
+                <option v-for="p in totalPages" :key="p" :value="p">Página {{ p }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <div>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block">X (%)</label>
+              <input
+                type="number"
+                step="0.5"
+                min="0"
+                max="100"
+                :value="selectedMapping.targetBox.x"
+                @change="updateMappingBoxProp('x', +($event.target as HTMLInputElement).value)"
+                class="w-full text-center px-1 py-1 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Y (%)</label>
+              <input
+                type="number"
+                step="0.5"
+                min="0"
+                max="100"
+                :value="selectedMapping.targetBox.y"
+                @change="updateMappingBoxProp('y', +($event.target as HTMLInputElement).value)"
+                class="w-full text-center px-1 py-1 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Larg (%)</label>
+              <input
+                type="number"
+                step="0.5"
+                min="0.5"
+                max="100"
+                :value="selectedMapping.targetBox.width"
+                @change="updateMappingBoxProp('width', +($event.target as HTMLInputElement).value)"
+                class="w-full text-center px-1 py-1 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Alt (%)</label>
+              <input
+                type="number"
+                step="0.5"
+                min="0.5"
+                max="100"
+                :value="selectedMapping.targetBox.height"
+                @change="updateMappingBoxProp('height', +($event.target as HTMLInputElement).value)"
+                class="w-full text-center px-1 py-1 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <!-- Quick Nudge Controls -->
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[10px] text-gray-400">Ajuste Fino (+/- 0.5%):</span>
+            <div class="flex items-center gap-1">
+              <button
+                @click="nudgeMapping(-0.5, 0)"
+                class="px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Mover 0.5% para esquerda"
+              >←</button>
+              <button
+                @click="nudgeMapping(0, -0.5)"
+                class="px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Mover 0.5% para cima"
+              >↑</button>
+              <button
+                @click="nudgeMapping(0, 0.5)"
+                class="px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Mover 0.5% para baixo"
+              >↓</button>
+              <button
+                @click="nudgeMapping(0.5, 0)"
+                class="px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Mover 0.5% para direita"
+              >→</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
