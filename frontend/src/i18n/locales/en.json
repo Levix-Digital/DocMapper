@@ -69,7 +69,7 @@
     "scannedNoticeDesc": "This PDF appears to be a pure raster image with no digital text stream. OCR pre-processing is required for automated spatial text extraction."
   },
   "fields": {
-    "drawerTitle": "Target Fields",
+    "drawerTitle": "Extraction Fields",
     "addField": "Add Field",
     "configureKey": "Configure Gemini API",
     "activeField": "Active Field:",

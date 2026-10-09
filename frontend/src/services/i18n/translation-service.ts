@@ -1,6 +1,18 @@
 import { getLanguageOption } from '../../i18n/languages';
 
-const CACHE_KEY_PREFIX = 'docmapper_i18n_cache_';
+const CACHE_KEY_PREFIX = 'docmapper_i18n_v2_';
+
+// Automatically purge legacy v1 cache (which may contain crowdsourced semicolons)
+if (typeof window !== 'undefined') {
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('docmapper_i18n_cache_') || key.startsWith('docmapper_i18n_v1_'))) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch {}
+}
 
 /**
  * Flattens a nested object into dot-notation key-value pairs.
@@ -26,6 +38,26 @@ export function flattenDictionary(
   }
 
   return result;
+}
+
+/**
+ * Sanitizes translated text so that trailing punctuation (;, :, ., ,) strictly matches the source string.
+ * Prevents translation engines from appending unintended trailing semicolons or periods to standalone UI labels.
+ */
+export function sanitizePunctuation(source: string, translated: string): string {
+  if (!translated) return translated;
+  let clean = translated.trim();
+  const trimmedSource = source.trim();
+
+  // If source string doesn't end with punctuation mark, remove it from translated output
+  const punctuationMarks = [';', ':', '.', ','];
+  for (const p of punctuationMarks) {
+    if (!trimmedSource.endsWith(p) && clean.endsWith(p)) {
+      clean = clean.slice(0, -1).trim();
+    }
+  }
+
+  return clean;
 }
 
 /**
@@ -89,7 +121,7 @@ export function clearLanguageCache(langCode?: string): void {
   } else {
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
-      if (key && key.startsWith(CACHE_KEY_PREFIX)) {
+      if (key && (key.startsWith(CACHE_KEY_PREFIX) || key.startsWith('docmapper_i18n_cache_'))) {
         localStorage.removeItem(key);
       }
     }
@@ -125,7 +157,8 @@ async function translateSingleWithGoogle(
       translated = translated.replace(new RegExp(`~\\s*${idx}\\s*~`, 'gi'), plh);
     });
 
-    return translated || text;
+    const result = translated || text;
+    return sanitizePunctuation(text, result);
   } catch (err) {
     console.warn(`[DocMapper Google Translate] Error translating "${text}":`, err);
     return text;
@@ -174,7 +207,8 @@ async function translateBatchWithGoogle(
 
       if (parts.length === items.length) {
         items.forEach((item, idx) => {
-          result[item.key] = parts[idx]?.trim() || item.value;
+          const raw = parts[idx]?.trim() || item.value;
+          result[item.key] = sanitizePunctuation(item.value, raw);
         });
         return result;
       }
@@ -187,7 +221,7 @@ async function translateBatchWithGoogle(
   await Promise.all(
     items.map(async item => {
       const translated = await translateSingleWithGoogle(item.value, googleLang);
-      result[item.key] = translated;
+      result[item.key] = sanitizePunctuation(item.value, translated);
     })
   );
 
@@ -204,7 +238,7 @@ export interface TranslationProgressEvent {
  * Main translation orchestrator using Google Translate.
  * 1. Checks localStorage cache first for 0ms load.
  * 2. If any missing keys exist, translates missing keys in parallel batches.
- * 3. Restores placeholders and persists into localStorage.
+ * 3. Restores placeholders, sanitizes punctuation, and persists into localStorage.
  */
 export async function getOrTranslateDictionary(
   baseEnFlat: Record<string, string>,
