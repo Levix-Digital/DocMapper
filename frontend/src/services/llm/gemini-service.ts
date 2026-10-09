@@ -16,20 +16,20 @@ export const AVAILABLE_GEMINI_MODELS: GeminiModelInfo[] = [
   {
     id: 'gemini-3.5-flash-lite',
     name: 'Gemini 3.5 Flash-Lite',
-    tag: 'Econômico & Rápido ($0.30/1M)',
-    description: 'Ultra-econômico e veloz para extração e geração de regex.',
+    tag: 'Cost-Effective & Fast ($0.30/1M)',
+    description: 'Ultra-fast and cost-effective for extraction and regex inference.',
   },
   {
     id: 'gemini-3.8-flash',
     name: 'Gemini 3.8 Flash',
-    tag: 'Padrão Google 3.x',
-    description: 'Modelo de alta precisão para regras e formatos complexos.',
+    tag: 'Google Standard 3.x',
+    description: 'High-precision model for complex rules and formats.',
   },
   {
     id: 'gemini-2.5-flash',
     name: 'Gemini 2.5 Flash',
     tag: 'Compatibilidade 2.5',
-    description: 'Alternativa da família 2.5 para contas legadas.',
+    description: 'Legacy alternative from the 2.5 model family.',
   },
 ];
 
@@ -88,7 +88,7 @@ export async function generateValidationPattern(
 
   if (!key) {
     throw new Error(
-      'Google Gemini API key não configurada. Por favor, clique no botão "Configurar Chave" (🔑) para inserir sua chave.'
+      'Google Gemini API key is not configured. Please click "Configure Key" (🔑) to enter your API key.'
     );
   }
 
@@ -155,7 +155,7 @@ Rules:
       }
 
       const errorBody = await res.text();
-      console.warn(`[DocMapper Gemini] Modelo ${currentModel} retornou ${res.status}:`, errorBody);
+      console.warn(`[DocMapper Gemini] Model ${currentModel} returned ${res.status}:`, errorBody);
       let errMsg = `Gemini API error (${res.status}): ${res.statusText}`;
       try {
         const parsedErr = JSON.parse(errorBody);
@@ -192,7 +192,7 @@ Rules:
   }
 
   if (!response || !response.ok) {
-    throw new Error(lastErrorMessage || 'Não foi possível conectar a nenhum modelo Gemini disponível.');
+    throw new Error(lastErrorMessage || 'Unable to connect to any available Gemini models.');
   }
 
   const data = await response.json();

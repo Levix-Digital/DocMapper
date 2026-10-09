@@ -222,7 +222,7 @@ async function onGenerateRuleWithAi(fieldId: string) {
 
   aiError.value = null;
   if (!field.sampleExtractedValue) {
-    aiError.value = 'Por favor, informe ou capture um valor de exemplo primeiro.';
+    aiError.value = 'Please enter or capture a sample value first.';
     return;
   }
 
@@ -235,7 +235,7 @@ async function onGenerateRuleWithAi(fieldId: string) {
 
   try {
     isAiGenerating.value = true;
-    console.log('[DocMapper Gemini] Solicitando inferência de regra para:', {
+    console.log('[DocMapper Gemini] Requesting rule inference for:', {
       fieldName: field.name,
       sampleValue: field.sampleExtractedValue,
       labelContext: labelText,
@@ -247,13 +247,13 @@ async function onGenerateRuleWithAi(fieldId: string) {
       labelContext: labelText,
     });
 
-    console.log('[DocMapper Gemini] Resposta do modelo:', result);
+    console.log('[DocMapper Gemini] Model response:', result);
     field.validationPattern = result.regex;
     field.dataType = result.dataType;
     saveCurrentProfile();
-    showToast(`Regra gerada com sucesso para "${field.name}": ${result.regex}`);
+    showToast(`Regex rule successfully generated for "${field.name}": ${result.regex}`);
   } catch (err: any) {
-    console.error('[DocMapper Gemini] Erro ao gerar regra:', err);
+    console.error('[DocMapper Gemini] Error generating rule:', err);
     aiError.value = err?.message || String(err);
   } finally {
     isAiGenerating.value = false;
@@ -477,7 +477,7 @@ async function generateSamplePreview() {
               Upload a Sample PDF (e.g., CMR) to Calibrate
             </h3>
             <p class="text-xs text-gray-500 max-w-md">
-              Faça upload de um documento de exemplo para desenhar as caixas de seleção (Value Box / Label Box) diretamente sobre o texto e calibrar as regras de extração.
+              Upload a sample document to draw bounding boxes (Value Box / Label Box) directly over the text and calibrate extraction rules.
             </p>
             <label class="cursor-pointer px-5 py-2.5 bg-brand-purple text-white text-sm font-semibold rounded-xl shadow-md hover:bg-brand-purple/90 transition-all flex items-center gap-2">
               <Upload class="w-4 h-4" />

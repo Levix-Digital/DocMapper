@@ -47,7 +47,7 @@ const loadedPdfDoc = shallowRef<any | null>(null);
 const selectedMappingId = ref<string | null>(null);
 const placementMode = ref<'field' | 'custom'>('field');
 const activeFieldIdToPlace = ref<string | null>(null);
-const customTextToPlace = ref<string>('Texto Fixo');
+const customTextToPlace = ref<string>('Custom Text');
 const defaultRenderFormat = ref<RenderFormat>('TEXT');
 
 type ResizeHandle = 'nw' | 'ne' | 'se' | 'sw' | 'n' | 's' | 'e' | 'w';
@@ -123,9 +123,9 @@ const selectedFieldColor = computed(() => {
 
 function getMappingDisplayText(mapping: DestinationFieldMapping): string {
   if (mapping.sourceType === 'custom') {
-    return mapping.customText || 'Texto Fixo';
+    return mapping.customText || 'Custom Text';
   }
-  const fieldName = fieldMap.value.get(mapping.fieldId || '')?.name || 'Campo';
+  const fieldName = fieldMap.value.get(mapping.fieldId || '')?.name || 'Field';
   const prefix = mapping.prefix || '';
   const suffix = mapping.suffix || '';
   return `${prefix}${fieldName}${suffix}`;
@@ -318,7 +318,7 @@ function onCanvasMouseUp() {
         id: `dest-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         sourceType: isCustom ? 'custom' : 'field',
         fieldId: isCustom ? null : activeFieldIdToPlace.value,
-        customText: isCustom ? (customTextToPlace.value || 'Texto Fixo') : undefined,
+        customText: isCustom ? (customTextToPlace.value || 'Custom Text') : undefined,
         prefix: '',
         suffix: '',
         targetBox: newBox,
@@ -669,7 +669,7 @@ const draftBoxStyle = computed(() => {
                 font-weight="bold"
                 class="font-sans select-none drop-shadow-sm pointer-events-none uppercase tracking-wide"
               >
-                [{{ mapping.sourceType === 'custom' ? 'FIXO' : mapping.renderFormat }}] {{ mapping.sourceType === 'custom' ? 'Texto Customizado' : (fieldMap.get(mapping.fieldId || '')?.name || 'Campo') }}
+                [{{ mapping.sourceType === 'custom' ? 'CUSTOM' : mapping.renderFormat }}] {{ mapping.sourceType === 'custom' ? 'Custom Text' : (fieldMap.get(mapping.fieldId || '')?.name || 'Field') }}
               </text>
 
               <!-- In-box Content Preview with Horizontal and Vertical Alignment -->
@@ -883,7 +883,7 @@ const draftBoxStyle = computed(() => {
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm space-y-3">
         <h4 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <FileCheck class="w-4 h-4 text-brand-purple" />
-          <span>Posicionar no Modelo</span>
+          <span>Place on Template</span>
         </h4>
 
         <!-- Mode Toggle: Mapped Origin Field vs Custom Static Text -->
@@ -907,13 +907,13 @@ const draftBoxStyle = computed(() => {
         <!-- If Mapped Field -->
         <div v-if="placementMode === 'field'">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            Escolher Campo de Origem:
+            Choose Origin Field:
           </label>
           <select
             v-model="activeFieldIdToPlace"
             class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
           >
-            <option :value="null" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">-- Selecionar Campo --</option>
+            <option :value="null" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">-- Select Field --</option>
             <option v-for="f in fields" :key="f.id" :value="f.id" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               {{ f.name }}
             </option>
@@ -923,19 +923,19 @@ const draftBoxStyle = computed(() => {
         <!-- If Custom Text -->
         <div v-else>
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            Conteúdo do Texto Fixo:
+            Custom Text Content:
           </label>
           <input
             v-model="customTextToPlace"
             type="text"
-            placeholder="Ex: EMITIDO EM 2026, CONFERIDO..."
+            placeholder="e.g. APPROVED, ISSUED IN 2026..."
             class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
           />
         </div>
 
         <div>
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            Formato de Renderização:
+            Render Format:
           </label>
           <div class="grid grid-cols-3 gap-1.5">
             <button
@@ -944,7 +944,7 @@ const draftBoxStyle = computed(() => {
               :class="defaultRenderFormat === 'TEXT' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <Type class="w-4 h-4 mb-1" />
-              <span>Texto</span>
+              <span>Text</span>
             </button>
             <button
               @click="defaultRenderFormat = 'CODE128'"
@@ -966,7 +966,7 @@ const draftBoxStyle = computed(() => {
         </div>
 
         <div v-if="isReadyToDraw" class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-xs text-brand-purple dark:text-purple-300 font-semibold animate-pulse text-center">
-          Clique e arraste no documento para criar a caixa!
+          Click and drag on the document to draw the placement box!
         </div>
       </div>
 
@@ -975,12 +975,12 @@ const draftBoxStyle = computed(() => {
         <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
           <span class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
             <Move class="w-4 h-4 text-brand-purple" />
-            <span>Propriedades da Caixa</span>
+            <span>Box Properties</span>
           </span>
           <button
             @click="$emit('removeMapping', selectedMapping.id); selectedMappingId = null;"
             class="text-red-500 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
-            title="Excluir este campo"
+            title="Delete this placement box"
           >
             <Trash2 class="w-4 h-4" />
           </button>
@@ -989,7 +989,7 @@ const draftBoxStyle = computed(() => {
         <!-- 1. Content Definition (Custom Text or Mapped Field with Prefix/Suffix) -->
         <div v-if="selectedMapping.sourceType === 'custom'" class="space-y-1.5">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-            Texto Fixo Customizado:
+            Custom Static Text:
           </label>
           <input
             type="text"
@@ -1002,10 +1002,10 @@ const draftBoxStyle = computed(() => {
         <div v-else class="space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-              Campo Vinculado:
+              Bound Field:
             </label>
             <span class="text-xs font-bold text-gray-900 dark:text-white">
-              {{ fieldMap.get(selectedMapping.fieldId || '')?.name || 'Desconhecido' }}
+              {{ fieldMap.get(selectedMapping.fieldId || '')?.name || 'Unknown' }}
             </span>
           </div>
 
@@ -1013,11 +1013,11 @@ const draftBoxStyle = computed(() => {
           <div class="grid grid-cols-2 gap-2 pt-1">
             <div>
               <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-0.5">
-                Prefixo (antes):
+                Prefix (before):
               </label>
               <input
                 type="text"
-                placeholder="Ex: Nº: "
+                placeholder="e.g. No: "
                 :value="selectedMapping.prefix || ''"
                 @input="$emit('updateMapping', { ...selectedMapping, prefix: ($event.target as HTMLInputElement).value })"
                 class="w-full px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
@@ -1025,11 +1025,11 @@ const draftBoxStyle = computed(() => {
             </div>
             <div>
               <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-0.5">
-                Sufixo (após):
+                Suffix (after):
               </label>
               <input
                 type="text"
-                placeholder="Ex:  (UN)"
+                placeholder="e.g.  (UN)"
                 :value="selectedMapping.suffix || ''"
                 @input="$emit('updateMapping', { ...selectedMapping, suffix: ($event.target as HTMLInputElement).value })"
                 class="w-full px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
@@ -1039,83 +1039,86 @@ const draftBoxStyle = computed(() => {
 
           <!-- Live Combined Preview Tag -->
           <div class="p-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-[11px] leading-tight">
-            <span class="text-gray-400 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Resultado Gerado:</span>
+            <span class="text-gray-400 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Rendered Output:</span>
             <span class="font-bold text-brand-purple">{{ selectedMapping.prefix || '' }}</span>
             <span class="font-medium text-gray-800 dark:text-gray-200">{{ fieldMap.get(selectedMapping.fieldId || '')?.sampleExtractedValue || fieldMap.get(selectedMapping.fieldId || '')?.name || 'Valor' }}</span>
             <span class="font-bold text-brand-purple">{{ selectedMapping.suffix || '' }}</span>
           </div>
         </div>
 
-        <!-- 2. Alignments (Horizontal & Vertical) -->
+        <!-- 2. Alignments (Horizontal & Vertical - Word-style symbols) -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-            Alinhamento do Conteúdo:
+            Content Alignment:
           </label>
 
-          <!-- Horizontal Alignment Buttons -->
+          <!-- Horizontal Alignment (Word Symbols) -->
           <div>
-            <span class="text-[10px] text-gray-400 block mb-1">Horizontal:</span>
-            <div class="grid grid-cols-3 gap-1.5">
+            <span class="text-[10px] text-gray-400 block mb-1 font-medium">Horizontal:</span>
+            <div class="grid grid-cols-3 gap-1.5 bg-gray-50 dark:bg-gray-800/40 p-1 rounded-xl border border-gray-200 dark:border-gray-700/60">
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, horizontalAlign: 'left' })"
-                class="flex items-center justify-center gap-1 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                :class="(selectedMapping.horizontalAlign || 'left') === 'left' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                title="Alinhar à Esquerda"
+                class="flex items-center justify-center py-2 rounded-lg transition-all"
+                :class="(selectedMapping.horizontalAlign || 'left') === 'left' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
+                title="Align Left"
               >
-                <AlignLeft class="w-3.5 h-3.5" />
-                <span class="text-[11px]">Esq</span>
+                <AlignLeft class="w-4 h-4" />
               </button>
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, horizontalAlign: 'center' })"
-                class="flex items-center justify-center gap-1 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                :class="selectedMapping.horizontalAlign === 'center' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                title="Centralizar Horizontalmente"
+                class="flex items-center justify-center py-2 rounded-lg transition-all"
+                :class="selectedMapping.horizontalAlign === 'center' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
+                title="Align Center"
               >
-                <AlignCenter class="w-3.5 h-3.5" />
-                <span class="text-[11px]">Centro</span>
+                <AlignCenter class="w-4 h-4" />
               </button>
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, horizontalAlign: 'right' })"
-                class="flex items-center justify-center gap-1 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                :class="selectedMapping.horizontalAlign === 'right' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                title="Alinhar à Direita"
+                class="flex items-center justify-center py-2 rounded-lg transition-all"
+                :class="selectedMapping.horizontalAlign === 'right' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
+                title="Align Right"
               >
-                <AlignRight class="w-3.5 h-3.5" />
-                <span class="text-[11px]">Dir</span>
+                <AlignRight class="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          <!-- Vertical Alignment Buttons -->
+          <!-- Vertical Alignment (Word/Table Symbols) -->
           <div>
-            <span class="text-[10px] text-gray-400 block mb-1">Vertical:</span>
-            <div class="grid grid-cols-3 gap-1.5">
+            <span class="text-[10px] text-gray-400 block mb-1 font-medium">Vertical:</span>
+            <div class="grid grid-cols-3 gap-1.5 bg-gray-50 dark:bg-gray-800/40 p-1 rounded-xl border border-gray-200 dark:border-gray-700/60">
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, verticalAlign: 'top' })"
-                class="flex items-center justify-center gap-1 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                :class="selectedMapping.verticalAlign === 'top' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                title="Alinhar ao Topo"
+                class="flex items-center justify-center py-2 rounded-lg transition-all"
+                :class="selectedMapping.verticalAlign === 'top' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
+                title="Align Top"
               >
-                <AlignVerticalJustifyStart class="w-3.5 h-3.5" />
-                <span class="text-[11px]">Topo</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="3" y1="3" x2="21" y2="3" stroke-width="2.5" />
+                  <rect x="6" y="8" width="12" height="13" rx="1.5" />
+                </svg>
               </button>
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, verticalAlign: 'middle' })"
-                class="flex items-center justify-center gap-1 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                :class="(selectedMapping.verticalAlign || 'middle') === 'middle' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                title="Centralizar Verticalmente (Meio)"
+                class="flex items-center justify-center py-2 rounded-lg transition-all"
+                :class="(selectedMapping.verticalAlign || 'middle') === 'middle' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
+                title="Align Middle (Center)"
               >
-                <AlignVerticalJustifyCenter class="w-3.5 h-3.5" />
-                <span class="text-[11px]">Meio</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="3" y1="12" x2="21" y2="12" stroke-width="2.5" />
+                  <rect x="6" y="6" width="12" height="12" rx="1.5" />
+                </svg>
               </button>
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, verticalAlign: 'bottom' })"
-                class="flex items-center justify-center gap-1 py-1.5 rounded-lg border text-xs font-semibold transition-all"
-                :class="selectedMapping.verticalAlign === 'bottom' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                title="Alinhar à Base"
+                class="flex items-center justify-center py-2 rounded-lg transition-all"
+                :class="selectedMapping.verticalAlign === 'bottom' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
+                title="Align Bottom"
               >
-                <AlignVerticalJustifyEnd class="w-3.5 h-3.5" />
-                <span class="text-[11px]">Base</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="3" y1="21" x2="21" y2="21" stroke-width="2.5" />
+                  <rect x="6" y="3" width="12" height="13" rx="1.5" />
+                </svg>
               </button>
             </div>
           </div>
@@ -1124,7 +1127,7 @@ const draftBoxStyle = computed(() => {
         <!-- 3. Format and Font Size -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-            Modo de Renderização:
+            Render Format:
           </label>
           <div class="grid grid-cols-3 gap-1.5">
             <button
@@ -1155,7 +1158,7 @@ const draftBoxStyle = computed(() => {
 
           <div v-if="selectedMapping.renderFormat === 'TEXT'">
             <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-              Tamanho da Fonte (pt):
+              Font Size (pt):
             </label>
             <input
               type="number"
@@ -1172,16 +1175,16 @@ const draftBoxStyle = computed(() => {
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-              Posição e Dimensões (%):
+              Position & Dimensions (%):
             </label>
             <div v-if="totalPages > 1" class="flex items-center gap-1">
-              <span class="text-[10px] text-gray-400">Pág:</span>
+              <span class="text-[10px] text-gray-400">Page:</span>
               <select
                 :value="selectedMapping.targetBox.page || 1"
                 @change="changeMappingPage(Number(($event.target as HTMLSelectElement).value))"
                 class="px-1.5 py-0.5 text-[11px] rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
-                <option v-for="p in totalPages" :key="p" :value="p">Página {{ p }}</option>
+                <option v-for="p in totalPages" :key="p" :value="p">Page {{ p }}</option>
               </select>
             </div>
           </div>
@@ -1212,7 +1215,7 @@ const draftBoxStyle = computed(() => {
               />
             </div>
             <div>
-              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">Larg (%)</label>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">W (%)</label>
               <input
                 type="number"
                 step="0.5"
@@ -1224,7 +1227,7 @@ const draftBoxStyle = computed(() => {
               />
             </div>
             <div>
-              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">Alt (%)</label>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">H (%)</label>
               <input
                 type="number"
                 step="0.5"
@@ -1239,33 +1242,33 @@ const draftBoxStyle = computed(() => {
 
           <!-- Quick Nudge Controls -->
           <div class="flex items-center justify-between pt-1">
-            <span class="text-[10px] text-gray-400">Ajuste Fino (+/- 0.5%):</span>
+            <span class="text-[10px] text-gray-400">Nudge (+/- 0.5%):</span>
             <div class="flex items-center gap-1">
               <button
                 @click="nudgeMapping(-0.5, 0)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Mover 0.5% para a esquerda"
+                title="Move 0.5% left"
               >
                 <ArrowLeft class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 @click="nudgeMapping(0, -0.5)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Mover 0.5% para cima"
+                title="Move 0.5% up"
               >
                 <ArrowUp class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 @click="nudgeMapping(0, 0.5)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Mover 0.5% para baixo"
+                title="Move 0.5% down"
               >
                 <ArrowDown class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 @click="nudgeMapping(0.5, 0)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Mover 0.5% para a direita"
+                title="Move 0.5% right"
               >
                 <ArrowRight class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
@@ -1275,10 +1278,10 @@ const draftBoxStyle = computed(() => {
           <div class="p-2 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[11px] text-gray-600 dark:text-gray-400 space-y-1">
             <div class="flex items-center gap-1 font-semibold text-gray-900 dark:text-white">
               <MousePointer class="w-3.5 h-3.5 text-brand-purple" />
-              <span>Interação Direta na Tela:</span>
+              <span>Interactive Canvas Controls:</span>
             </div>
-            <p>• Arraste a caixa na tela para movê-la.</p>
-            <p>• Arraste qualquer um dos 8 pontos brancos nas bordas para redimensionar.</p>
+            <p>• Drag the box on the canvas to move it.</p>
+            <p>• Drag any of the 8 white handles to resize.</p>
           </div>
         </div>
       </div>

@@ -186,7 +186,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             ? 'border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
             : 'border-purple-200 dark:border-purple-700 text-brand-purple dark:text-purple-300 bg-purple-50/50 dark:bg-purple-950/20 hover:bg-purple-100 dark:hover:bg-purple-900/40'
         ]"
-        :title="hasStoredKey ? 'Chave Gemini configurada' : 'Configurar Google Gemini API Key'"
+        :title="hasStoredKey ? 'Chave Gemini configurada' : 'Configure Google Gemini API Key'"
       >
         <Key class="w-3.5 h-3.5" />
         <span>{{ hasStoredKey ? 'Gemini OK' : 'Chave IA' }}</span>
@@ -233,7 +233,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               :value="field.name"
               @change="updateFieldName(field, ($event.target as HTMLInputElement).value)"
               class="font-semibold text-gray-900 dark:text-white text-sm bg-transparent border-b border-brand-purple/40 focus:border-brand-purple focus:outline-none px-1 py-0.5 rounded w-full"
-              title="Clique para editar o nome do campo"
+              title="Click to edit field name"
               @click.stop
             />
             <span v-else class="font-semibold text-gray-900 dark:text-white text-sm truncate">
@@ -297,17 +297,17 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         <div v-if="selectedFieldId === field.id" class="p-2.5 my-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 space-y-2 text-xs" @click.stop>
           <div class="flex items-center justify-between gap-2">
             <label class="text-[11px] font-semibold text-gray-700 dark:text-gray-300">
-              Tipo do Campo:
+              Field Type:
             </label>
             <select
               :value="field.dataType || 'alphanumeric'"
               @change="updateFieldDataType(field, ($event.target as HTMLSelectElement).value as FieldDataType)"
               class="px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-brand-purple"
             >
-              <option value="alphanumeric">Alfanumérico (letras e números)</option>
+              <option value="alphanumeric">Alphanumeric (letters & numbers)</option>
               <option value="text">Texto Geral</option>
               <option value="date">Data</option>
-              <option value="number">Numérico</option>
+              <option value="number">Numeric</option>
               <option value="multiline">Multilinhas</option>
             </select>
           </div>
@@ -315,27 +315,27 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
           <!-- Value Box Coordinate Editor -->
           <div v-if="field.valueBox" class="pt-2 border-t border-purple-100 dark:border-purple-900/30 space-y-1">
             <div class="flex items-center justify-between text-[11px] font-semibold text-gray-600 dark:text-gray-400">
-              <span>Dimensões da Value Box (pág. {{ field.valueBox.page }}):</span>
+              <span>Value Box Dimensions (Page {{ field.valueBox.page }}):</span>
               <div class="flex items-center gap-1">
                 <button
                   @click="nudgeBox(field, 'value', -0.5, 0)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Mover para esquerda"
+                  title="Move left"
                 >←</button>
                 <button
                   @click="nudgeBox(field, 'value', 0, -0.5)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Mover para cima"
+                  title="Move up"
                 >↑</button>
                 <button
                   @click="nudgeBox(field, 'value', 0, 0.5)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Mover para baixo"
+                  title="Move down"
                 >↓</button>
                 <button
                   @click="nudgeBox(field, 'value', 0.5, 0)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Mover para direita"
+                  title="Move right"
                 >→</button>
               </div>
             </div>
@@ -402,7 +402,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               "{{ field.sampleExtractedValue }}"
             </span>
             <span v-else class="text-gray-400 dark:text-gray-500 italic text-[11px] font-normal">
-              (Desenhe a Value Box no PDF para detectar)
+              (Draw Value Box on PDF to capture)
             </span>
           </div>
         </div>
@@ -422,7 +422,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               v-else
               class="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 italic text-[11px]"
             >
-              <span>Aguardando demarcação</span>
+              <span>Awaiting box placement</span>
             </span>
 
             <!-- Required Toggle -->
@@ -433,27 +433,27 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
                 @change="toggleRequired(field)"
                 class="rounded border-gray-300 text-brand-purple focus:ring-brand-purple w-3.5 h-3.5 cursor-pointer"
               />
-              <span class="text-[11px] font-medium">Obrigatório</span>
+              <span class="text-[11px] font-medium">Required</span>
             </label>
           </div>
 
           <!-- Advanced Settings (Optional / Collapsed) -->
           <details class="text-xs text-gray-500 group pt-1" @click.stop>
             <summary class="cursor-pointer hover:text-gray-800 dark:hover:text-gray-300 text-[11px] flex items-center justify-between py-1 transition-colors select-none">
-              <span>Filtro Avançado (Opcional)</span>
+              <span>Advanced Filter (Optional)</span>
               <span class="text-[10px] text-gray-400 group-open:rotate-180 transition-transform">▼</span>
             </summary>
             
             <div class="pt-2 space-y-2 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800 mt-1">
               <div>
                 <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1 font-medium">
-                  Máscara Regex (opcional):
+                  Regex Validation Pattern (optional):
                 </label>
                 <input
                   :value="field.validationPattern || ''"
                   @input="updateFieldPattern(field, ($event.target as HTMLInputElement).value)"
                   type="text"
-                  placeholder="ex: ^[0-9]+$ (deixe vazio para aceitar tudo)"
+                  placeholder="e.g. ^[0-9]+$ (leave empty to accept any)"
                   class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-purple"
                 />
               </div>
@@ -465,7 +465,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
                 class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border border-purple-200 dark:border-purple-800 text-[11px] font-medium text-brand-purple dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors disabled:opacity-50"
               >
                 <Sparkles class="w-3 h-3" :class="{ 'animate-spin': isAiGenerating }" />
-                <span>{{ isAiGenerating ? 'Sugerindo com Gemini...' : 'Sugerir Regex com IA' }}</span>
+                <span>{{ isAiGenerating ? 'Inferring with Gemini...' : 'Suggest Regex with AI' }}</span>
               </button>
             </div>
           </details>
@@ -536,9 +536,9 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         </h3>
 
         <div class="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-100 dark:border-purple-900/40 text-xs text-purple-900 dark:text-purple-200 space-y-1.5">
-          <p class="font-semibold text-brand-purple dark:text-purple-300">Como obter sua chave gratuita:</p>
+          <p class="font-semibold text-brand-purple dark:text-purple-300">How to get your free API key:</p>
           <p class="text-[11px] text-gray-600 dark:text-gray-400">
-            A IA é utilizada apenas no mapeamento inicial para deduzir expressões regulares (Regex) a partir de um valor de exemplo. Todo o processamento dos lotes de documentos ocorre 100% offline no seu navegador.
+            AI is only used during initial profile calibration to infer regex patterns from sample values. All batch document processing runs 100% offline in your browser.
           </p>
           <a
             href="https://aistudio.google.com/app/apikey"
@@ -546,7 +546,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             rel="noopener noreferrer"
             class="inline-flex items-center gap-1 text-brand-purple dark:text-purple-300 font-semibold hover:underline pt-1 text-xs"
           >
-            <span>Obter chave gratuita no Google AI Studio</span>
+            <span>Get free API key on Google AI Studio</span>
             <ExternalLink class="w-3.5 h-3.5" />
           </a>
         </div>
@@ -555,7 +555,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         <div class="p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700 text-xs space-y-2.5">
           <div>
             <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              Modelo Gemini:
+              Gemini Model:
             </label>
             <select
               v-model="selectedModel"
@@ -571,19 +571,19 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               </option>
             </select>
             <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
-              {{ AVAILABLE_GEMINI_MODELS.find(m => m.id === selectedModel)?.description || 'Modelo otimizado para extração e inferência rápida.' }}
+              {{ AVAILABLE_GEMINI_MODELS.find(m => m.id === selectedModel)?.description || 'Model optimized for rapid extraction and inference.' }}
             </p>
           </div>
 
           <div class="pt-1.5 border-t border-gray-200 dark:border-gray-700/80 flex items-center justify-between text-[11px]">
-            <span class="text-gray-600 dark:text-gray-400">Observabilidade & Métricas:</span>
+            <span class="text-gray-600 dark:text-gray-400">Observability & Metrics:</span>
             <a
               href="https://console.cloud.google.com/apis/api/generativelanguage.googleapis.com/metrics"
               target="_blank"
               rel="noopener noreferrer"
               class="text-brand-purple dark:text-purple-300 hover:underline inline-flex items-center gap-1 font-semibold"
             >
-              <span>Ver Métricas no GCP</span>
+              <span>View Metrics in GCP Console</span>
               <ExternalLink class="w-3 h-3" />
             </a>
           </div>
@@ -591,7 +591,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
 
         <div>
           <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            Chave da API (API Key):
+            API Key:
           </label>
           <input
             v-model="apiKeyInput"
