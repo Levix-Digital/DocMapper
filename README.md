@@ -1,142 +1,142 @@
 # Copyx
 
-Motor de alto desempenho para extração espacial determinística, mapeamento visual e preenchimento dinâmico de documentos fiscais e logísticos no navegador.
+High-performance client-side engine for deterministic spatial extraction, visual mapping, and dynamic stamping of logistics, shipping, and fiscal documents in the browser.
 
 ---
 
 ## Levi's Scale-Invariant Extraction (LSIE)
 
-Criado por **Levi Silveira**, o algoritmo **Levi's Scale-Invariant Extraction (LSIE)** é um método geométrico determinístico de varredura bidirecional e deformação elástica por proporções relativas, desenvolvido especificamente para resolver o problema de **Layout Elástico (*Reflowable Layout / Vertical & Horizontal Drift*)** em documentos de transporte, frete e faturamento.
+Created by **Levi Silveira**, the **Levi's Scale-Invariant Extraction (LSIE)** algorithm is a deterministic geometric method featuring bidirectional scanning and relative-proportion elastic deformation, designed specifically to solve the **Reflowable Layout (*Vertical & Horizontal Drift*)** problem in freight, shipping, customs, and billing documents.
 
 ---
 
-### Para que serve o LSIE?
+### What is LSIE Used For?
 
-Em documentos estruturados (como CMRs, faturas comerciais, romaneios de carga e conhecimentos de transporte), sistemas de extração tradicionais baseados em coordenadas fixas falham frequentemente devido a três fatores críticos:
+In structured and semi-structured documents (such as CMRs, commercial invoices, packing lists, and bills of lading), traditional extraction systems relying on fixed coordinate grids frequently fail due to three critical factors:
 
-1. **Expansão Dinâmica de Conteúdo (Efeito Sanfona):**
-   - Campos como *Consignment Numbers* ou *Descrição de Mercadorias* podem conter 1 linha em um documento e 10 linhas em outro.
-   - Quando um campo expande, ele empurra todas as seções e campos abaixo dele para posições verticais inferiores ($\Delta Y > 0$).
-2. **Invariância de Escala e Dispositivo de Impressão:**
-   - Documentos gerados via *"Imprimir para PDF"*, convertidos para papel *Carta (Letter)* em vez de *A4*, ou digitalizados com margens de impressão sofrem reduções de escala e deslocamentos de margem.
-   - Embora as distâncias absolutas (pixels ou milímetros) mudem, a **composição geométrica relativa** entre os campos permanece rigorosamente a mesma.
-3. **Prevenção de Contaminação entre Campos:**
-   - Se o usuário mapeou apenas 2 campos de um formulário de 50 campos (por exemplo, um código no topo e a placa do caminhão no rodapé), um extrator ingênuo que expanda até a próxima âncora "engoliria" todas as descrições de mercadorias, pesos e cubagens não mapeadas intermediárias.
-   - O LSIE delimita o fluxo contíguo das linhas do próprio campo, garantindo **zero vazamento**.
+1. **Dynamic Content Expansion (Accordion Effect):**
+   - Fields such as *Consignment Numbers* or *Goods Descriptions* may contain a single line in one document and 10+ lines in another.
+   - When a field expands, it pushes all subsequent sections and fields downward ($\Delta Y > 0$).
+2. **Scale Invariance and Virtual Printers:**
+   - Documents generated via *"Print to PDF"*, converted to *Letter* instead of *A4*, or scanned with variable margins suffer scaling changes and offset shifts.
+   - While absolute distances (pixels, points, or millimeters) change, the **relative geometric composition** between fields remains strictly invariant.
+3. **Prevention of Field Contamination (Zero Data Leakage):**
+   - If a user maps only 2 fields across a 50-field document (e.g., a header code at the top and the trailer plate at the footer), a naive extractor expanding downward to the next anchor would indiscriminately swallow all unmapped goods descriptions, weights, and dimensions in between.
+   - LSIE isolates the contiguous flow of the field's own lines, guaranteeing **zero leakage** into unmapped sections.
 
-O **LSIE** resolve esses desafios com processamento local em **~5 milissegundos**, **zero chamadas de API externas**, custo **R$ 0,00** e privacidade total no cliente (**100% aderente a LGPD e GDPR**).
+**LSIE** solves these challenges with local in-browser processing in **~5 milliseconds**, **zero external API calls**, **$0.00 execution cost**, and complete client-side privacy (**100% compliant with GDPR and LGPD**).
 
 ---
 
-### Arquitetura e Fluxo do Algoritmo
+### Algorithm Architecture and Flow
 
-O LSIE opera em duas grandes etapas: a **Inicialização Topológica (Fase 0)** — que define a geometria dos campos de interesse — e o **Ciclo de Resolução Elástica (Fases 1 a 5)**, executado em tempo real para cada documento.
+LSIE operates in two primary stages: **Topological Initialization (Phase 0)** — which defines the initial geometry of the target fields — and the **Elastic Resolution Cycle (Phases 1 to 5)**, executed in real time for each document.
 
 ```mermaid
 flowchart TD
-    subgraph S0["Fase 0: Topological Seeding (Agnóstica à Origem)"]
-        M1["Mapeamento Manual (ex: Mapping Studio / Bounding Boxes)"]
-        M2["Descoberta Assistida por IA (One-Shot Layout Analysis)"]
-        M3["Importação Externa (JSON / AcroForms / ERP Schema)"]
+    subgraph S0["Phase 0: Topological Seeding (Input Agnostic)"]
+        M1["Manual Mapping (e.g. Mapping Studio / Bounding Boxes)"]
+        M2["AI-Assisted Discovery (One-Shot Layout Analysis)"]
+        M3["External Schema Import (JSON / AcroForms / ERP Schema)"]
     end
     
-    M1 --> Mesh["Topologia Canônica Base G_0 (Origem Top-Left (x, y), Calha w e Âncoras)"]
+    M1 --> Mesh["Canonical Base Topology G_0 (Top-Left Origin (x, y), Containment Width w, Anchors)"]
     M2 --> Mesh
     M3 --> Mesh
 
-    Doc["Novo Documento PDF (A4, Carta ou 'Imprimir para PDF')"] --> Span["1. Identificação dos Marcos e Spans de Referência (H_ref, W_ref)"]
+    Doc["New PDF Document (A4, Letter, or 'Print to PDF')"] --> Span["1. Anchor Identification & Reference Span Calculation (H_ref, W_ref)"]
     Mesh --> Span
     
-    Span --> Ratios["2. Matriz de Proporções Adimensionais Relativas: R_Y(i) = ΔY_i / H_ref"]
-    Ratios --> Sweep["3. Varredura Bidirecional Geométrica (Vertical e Horizontal)"]
+    Span --> Ratios["2. Dimensionless Relative Ratio Matrix: R_Y(i) = ΔY_i / H_ref"]
+    Ratios --> Sweep["3. Bidirectional Geometric Sweep (Vertical & Horizontal)"]
     
-    Sweep --> Check{"Razão Observada R'_Y(i) > R_Y(i) + Tolerância?"}
-    Check -- "Não (Proporção Normal)" --> Direct["Extração em Coordenada Relativa"]
-    Check -- "Sim (Esticamento Detectado)" --> Flow["4. Análise de Fluxo Contíguo (Coleta Apenas Linhas do Bloco)"]
+    Sweep --> Check{"Observed Ratio R'_Y(i) > R_Y(i) + Tolerance?"}
+    Check -- "No (Normal Proportion)" --> Direct["Extract at Relative Coordinates"]
+    Check -- "Yes (Stretching Detected)" --> Flow["4. Contiguous Flow Analysis (Collect Lines of Current Block Only)"]
     
-    Flow --> Accum["5. Acumulação de Deformação (Σ ΔStretch) e Propagação das Proporções"]
-    Direct --> Integrity{"Verificação de Integridade (Anomaly Gate)"}
+    Flow --> Accum["5. Deformation Accumulation (Σ ΔStretch) & Mesh Proportion Propagation"]
+    Direct --> Integrity{"Structural Integrity Check (Anomaly Gate)"}
     Accum --> Integrity
     
-    Integrity -- "Aprovado (100% Sucesso)" --> Out["Saída Estruturada / Preenchimento de PDF"]
-    Integrity -- "Falha Crítica / Âncora Ausente" --> Vision["Resgate Transparente por Imagem (Gemini 2.0 Flash Vision)"]
+    Integrity -- "Passed (100% Success)" --> Out["Structured Output / Dynamic PDF Stamping"]
+    Integrity -- "Critical Failure / Missing Anchor" --> Vision["Silent Vision Fallback (Gemini 2.0 Flash Vision)"]
     Vision --> Out
 ```
 
 ---
 
-### Formulação Matemática do LSIE
+### Mathematical Formulation of LSIE
 
-#### 0. Fase 0: Topological Seeding (Entrada de Geometria Canônica)
-O LSIE é **estritamente agnóstico ao método de identificação ou medição espacial**. O algoritmo não impõe nem depende de nenhuma ferramenta de interface específica: qualquer operador, sistema ou script pode aferir as coordenadas da forma que preferir (medição manual de pixels, clique interativo em tela, inspeção de streams PDF, scripts em Python/OpenCV, anotação em ferramentas como Label Studio ou extração via LLM).
+#### 0. Phase 0: Topological Seeding (Canonical Geometry Input)
+LSIE is **strictly agnostic to the coordinate discovery or measurement method**. The algorithm does not depend on any specific user interface: any operator, automated system, or script can capture the baseline coordinates through whatever mechanism is preferred (manual pixel measurement, interactive canvas click-and-drag, PDF stream inspection, Python/OpenCV scripts, annotation tools like Label Studio, or one-shot LLM layout extraction).
 
-O requisito fundamental do LSIE é receber a geometria inicial dos campos delimitada pela sua **coordenada primária de origem: o canto superior esquerdo $(x, y)$**:
+The core requirement of LSIE is receiving the initial field geometry anchored by its **primary origin coordinate: the top-left corner $(x, y)$**:
 
 $$\mathcal{G}_0 = \{ (F_i, B_i, A_i) \}_{i=1}^n$$
-Onde:
-- $F_i$: Identificador semântico do campo (ex: `consignments`, `trailer_plate`, `shipper_name`).
+Where:
+- $F_i$: Semantic field identifier (e.g., `consignments`, `trailer_plate`, `shipper_name`).
 - $B_i = (x, y, w, h) \in [0, 1]^4$: 
-  - **$(x, y)$ — Coordenada Primária (Canto Superior Esquerdo):** É o ponto de ancoragem canônico do campo. Por convenção de leitura ocidental e renderização vetorial, o texto se inicia no vértice superior esquerdo. Como o esticamento elástico de conteúdo se propaga para baixo ($+Y$) e para a direita ($+X$), o canto superior esquerdo permanece como a referência primordial estável de onde o fluxo textual se origina.
-  - **$(w, h)$ — Delimitação da Calha Espacial:** A largura $w$ define a coluna de contenção horizontal (evitando invasão de colunas vizinhas), e $h$ define a altura nominal de partida da primeira linha.
-- $A_i$: Texto contextual do rótulo/âncora mais próximo (ex: `"Consignment no"`, `"Trailer No:"`), utilizado para guiar a calibração de marcos relativos.
+  - **$(x, y)$ — Primary Coordinate (Top-Left Corner):** The canonical anchor point of the field. By Western reading convention and vector typography rendering, text begins at the top-left vertex. Because dynamic content stretching propagates downward ($+Y$) and rightward ($+X$), the top-left corner remains the stable reference point from which textual flow originates.
+  - **$(w, h)$ — Spatial Channel Boundaries:** The width $w$ defines the horizontal containment channel (preventing cross-column intrusion into neighboring sections), and $h$ defines the nominal starting height of the first line.
+- $A_i$: Contextual label or anchor text (e.g., `"Consignment no"`, `"Trailer No:"`), used to guide relative landmark calibration.
 
-Uma vez fornecida essa malha canônica inicial $\mathcal{G}_0$ (seja por inspeção manual, automação de código ou schema externo), o LSIE assume a resolução determinística para qualquer documento elástico subsequente.
+Once provided with this canonical initial mesh $\mathcal{G}_0$, LSIE deterministically resolves all subsequent elastic documents.
 
-#### 1. Invariância de Escala por Proporções Adimensionais
-Sejam $A_1, A_2, \dots, A_k$ as âncoras conhecidas ordenadas verticalmente pelo seu $Y$ de design.  
-Define-se o **Span de Referência Vertical**:
+#### 1. Scale Invariance via Dimensionless Ratios
+Let $A_1, A_2, \dots, A_k$ be known anchors ordered vertically by their design $Y$-coordinates.  
+The **Vertical Reference Span** is defined as:
 $$H_{\text{ref}} = Y(A_k) - Y(A_1)$$
 
-E o **Span de Referência Horizontal**:
-$$W_{\text{ref}} = X(A_{\text{dir}}) - X(A_{\text{esq}})$$
+And the **Horizontal Reference Span** is defined as:
+$$W_{\text{ref}} = X(A_{\text{right}}) - X(A_{\text{left}})$$
 
-Para qualquer intervalo consecutivo $i$ entre as âncoras $A_i$ e $A_{i+1}$, calcula-se a **Razão Relativa Adimensional**:
-$$R_{Y}(i) = \frac{Y(A_{i+1}) - Y(A_i)}{H_{\text{ref}}}, \quad \text{onde } \sum_{i=1}^{k-1} R_Y(i) = 1.0$$
+For any consecutive interval $i$ between anchors $A_i$ and $A_{i+1}$, the **Dimensionless Relative Ratio** is calculated as:
+$$R_{Y}(i) = \frac{Y(A_{i+1}) - Y(A_i)}{H_{\text{ref}}}, \quad \text{where } \sum_{i=1}^{k-1} R_Y(i) = 1.0$$
 
-Como $R_Y(i)$ e $R_X(j)$ são razões adimensionais puras, elas são **estritamente invariantes a resoluções de tela, DPIs de escaneamento, formatos de página (Letter vs A4) e margens de impressoras virtuais**.
+Because $R_Y(i)$ and $R_X(j)$ are pure dimensionless ratios, they are **strictly invariant to screen resolutions, scan DPIs, page formats (Letter vs. A4), and virtual printer margin offsets**.
 
-#### 2. Detecção e Localização de Deformações Locais
-No documento real sendo processado, as posições reais observadas $Y'(A_i)$ e $H'_{\text{ref}}$ são medidas.  
-Calcula-se a razão real do intervalo:
+#### 2. Detection and Localization of Local Deformations
+In the active document being processed, the observed physical coordinates $Y'(A_i)$ and $H'_{\text{ref}}$ are measured.  
+The observed interval ratio is computed as:
 $$R'_{Y}(i) = \frac{Y'(A_{i+1}) - Y'(A_i)}{H'_{\text{ref}}}$$
 
-Se $R'_Y(i) - R_Y(i) > \tau$ (onde $\tau \approx 0.02$, ou 2% do span), o algoritmo diagnostica:
-- **Localização:** O intervalo $i$ sofreu esticamento elástico de conteúdo.
-- **Deformação Absoluta Observada:**
+If $R'_Y(i) - R_Y(i) > \tau$ (where $\tau \approx 0.02$, or 2% of the span), the algorithm diagnoses:
+- **Localization:** Interval $i$ experienced dynamic content expansion.
+- **Absolute Observed Deformation:**
   $$\Delta\text{Stretch}_Y(i) = (R'_Y(i) - R_Y(i)) \times H'_{\text{ref}}$$
 
-O mesmo cálculo é executado no eixo horizontal para colunas que alargam ($\Delta\text{Stretch}_X$).
+The exact same formulation is applied along the horizontal axis for columns that expand horizontally ($\Delta\text{Stretch}_X$).
 
-#### 3. Coleta de Conteúdo Contíguo (*Contiguous Flow*)
-Para o campo contido no intervalo que deformou (como *Consignments*):
-- O campo **só inicia** se o primeiro glifo de texto intersectar os limites da sua caixa de partida ($Y_{\text{start}}$), evitando que campos vazios capturem seções inferiores.
-- O algoritmo agrupa as linhas contíguas da mesma coluna que mantêm entrelinha uniforme:
+#### 3. Contiguous Flow Analysis (*Zero Leakage*)
+For fields contained within a deformed interval (such as *Consignments*):
+- Extraction **only begins** if the first text glyph intersects the original starting bounding box ($Y_{\text{start}}$), preventing empty fields from capturing unrelated lower sections.
+- The algorithm clusters contiguous text lines sharing the same horizontal channel with a uniform line pitch:
   $$\text{Pitch} \le 1.6 \times \text{LineHeight}$$
-- A coleta é finalizada no primeiro salto de espaço em branco maior que a entrelinha normal, **impedindo a contaminação de seções intermediárias não mapeadas**.
+- Extraction immediately terminates at the first blank whitespace gap larger than the standard line pitch, **completely preventing contamination of unmapped intermediate sections**.
 
-#### 4. Propagação de Malha e Preservação de Proporções
-Para qualquer campo subjacente $m$ localizado abaixo de um ou mais esticamentos:
-$$Y_{\text{real}}(m) = (Y_{\text{original}}(m) \times S_y) + \sum_{j < m} \Delta\text{Stretch}_Y(j)$$
+#### 4. Mesh Propagation and Relative Proportion Preservation
+For any subsequent field $m$ positioned below one or more stretched regions:
+$$Y_{\text{actual}}(m) = (Y_{\text{original}}(m) \times S_y) + \sum_{j < m} \Delta\text{Stretch}_Y(j)$$
 
-As distâncias relativas entre todos os campos não deformados subsequentes continuam exatamente as mesmas do desenho original.
-
----
-
-### Camada de Resgate Transparente: *Anomaly Gate*
-
-Caso um documento sofra uma deformação catastrófica que viole a integridade geométrica (por exemplo: âncora obrigatória cortada na digitalização ou layout alienígena):
-1. O motor aciona silenciosamente o **Gemini 2.0 Flash Vision**.
-2. A página é renderizada em memória como imagem leve e analisada via visão computacional multimodal.
-3. O resultado é mesclado de forma **100% transparente para o usuário**, sem interrupções nem necessidade de configuração manual.
+The relative spatial distances between all subsequent non-deformed fields remain mathematically identical to the original template design.
 
 ---
 
-### Benefícios do LSIE no Copyx
+### Silent Safety Fallback: *Anomaly Gate*
 
-| Critério | Extratores Tradicionais | LSIE (Levi's Scale-Invariant Extraction) |
+If a document experiences catastrophic structural deformation that violates geometric integrity (such as an essential anchor truncated during scanning or an alien layout):
+1. The engine silently activates **Gemini 2.0 Flash Vision**.
+2. The page is rendered in-memory as an optimized image and parsed via multimodal computer vision.
+3. The extracted fields are merged **100% transparently to the user**, requiring zero manual intervention or workflow interruption.
+
+---
+
+### LSIE Advantages in Copyx
+
+| Metric | Traditional Extractors | LSIE (Levi's Scale-Invariant Extraction) |
 | :--- | :--- | :--- |
-| **Tempo de Execução** | ~200ms - 2s | **~5 milissegundos por página** |
-| **Custo por Documento** | R$ 0,05 a R$ 0,25 | **R$ 0,00 (100% Gratuito no Cliente)** |
-| **Privacidade de Dados** | Envio de PDFs para nuvens terceiras | **Totalmente Offline (Aderente à LGPD/GDPR)** |
-| **Suporte a Layout Elástico** | Quebra quando campos expandem | **Auto-correção elástica e preservação de proporções** |
-| **Sensibilidade a Impressoras** | Quebra em Carta vs A4 | **100% Invariante a Escala e Margens** |
+| **Execution Time** | ~200ms - 2s | **~5 milliseconds per page** |
+| **Cost per Document** | $0.01 to $0.05 | **$0.00 (100% Free on Client)** |
+| **Data Privacy** | PDFs transmitted to 3rd-party clouds | **Fully Offline (100% GDPR & LGPD Compliant)** |
+| **Elastic Layout Support** | Fails when fields expand | **Automatic elastic correction & proportion preservation** |
+| **Printer Scale Sensitivity** | Fails on Letter vs. A4 | **100% Invariant to Scale & Margins** |
