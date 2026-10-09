@@ -6,7 +6,6 @@ import {
   Sparkles,
   Key,
   CheckCircle2,
-  Edit2,
   Crosshair,
   Layers,
   ExternalLink
@@ -60,13 +59,6 @@ const showKeyModal = ref(false);
 const apiKeyInput = ref(getStoredApiKey());
 const selectedModel = ref(getStoredModel());
 const hasStoredKey = ref(!!getStoredApiKey());
-
-
-
-// Manual Edit Sample Value State
-const editingSampleFieldId = ref<string | null>(null);
-const editSampleValue = ref('');
-
 function openAddModal() {
   newFieldName.value = '';
   newFieldDataType.value = 'alphanumeric';
@@ -119,36 +111,12 @@ function saveApiKey() {
   showKeyModal.value = false;
 }
 
-function startEditingSample(field: FieldDefinition) {
-  editingSampleFieldId.value = field.id;
-  editSampleValue.value = field.sampleExtractedValue || '';
-}
-
-function saveEditingSample(field: FieldDefinition) {
-  const updated: FieldDefinition = {
-    ...field,
-    sampleExtractedValue: editSampleValue.value.trim() || undefined,
-  };
-  emit('updateField', updated);
-  editingSampleFieldId.value = null;
-}
-
-function cancelEditingSample() {
-  editingSampleFieldId.value = null;
-}
-
 function handleAiButtonClick(field: FieldDefinition) {
-  // If user typed in the sample input and clicked AI without hitting Enter/Save, commit it first
-  if (editingSampleFieldId.value === field.id && editSampleValue.value.trim()) {
-    field.sampleExtractedValue = editSampleValue.value.trim();
-    saveEditingSample(field);
-  }
   if (!getStoredApiKey()) {
     openApiKeyModal();
     return;
   }
   if (!field.sampleExtractedValue) {
-    startEditingSample(field);
     return;
   }
   emit('generateRuleWithAi', field.id);
@@ -272,59 +240,18 @@ function handleAiButtonClick(field: FieldDefinition) {
           </button>
         </div>
 
-        <!-- Extracted Sample Value Preview & Inline Editor -->
+        <!-- Detected Text Preview -->
         <div class="bg-gray-50 dark:bg-gray-800/60 rounded-lg p-2.5 my-2 text-xs border border-gray-100 dark:border-gray-800">
-          <div class="flex items-center justify-between text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">
-            <span>Sample Value (Exemplo):</span>
-            <button
-              v-if="editingSampleFieldId !== field.id"
-              @click.stop="startEditingSample(field)"
-              class="text-brand-purple hover:underline text-[11px] flex items-center gap-0.5 font-normal capitalize"
-              title="Digitar ou editar valor de exemplo manualmente"
-            >
-              <Edit2 class="w-2.5 h-2.5" />
-              <span>{{ field.sampleExtractedValue ? 'editar' : '+ digitar' }}</span>
-            </button>
+          <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">
+            Texto Detectado (Preview):
           </div>
-
-          <!-- Normal Display of Sample Value -->
-          <div v-if="editingSampleFieldId !== field.id" class="font-mono text-gray-800 dark:text-gray-200 break-all text-xs">
-            <span v-if="field.sampleExtractedValue" class="text-gray-900 dark:text-white font-medium">
+          <div class="font-mono text-gray-900 dark:text-white break-all text-xs font-medium">
+            <span v-if="field.sampleExtractedValue">
               "{{ field.sampleExtractedValue }}"
             </span>
-            <span v-else class="text-gray-400 dark:text-gray-500 italic text-[11px]">
-              (Desenhe a caixa no PDF ou clique em "+ digitar")
+            <span v-else class="text-gray-400 dark:text-gray-500 italic text-[11px] font-normal">
+              (Desenhe a Value Box no PDF para detectar)
             </span>
-          </div>
-
-          <!-- Inline Edit of Sample Value -->
-          <div v-else class="space-y-1.5 pt-0.5">
-            <input
-              v-model="editSampleValue"
-              type="text"
-              placeholder="ex: 015-TSO-1234, 123456, 12/05/2024..."
-              class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-purple"
-              @keyup.enter="saveEditingSample(field)"
-              @click.stop
-              autofocus
-            />
-            <div class="flex items-center justify-between text-[10px]">
-              <span class="text-gray-400">Pressione Enter para salvar</span>
-              <div class="flex items-center gap-1.5">
-                <button
-                  @click.stop="cancelEditingSample"
-                  class="px-2 py-0.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                >
-                  Cancelar
-                </button>
-                <button
-                  @click.stop="saveEditingSample(field)"
-                  class="px-2.5 py-0.5 bg-brand-purple text-white rounded font-medium hover:bg-brand-purple/90"
-                >
-                  Salvar
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -337,13 +264,13 @@ function handleAiButtonClick(field: FieldDefinition) {
               class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]"
             >
               <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />
-              <span>Capturado (LSIE)</span>
+              <span>Calibrado (LSIE)</span>
             </span>
             <span
               v-else
               class="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 italic text-[11px]"
             >
-              <span>Aguardando captura</span>
+              <span>Aguardando demarcação</span>
             </span>
 
             <!-- Required Toggle -->
