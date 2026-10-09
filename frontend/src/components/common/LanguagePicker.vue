@@ -157,9 +157,9 @@ onBeforeUnmount(() => {
             "
           >
             <!-- Left: Flag & Names -->
-            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1 pr-3">
               <span class="text-lg leading-none shrink-0">{{ lang.flag }}</span>
-              <div class="truncate">
+              <div class="min-w-0 truncate">
                 <div class="flex items-center gap-1.5">
                   <span class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ lang.nativeName }}</span>
                   <span
@@ -173,21 +173,21 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <!-- Right: 3 States (Downloading | Downloaded | Not Downloaded) -->
-            <div class="flex items-center gap-1.5 shrink-0" @click.stop>
+            <!-- Right: Fixed & Pinned to the right edge -->
+            <div class="ml-auto shrink-0 flex items-center justify-end min-w-[76px]" @click.stop>
               <!-- STATE 2: DOWNLOADING (Spinner + Progress) -->
               <template v-if="downloadingLanguageCode === lang.code.toLowerCase()">
-                <span class="flex items-center gap-1 text-[10px] font-bold text-brand-purple dark:text-purple-300 bg-brand-purple/10 dark:bg-brand-purple/25 px-2 py-0.5 rounded-full animate-pulse">
-                  <Loader2 class="w-3 h-3 animate-spin" />
+                <span class="inline-flex items-center justify-center gap-1 text-[10px] font-bold text-brand-purple dark:text-purple-300 bg-brand-purple/10 dark:bg-brand-purple/25 px-2 py-0.5 rounded-full animate-pulse">
+                  <Loader2 class="w-3.5 h-3.5 animate-spin" />
                   <span>{{ translationProgress }}%</span>
                 </span>
               </template>
 
               <!-- STATE 1: DOWNLOADED (Green Checkmark) -->
               <template v-else-if="isDownloaded(lang.code)">
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5 justify-end">
                   <span
-                    class="flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
+                    class="inline-flex items-center justify-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
                     :title="t('common.downloaded')"
                   >
                     <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />
@@ -206,14 +206,14 @@ onBeforeUnmount(() => {
                 </div>
               </template>
 
-              <!-- STATE 3: NOT DOWNLOADED (Download button) -->
+              <!-- STATE 3: NOT DOWNLOADED (Download button pinned to the right) -->
               <template v-else>
                 <button
                   @click.stop="handleDownloadClick(lang.code)"
-                  class="flex items-center gap-1 text-[10px] font-medium text-gray-600 dark:text-gray-300 hover:text-brand-purple dark:hover:text-purple-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 transition-colors"
+                  class="inline-flex items-center justify-center gap-1 text-[10px] font-medium text-gray-600 dark:text-gray-300 hover:text-brand-purple dark:hover:text-purple-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-2.5 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 transition-colors shadow-2xs"
                   :title="t('common.download')"
                 >
-                  <Download class="w-3 h-3" />
+                  <Download class="w-3 h-3 text-brand-purple dark:text-purple-300" />
                   <span>{{ t('common.download') }}</span>
                 </button>
               </template>
