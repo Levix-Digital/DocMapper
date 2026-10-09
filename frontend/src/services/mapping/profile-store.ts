@@ -142,7 +142,7 @@ export function getAllProfiles(): MappingProfile[] {
     // If the built-in profile in localStorage has old mock or uncalibrated coordinates, update it
     const existing = profiles[builtinIndex];
     const shipmentField = existing.fields.find(f => f.id === 'field-shipment');
-    if (shipmentField && (shipmentField.valueBox.y < 10 || shipmentField.valueBox.width > 10 || !shipmentField.anchorText)) {
+    if (shipmentField && (!shipmentField.valueBox || shipmentField.valueBox.y < 10 || shipmentField.valueBox.width > 10 || !shipmentField.anchorText)) {
       profiles[builtinIndex] = createBuiltinCmrProfile();
       saveAllProfiles(profiles);
     }

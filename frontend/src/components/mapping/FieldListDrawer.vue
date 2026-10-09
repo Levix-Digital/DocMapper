@@ -73,7 +73,7 @@ function confirmAddField() {
     id: `field-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     name: newFieldName.value.trim(),
     color,
-    valueBox: { x: 20, y: 20, width: 25, height: 4, page: 1 },
+    valueBox: undefined,
     validationPattern: '',
     dataType: newFieldDataType.value,
     isRequired: true,
@@ -81,6 +81,7 @@ function confirmAddField() {
 
   emit('addField', newField);
   emit('selectField', newField.id);
+  emit('setDrawingMode', newField.id, 'value');
   showAddModal.value = false;
 }
 
@@ -215,7 +216,7 @@ function handleAiButtonClick(field: FieldDefinition) {
               <span>Value Box</span>
             </span>
             <span class="text-[10px] opacity-75">
-              p.{{ field.valueBox?.page || 1 }}
+              {{ field.valueBox ? `p.${field.valueBox.page}` : 'None' }}
             </span>
           </button>
 
@@ -246,7 +247,7 @@ function handleAiButtonClick(field: FieldDefinition) {
             Texto Detectado (Preview):
           </div>
           <div class="font-mono text-gray-900 dark:text-white break-all text-xs font-medium">
-            <span v-if="field.sampleExtractedValue">
+            <span v-if="field.valueBox && field.sampleExtractedValue">
               "{{ field.sampleExtractedValue }}"
             </span>
             <span v-else class="text-gray-400 dark:text-gray-500 italic text-[11px] font-normal">
@@ -260,7 +261,7 @@ function handleAiButtonClick(field: FieldDefinition) {
           <!-- Status Row -->
           <div class="flex items-center justify-between text-xs">
             <span
-              v-if="field.sampleExtractedValue"
+              v-if="field.valueBox && field.sampleExtractedValue"
               class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]"
             >
               <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />

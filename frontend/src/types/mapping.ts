@@ -27,7 +27,7 @@ export interface FieldDefinition {
   /** Optional text captured from the anchor label */
   anchorText?: string;
   /** Bounding box where the field value is extracted */
-  valueBox: BoundingBox;
+  valueBox?: BoundingBox;
   /** Deterministic regex pattern for format validation */
   validationPattern: string;
   /** Semantic data type */

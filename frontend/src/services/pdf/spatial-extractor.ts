@@ -338,8 +338,8 @@ export async function extractFieldsWithCalibration(
     }
     candidates.push(field.name);
 
-    const expectedY = field.labelBox?.y ?? field.valueBox.y;
-    const expectedX = field.labelBox?.x ?? field.valueBox.x;
+    const expectedY = field.labelBox?.y ?? field.valueBox?.y ?? 20;
+    const expectedX = field.labelBox?.x ?? field.valueBox?.x ?? 20;
 
     let bestGlyph: ExtractedGlyph | null = null;
     let minScore = Infinity;
@@ -456,6 +456,11 @@ export async function extractFieldsWithCalibration(
   const missingRequiredFields: string[] = [];
 
   for (const field of fields) {
+    if (!field.valueBox) {
+      results[field.name] = '';
+      continue;
+    }
+
     const anchorGlyph = detectedAnchors.get(field.id);
     let targetBox: { x: number; y: number; width: number; height: number };
 
@@ -523,6 +528,11 @@ export async function extractAllFieldsFromPdf(
   const pageCache = new Map<number, any>();
 
   for (const field of fields) {
+    if (!field.valueBox) {
+      results[field.name] = '';
+      continue;
+    }
+
     const targetPageNum = Math.min(Math.max(field.valueBox.page, 1), numPages);
     
     if (!pageCache.has(targetPageNum)) {

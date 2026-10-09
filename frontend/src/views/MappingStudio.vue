@@ -175,6 +175,9 @@ function onDeleteBox(fieldId: string, type: 'value' | 'label') {
   if (type === 'label') {
     field.labelBox = undefined;
     field.anchorText = undefined;
+  } else if (type === 'value') {
+    field.valueBox = undefined;
+    field.sampleExtractedValue = undefined;
   }
   saveCurrentProfile();
 }
