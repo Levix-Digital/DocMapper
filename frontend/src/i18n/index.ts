@@ -5,6 +5,7 @@ import {
   getOrTranslateDictionary,
   getCachedTranslations,
   clearLanguageCache,
+  isLanguageDownloaded,
   type TranslationProgressEvent,
 } from '../services/i18n/translation-service';
 import { SUPPORTED_LANGUAGES, getLanguageOption, type LanguageOption } from './languages';
@@ -15,18 +16,32 @@ const LANGUAGE_STORAGE_KEY = 'docmapper_lang';
 export const flatEn: Record<string, string> = flattenDictionary(enRaw);
 
 // Global Reactive State
-const storedLang = typeof window !== 'undefined' ? localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'en' : 'en';
+const initialStoredLang = typeof window !== 'undefined' ? localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'en' : 'en';
 
-export const currentLanguage = ref<string>(storedLang);
+export const currentLanguage = ref<string>(initialStoredLang);
 export const currentTranslations = ref<Record<string, string>>({ ...flatEn });
 export const isTranslating = ref<boolean>(false);
 export const translationProgress = ref<number>(100);
 export const translationStatus = ref<string>('');
-export const translationProvider = ref<'gemini' | 'fallback' | 'cache'>('cache');
+export const downloadingLanguageCode = ref<string | null>(null);
+
+// Reactive tracker for local cache changes
+export const cacheVersion = ref<number>(0);
 
 export const currentLanguageOption = computed<LanguageOption>(() => {
   return getLanguageOption(currentLanguage.value);
 });
+
+/**
+ * Checks if a language pack is downloaded and stored locally.
+ */
+export function isDownloaded(langCode: string): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  cacheVersion.value; // dependency tracking
+  const norm = (langCode || 'en').toLowerCase();
+  if (norm === 'en') return true;
+  return isLanguageDownloaded(norm);
+}
 
 /**
  * Reactive translation function `t(key, params)`
@@ -45,8 +60,43 @@ export function t(key: string, params?: Record<string, string | number>): string
 }
 
 /**
- * Changes the active language.
- * Checks local cache first; if not present, calls AI runtime translation.
+ * Downloads a language pack into local cache without necessarily switching the active language.
+ */
+export async function downloadLanguagePack(code: string): Promise<boolean> {
+  const normCode = code.toLowerCase();
+  if (normCode === 'en' || isDownloaded(normCode)) return true;
+
+  const option = getLanguageOption(normCode);
+  downloadingLanguageCode.value = normCode;
+  translationProgress.value = 10;
+  translationStatus.value = `Downloading ${option.nativeName}...`;
+
+  try {
+    await getOrTranslateDictionary(
+      flatEn,
+      normCode,
+      (ev: TranslationProgressEvent) => {
+        translationProgress.value = ev.percent;
+        if (ev.message) {
+          translationStatus.value = ev.message;
+        }
+      }
+    );
+    cacheVersion.value++;
+    return true;
+  } catch (err: any) {
+    console.error(`[DocMapper i18n] Failed to download language ${normCode}:`, err);
+    return false;
+  } finally {
+    downloadingLanguageCode.value = null;
+    translationProgress.value = 100;
+    translationStatus.value = '';
+  }
+}
+
+/**
+ * Changes the active application language.
+ * Loads instantly (0ms) if cached, or downloads and applies if not downloaded.
  */
 export async function changeLanguage(code: string): Promise<boolean> {
   const normCode = code.toLowerCase();
@@ -56,9 +106,9 @@ export async function changeLanguage(code: string): Promise<boolean> {
     currentLanguage.value = 'en';
     currentTranslations.value = { ...flatEn };
     isTranslating.value = false;
+    downloadingLanguageCode.value = null;
     translationProgress.value = 100;
     translationStatus.value = '';
-    translationProvider.value = 'cache';
     if (typeof window !== 'undefined') {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, 'en');
       document.documentElement.dir = 'ltr';
@@ -67,18 +117,31 @@ export async function changeLanguage(code: string): Promise<boolean> {
     return true;
   }
 
+  // If already cached, switch instantly (0ms)
+  const cached = getCachedTranslations(normCode);
+  if (cached) {
+    currentTranslations.value = { ...flatEn, ...cached };
+    currentLanguage.value = normCode;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, normCode);
+      document.documentElement.dir = option.dir || 'ltr';
+      document.documentElement.lang = normCode;
+    }
+    return true;
+  }
+
+  // Not cached: download and apply
   isTranslating.value = true;
+  downloadingLanguageCode.value = normCode;
   translationProgress.value = 10;
-  translationStatus.value = `Loading ${option.nativeName}...`;
+  translationStatus.value = `Downloading ${option.nativeName}...`;
 
   try {
     const translated = await getOrTranslateDictionary(
       flatEn,
       normCode,
-      option.name,
       (ev: TranslationProgressEvent) => {
         translationProgress.value = ev.percent;
-        translationProvider.value = ev.provider;
         if (ev.message) {
           translationStatus.value = ev.message;
         }
@@ -87,6 +150,8 @@ export async function changeLanguage(code: string): Promise<boolean> {
 
     currentTranslations.value = translated;
     currentLanguage.value = normCode;
+    cacheVersion.value++;
+
     if (typeof window !== 'undefined') {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, normCode);
       document.documentElement.dir = option.dir || 'ltr';
@@ -99,30 +164,44 @@ export async function changeLanguage(code: string): Promise<boolean> {
     return false;
   } finally {
     isTranslating.value = false;
+    downloadingLanguageCode.value = null;
+    translationProgress.value = 100;
   }
 }
 
 /**
- * Resets translation cache and re-translates current language.
+ * Resets translation cache and re-downloads current language.
  */
 export async function reloadCurrentLanguage(): Promise<void> {
   if (currentLanguage.value === 'en') return;
   clearLanguageCache(currentLanguage.value);
+  cacheVersion.value++;
   await changeLanguage(currentLanguage.value);
 }
 
+/**
+ * Deletes a cached language pack.
+ */
+export function removeLanguagePack(code: string): void {
+  const norm = code.toLowerCase();
+  if (norm === 'en') return;
+  clearLanguageCache(norm);
+  cacheVersion.value++;
+  if (currentLanguage.value === norm) {
+    changeLanguage('en');
+  }
+}
+
 // Initialise if initial stored language is not English
-if (typeof window !== 'undefined' && storedLang !== 'en') {
-  // Try immediate cache load for 0ms initial render
-  const cached = getCachedTranslations(storedLang);
+if (typeof window !== 'undefined' && initialStoredLang !== 'en') {
+  const cached = getCachedTranslations(initialStoredLang);
   if (cached) {
     currentTranslations.value = { ...flatEn, ...cached };
-    const opt = getLanguageOption(storedLang);
+    const opt = getLanguageOption(initialStoredLang);
     document.documentElement.dir = opt.dir || 'ltr';
-    document.documentElement.lang = storedLang;
+    document.documentElement.lang = initialStoredLang;
   } else {
-    // Background translate
-    changeLanguage(storedLang);
+    changeLanguage(initialStoredLang);
   }
 }
 
@@ -138,8 +217,11 @@ export function useI18n() {
     isTranslating,
     translationProgress,
     translationStatus,
-    translationProvider,
+    downloadingLanguageCode,
+    isDownloaded,
+    downloadLanguagePack,
     changeLanguage,
     reloadCurrentLanguage,
+    removeLanguagePack,
   };
 }

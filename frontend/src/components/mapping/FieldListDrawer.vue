@@ -258,7 +258,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
           <!-- Label Box Button (Left) -->
           <button
             @click.stop="$emit('setDrawingMode', field.id, 'label')"
-            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium"
+            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium min-w-0"
             :class="[
               activeDrawingType === 'label' && selectedFieldId === field.id
                 ? 'bg-brand-purple text-white border-brand-purple'
@@ -266,11 +266,11 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             ]"
             title="Draw optional anchor label box"
           >
-            <span class="flex items-center gap-1">
-              <Crosshair class="w-3.5 h-3.5" />
-              <span>{{ t('fields.labelBox') }}</span>
+            <span class="flex items-center gap-1 min-w-0 truncate">
+              <Crosshair class="w-3.5 h-3.5 shrink-0" />
+              <span class="truncate">{{ t('fields.labelBox') }}</span>
             </span>
-            <span class="text-[10px] opacity-75">
+            <span class="text-[10px] opacity-75 shrink-0 ml-1">
               {{ field.labelBox ? `p.${field.labelBox.page}` : t('fields.none') }}
             </span>
           </button>
@@ -278,7 +278,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
           <!-- Value Box Button (Right) -->
           <button
             @click.stop="$emit('setDrawingMode', field.id, 'value')"
-            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium"
+            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium min-w-0"
             :class="[
               activeDrawingType === 'value' && selectedFieldId === field.id
                 ? 'bg-brand-purple text-white border-brand-purple'
@@ -286,11 +286,11 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             ]"
             title="Draw or reposition Value bounding box"
           >
-            <span class="flex items-center gap-1">
-              <Crosshair class="w-3.5 h-3.5" />
-              <span>{{ t('fields.valueBox') }}</span>
+            <span class="flex items-center gap-1 min-w-0 truncate">
+              <Crosshair class="w-3.5 h-3.5 shrink-0" />
+              <span class="truncate">{{ t('fields.valueBox') }}</span>
             </span>
-            <span class="text-[10px] opacity-75">
+            <span class="text-[10px] opacity-75 shrink-0 ml-1">
               {{ field.valueBox ? `p.${field.valueBox.page}` : t('fields.none') }}
             </span>
           </button>
@@ -298,14 +298,14 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
 
         <!-- Field Data Type Selector & Dimensions Inspector -->
         <div v-if="selectedFieldId === field.id" class="p-2.5 my-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 space-y-2 text-xs" @click.stop>
-          <div class="flex items-center justify-between gap-2">
+          <div class="flex flex-col gap-1.5">
             <label class="text-[11px] font-semibold text-gray-700 dark:text-gray-300">
               {{ t('fields.fieldType') }}
             </label>
             <select
               :value="field.dataType || 'alphanumeric'"
               @change="updateFieldDataType(field, ($event.target as HTMLSelectElement).value as FieldDataType)"
-              class="px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-brand-purple"
+              class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-brand-purple"
             >
               <option value="alphanumeric">{{ t('fields.typeAlphanumeric') }}</option>
               <option value="text">{{ t('fields.typeText') }}</option>
@@ -317,9 +317,11 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
 
           <!-- Value Box Coordinate Editor -->
           <div v-if="field.valueBox" class="pt-2 border-t border-purple-100 dark:border-purple-900/30 space-y-1">
-            <div class="flex items-center justify-between text-[11px] font-semibold text-gray-600 dark:text-gray-400">
-              <span>{{ t('fields.valueBoxDimensions', { page: field.valueBox.page }) }}</span>
-              <div class="flex items-center gap-1">
+            <div class="flex items-center justify-between text-[11px] font-semibold text-gray-600 dark:text-gray-400 gap-1.5">
+              <span class="truncate" :title="t('fields.valueBoxDimensions', { page: field.valueBox.page })">
+                {{ t('fields.valueBoxDimensions', { page: field.valueBox.page }) }}
+              </span>
+              <div class="flex items-center gap-1 shrink-0">
                 <button
                   @click="nudgeBox(field, 'value', -0.5, 0)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"

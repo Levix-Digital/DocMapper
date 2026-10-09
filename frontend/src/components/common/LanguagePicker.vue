@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
-  Check,
-  ChevronDown,
+  CheckCircle2,
+  Download,
   Loader2,
+  ChevronDown,
   Search,
-  Sparkles,
   RefreshCw,
+  Trash2,
 } from 'lucide-vue-next';
 import { useI18n } from '../../i18n';
 import type { LanguageOption } from '../../i18n/languages';
@@ -18,8 +19,12 @@ const {
   supportedLanguages,
   isTranslating,
   translationProgress,
+  downloadingLanguageCode,
+  isDownloaded,
+  downloadLanguagePack,
   changeLanguage,
   reloadCurrentLanguage,
+  removeLanguagePack,
 } = useI18n();
 
 const isOpen = ref(false);
@@ -44,10 +49,28 @@ function toggleDropdown() {
   }
 }
 
-async function selectLanguage(langCode: string) {
-  isOpen.value = false;
-  if (langCode === currentLanguage.value) return;
-  await changeLanguage(langCode);
+async function handleRowClick(langCode: string) {
+  const norm = langCode.toLowerCase();
+  if (norm === currentLanguage.value.toLowerCase()) {
+    isOpen.value = false;
+    return;
+  }
+
+  // If not downloaded yet, clicking the row downloads and applies it
+  if (!isDownloaded(norm)) {
+    await changeLanguage(langCode);
+  } else {
+    await changeLanguage(langCode);
+    isOpen.value = false;
+  }
+}
+
+async function handleDownloadClick(langCode: string) {
+  await downloadLanguagePack(langCode);
+}
+
+function handleDeletePack(langCode: string) {
+  removeLanguagePack(langCode);
 }
 
 function handleClickOutside(event: MouseEvent) {
@@ -78,7 +101,7 @@ onBeforeUnmount(() => {
       <span class="text-base leading-none">{{ currentLanguageOption.flag }}</span>
       <span class="font-medium tracking-wide uppercase">{{ currentLanguageOption.code }}</span>
 
-      <!-- Translating Indicator -->
+      <!-- Translating Indicator in Trigger -->
       <span
         v-if="isTranslating"
         class="flex items-center gap-1 text-[10px] font-bold text-brand-purple dark:text-purple-300 bg-brand-purple/10 dark:bg-brand-purple/20 px-1.5 py-0.5 rounded-full animate-pulse"
@@ -104,7 +127,7 @@ onBeforeUnmount(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden text-xs"
+        class="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden text-xs"
       >
         <!-- Header & Search Input -->
         <div class="p-2.5 border-b border-gray-100 dark:border-gray-700/80 bg-gray-50/70 dark:bg-gray-800/90">
@@ -121,31 +144,81 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Languages List -->
-        <div class="max-h-64 overflow-y-auto p-1 divide-y divide-transparent">
-          <button
+        <div class="max-h-72 overflow-y-auto p-1.5 divide-y divide-gray-50 dark:divide-gray-800/50">
+          <div
             v-for="lang in filteredLanguages"
             :key="lang.code"
-            @click="selectLanguage(lang.code)"
-            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-700/60"
+            @click="handleRowClick(lang.code)"
+            class="group w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-all cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/60"
             :class="
-              currentLanguage === lang.code
-                ? 'bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple dark:text-purple-300 font-bold'
+              currentLanguage.toLowerCase() === lang.code.toLowerCase()
+                ? 'bg-brand-purple/10 dark:bg-brand-purple/20 text-brand-purple dark:text-purple-300 font-semibold'
                 : 'text-gray-700 dark:text-gray-200'
             "
           >
-            <div class="flex items-center gap-2.5 truncate">
-              <span class="text-lg leading-none">{{ lang.flag }}</span>
+            <!-- Left: Flag & Names -->
+            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+              <span class="text-lg leading-none shrink-0">{{ lang.flag }}</span>
               <div class="truncate">
-                <span class="font-medium text-gray-900 dark:text-gray-100">{{ lang.nativeName }}</span>
-                <span class="ml-1.5 text-[11px] text-gray-400 dark:text-gray-400">({{ lang.name }})</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ lang.nativeName }}</span>
+                  <span
+                    v-if="currentLanguage.toLowerCase() === lang.code.toLowerCase()"
+                    class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-brand-purple/20 text-brand-purple dark:text-purple-300 shrink-0"
+                  >
+                    {{ t('common.active') }}
+                  </span>
+                </div>
+                <span class="text-[11px] text-gray-400 dark:text-gray-400 truncate block">({{ lang.name }})</span>
               </div>
             </div>
 
-            <Check
-              v-if="currentLanguage === lang.code"
-              class="w-4 h-4 text-brand-purple dark:text-purple-300 shrink-0"
-            />
-          </button>
+            <!-- Right: 3 States (Downloading | Downloaded | Not Downloaded) -->
+            <div class="flex items-center gap-1.5 shrink-0" @click.stop>
+              <!-- STATE 2: DOWNLOADING (Spinner + Progress) -->
+              <template v-if="downloadingLanguageCode === lang.code.toLowerCase()">
+                <span class="flex items-center gap-1 text-[10px] font-bold text-brand-purple dark:text-purple-300 bg-brand-purple/10 dark:bg-brand-purple/25 px-2 py-0.5 rounded-full animate-pulse">
+                  <Loader2 class="w-3 h-3 animate-spin" />
+                  <span>{{ translationProgress }}%</span>
+                </span>
+              </template>
+
+              <!-- STATE 1: DOWNLOADED (Green Checkmark) -->
+              <template v-else-if="isDownloaded(lang.code)">
+                <div class="flex items-center gap-1">
+                  <span
+                    class="flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
+                    :title="t('common.downloaded')"
+                  >
+                    <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />
+                    <span>{{ t('common.downloaded') }}</span>
+                  </span>
+
+                  <!-- Delete pack button (only for non-English cached languages) -->
+                  <button
+                    v-if="lang.code.toLowerCase() !== 'en'"
+                    @click.stop="handleDeletePack(lang.code)"
+                    class="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 rounded transition-opacity"
+                    :title="t('common.deletePack')"
+                  >
+                    <Trash2 class="w-3 h-3" />
+                  </button>
+                </div>
+              </template>
+
+              <!-- STATE 3: NOT DOWNLOADED (Download button) -->
+              <template v-else>
+                <button
+                  @click.stop="handleDownloadClick(lang.code)"
+                  class="flex items-center gap-1 text-[10px] font-medium text-gray-600 dark:text-gray-300 hover:text-brand-purple dark:hover:text-purple-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 transition-colors"
+                  :title="t('common.download')"
+                >
+                  <Download class="w-3 h-3" />
+                  <span>{{ t('common.download') }}</span>
+                </button>
+              </template>
+            </div>
+          </div>
 
           <div
             v-if="filteredLanguages.length === 0"
@@ -157,13 +230,12 @@ onBeforeUnmount(() => {
 
         <!-- Translation Info Footer -->
         <div class="p-2.5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/80 flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
-          <div class="flex items-center gap-1.5">
-            <Sparkles class="w-3.5 h-3.5 text-brand-purple dark:text-purple-300" />
-            <span>AI Runtime i18n</span>
+          <div class="flex items-center gap-1.5 font-medium">
+            <span>{{ t('common.poweredByGoogle') }}</span>
           </div>
 
           <button
-            v-if="currentLanguage !== 'en'"
+            v-if="currentLanguage.toLowerCase() !== 'en'"
             @click.stop="reloadCurrentLanguage"
             class="flex items-center gap-1 text-[10px] text-gray-400 hover:text-brand-purple dark:hover:text-purple-300 transition-colors"
             title="Force refresh translations"

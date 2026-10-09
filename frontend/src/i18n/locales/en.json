@@ -207,8 +207,13 @@
     "translatingProgress": "Translating application ({progress}%)...",
     "language": "Language",
     "searchLanguage": "Search language...",
-    "aiTranslation": "AI Runtime Translation",
+    "aiTranslation": "Runtime Translation",
     "cached": "Instant (Cached)",
-    "poweredByGemini": "Powered by Google Gemini 2.5 Flash"
+    "poweredByGoogle": "Google Translate",
+    "downloaded": "Downloaded",
+    "downloading": "Downloading...",
+    "download": "Download",
+    "active": "Active",
+    "deletePack": "Delete pack"
   }
 }

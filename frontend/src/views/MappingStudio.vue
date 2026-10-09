@@ -26,7 +26,6 @@ import InteractivePdfCanvas from '../components/mapping/InteractivePdfCanvas.vue
 import FieldListDrawer from '../components/mapping/FieldListDrawer.vue';
 import DestinationPlacementCanvas from '../components/mapping/DestinationPlacementCanvas.vue';
 import ProfileManagementModal from '../components/mapping/ProfileManagementModal.vue';
-import LanguagePicker from '../components/common/LanguagePicker.vue';
 import { useI18n } from '../i18n';
 
 const { t } = useI18n();
@@ -385,8 +384,6 @@ async function generateSamplePreview() {
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2">
-        <LanguagePicker />
-
         <button
           @click="showProfileHub = true"
           class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-sm"

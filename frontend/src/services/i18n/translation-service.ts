@@ -1,4 +1,4 @@
-import { getStoredApiKey, getStoredModel } from '../llm/gemini-service';
+import { getLanguageOption } from '../../i18n/languages';
 
 const CACHE_KEY_PREFIX = 'docmapper_i18n_cache_';
 
@@ -29,16 +29,32 @@ export function flattenDictionary(
 }
 
 /**
+ * Checks whether a language pack is already downloaded and cached locally.
+ */
+export function isLanguageDownloaded(langCode: string): boolean {
+  const norm = (langCode || 'en').toLowerCase();
+  if (norm === 'en') return true;
+  if (typeof window === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem(`${CACHE_KEY_PREFIX}${norm}`);
+    return Boolean(raw && raw.length > 10);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Retrieves cached translation dictionary from localStorage if available.
  */
 export function getCachedTranslations(langCode: string): Record<string, string> | null {
   if (typeof window === 'undefined') return null;
+  const norm = (langCode || 'en').toLowerCase();
   try {
-    const raw = localStorage.getItem(`${CACHE_KEY_PREFIX}${langCode.toLowerCase()}`);
+    const raw = localStorage.getItem(`${CACHE_KEY_PREFIX}${norm}`);
     if (!raw) return null;
     return JSON.parse(raw);
   } catch (err) {
-    console.warn(`[DocMapper i18n] Failed to read cache for ${langCode}:`, err);
+    console.warn(`[DocMapper i18n] Failed to read cache for ${norm}:`, err);
     return null;
   }
 }
@@ -51,13 +67,14 @@ export function saveCachedTranslations(
   translations: Record<string, string>
 ): void {
   if (typeof window === 'undefined') return;
+  const norm = (langCode || 'en').toLowerCase();
   try {
     localStorage.setItem(
-      `${CACHE_KEY_PREFIX}${langCode.toLowerCase()}`,
+      `${CACHE_KEY_PREFIX}${norm}`,
       JSON.stringify(translations)
     );
   } catch (err) {
-    console.warn(`[DocMapper i18n] Failed to persist cache for ${langCode}:`, err);
+    console.warn(`[DocMapper i18n] Failed to persist cache for ${norm}:`, err);
   }
 }
 
@@ -67,9 +84,10 @@ export function saveCachedTranslations(
 export function clearLanguageCache(langCode?: string): void {
   if (typeof window === 'undefined') return;
   if (langCode) {
-    localStorage.removeItem(`${CACHE_KEY_PREFIX}${langCode.toLowerCase()}`);
+    const norm = langCode.toLowerCase();
+    localStorage.removeItem(`${CACHE_KEY_PREFIX}${norm}`);
   } else {
-    for (let i = 0; i < localStorage.length; i++) {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
       if (key && key.startsWith(CACHE_KEY_PREFIX)) {
         localStorage.removeItem(key);
@@ -79,270 +97,185 @@ export function clearLanguageCache(langCode?: string): void {
 }
 
 /**
- * Translates a batch of key-value pairs using Google Gemini.
+ * Translates a single text string with Google Translate, preserving curly bracket placeholders.
  */
-async function translateBatchWithGemini(
-  batch: Record<string, string>,
-  targetLangCode: string,
-  targetLangName: string,
-  apiKey: string
-): Promise<Record<string, string>> {
-  const modelsToTry = [getStoredModel(), 'gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash'];
-  const uniqueModels = Array.from(new Set(modelsToTry.filter(Boolean)));
-
-  const prompt = `You are an expert localization engineer and translator for a modern enterprise document processing and PDF mapping web application.
-Translate the following English UI strings into ${targetLangName} (language code: "${targetLangCode}").
-
-Rules:
-1. Translate accurately and professionally for a technical software interface.
-2. DO NOT translate or modify any curly bracket placeholders like {name}, {current}, {total}, {page}, {count}. Keep them verbatim.
-3. Keep product names like "DocMapper" and technical file extensions like ".docmapper", ".dmap", ".pdf" intact.
-4. Return strictly a valid, raw JSON object matching the exact keys provided in the input, with translated strings as values.
-
-Input JSON:
-${JSON.stringify(batch, null, 2)}`;
-
-  let lastError = '';
-
-  for (const model of uniqueModels) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.1,
-          },
-        }),
-      });
-
-      if (!res.ok) {
-        const errorJson = await res.json().catch(() => null);
-        lastError = errorJson?.error?.message || `HTTP ${res.status}`;
-        continue;
-      }
-
-      const data = await res.json();
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) continue;
-
-      const parsed = JSON.parse(rawText);
-      return parsed as Record<string, string>;
-    } catch (err: any) {
-      lastError = err?.message || String(err);
-    }
-  }
-
-  throw new Error(`Gemini translation failed: ${lastError}`);
-}
-
-/**
- * Fallback translation using free public endpoint with placeholder preservation.
- */
-async function translateSingleWithFallback(
+async function translateSingleWithGoogle(
   text: string,
-  targetLangCode: string
+  googleLang: string
 ): Promise<string> {
-  // If text contains placeholders, extract them to restore after translation
+  if (!text || text.trim() === '') return text;
+
+  // Preserve placeholders like {count}, {name}, {page}
   const placeholders: string[] = [];
   const tokenized = text.replace(/\{[a-zA-Z0-9_-]+\}/g, match => {
     placeholders.push(match);
-    return `___PLH_${placeholders.length - 1}___`;
+    return `~${placeholders.length - 1}~`;
   });
 
   try {
-    // Attempt MyMemory API
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(tokenized)}&langpair=en|${encodeURIComponent(targetLangCode)}`;
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${encodeURIComponent(googleLang)}&dt=t&q=${encodeURIComponent(tokenized)}`;
     const res = await fetch(url);
+    if (!res.ok) return text;
+
+    const data = await res.json();
+    let translated = (data[0] || []).map((part: any) => part[0]).join('');
+
+    // Restore placeholders
+    placeholders.forEach((plh, idx) => {
+      translated = translated.replace(new RegExp(`~\\s*${idx}\\s*~`, 'gi'), plh);
+    });
+
+    return translated || text;
+  } catch (err) {
+    console.warn(`[DocMapper Google Translate] Error translating "${text}":`, err);
+    return text;
+  }
+}
+
+/**
+ * Translates a batch of strings with Google Translate using a delimiter.
+ * Falls back to parallel single translations if delimiter gets altered.
+ */
+async function translateBatchWithGoogle(
+  items: { key: string; value: string }[],
+  googleLang: string
+): Promise<Record<string, string>> {
+  const result: Record<string, string> = {};
+  if (items.length === 0) return result;
+
+  const DELIMITER = '\n§§§\n';
+
+  // Extract all placeholders across the batch
+  const placeholders: string[] = [];
+  const tokenizedItems = items.map(item => {
+    return item.value.replace(/\{[a-zA-Z0-9_-]+\}/g, match => {
+      placeholders.push(match);
+      return `~${placeholders.length - 1}~`;
+    });
+  });
+
+  const payload = tokenizedItems.join(DELIMITER);
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${encodeURIComponent(googleLang)}&dt=t&q=${encodeURIComponent(payload)}`;
+    const res = await fetch(url);
+
     if (res.ok) {
       const data = await res.json();
-      let translated = data?.responseData?.translatedText;
-      if (translated && typeof translated === 'string') {
-        // Restore placeholders
-        placeholders.forEach((plh, idx) => {
-          translated = translated.replace(new RegExp(`___PLH_${idx}___`, 'gi'), plh);
+      let fullText = (data[0] || []).map((part: any) => part[0]).join('');
+
+      // Restore placeholders
+      placeholders.forEach((plh, idx) => {
+        fullText = fullText.replace(new RegExp(`~\\s*${idx}\\s*~`, 'gi'), plh);
+      });
+
+      // Split on delimiter
+      const parts = fullText.split(/\s*§§§\s*/);
+
+      if (parts.length === items.length) {
+        items.forEach((item, idx) => {
+          result[item.key] = parts[idx]?.trim() || item.value;
         });
-        return translated;
+        return result;
       }
     }
-  } catch {
-    // Ignore and fallback
+  } catch (err) {
+    console.warn('[DocMapper i18n] Batch delimiter failed, falling back to parallel single items:', err);
   }
 
-  return text;
-}
+  // Fallback: translate individual items concurrently
+  await Promise.all(
+    items.map(async item => {
+      const translated = await translateSingleWithGoogle(item.value, googleLang);
+      result[item.key] = translated;
+    })
+  );
 
-/**
- * Translates a dictionary using parallel fallback execution when Gemini is unavailable.
- */
-async function translateBatchWithFallback(
-  batch: Record<string, string>,
-  targetLangCode: string,
-  onBatchProgress?: (completed: number, total: number) => void
-): Promise<Record<string, string>> {
-  const entries = Object.entries(batch);
-  const total = entries.length;
-  const results: Record<string, string> = {};
-  let completed = 0;
-
-  // Run in chunks of 5 concurrently to respect rate limits
-  const concurrency = 5;
-  for (let i = 0; i < entries.length; i += concurrency) {
-    const chunk = entries.slice(i, i + concurrency);
-    await Promise.all(
-      chunk.map(async ([key, value]) => {
-        try {
-          const translated = await translateSingleWithFallback(value, targetLangCode);
-          results[key] = translated || value;
-        } catch {
-          results[key] = value;
-        } finally {
-          completed++;
-          if (onBatchProgress) onBatchProgress(completed, total);
-        }
-      })
-    );
-  }
-
-  return results;
-}
-
-/**
- * Splits an object of key-value pairs into smaller chunks of given size.
- */
-function chunkObject(
-  obj: Record<string, string>,
-  chunkSize: number
-): Record<string, string>[] {
-  const entries = Object.entries(obj);
-  const chunks: Record<string, string>[] = [];
-
-  for (let i = 0; i < entries.length; i += chunkSize) {
-    const slice = entries.slice(i, i + chunkSize);
-    const chunk: Record<string, string> = {};
-    for (const [k, v] of slice) {
-      chunk[k] = v;
-    }
-    chunks.push(chunk);
-  }
-
-  return chunks;
+  return result;
 }
 
 export interface TranslationProgressEvent {
   percent: number;
   message?: string;
-  provider: 'gemini' | 'fallback' | 'cache';
+  provider: 'google' | 'cache';
 }
 
 /**
- * Main translation orchestrator.
- * 1. Checks localStorage cache.
- * 2. If all keys present, returns immediately (0ms).
- * 3. If missing keys exist, translates missing keys in parallel:
- *    - Uses Google Gemini if API key is configured.
- *    - Automatically falls back to free public translation if API key is absent or fails.
- * 4. Merges into cached dictionary and persists to localStorage.
+ * Main translation orchestrator using Google Translate.
+ * 1. Checks localStorage cache first for 0ms load.
+ * 2. If any missing keys exist, translates missing keys in parallel batches.
+ * 3. Restores placeholders and persists into localStorage.
  */
 export async function getOrTranslateDictionary(
   baseEnFlat: Record<string, string>,
   targetLangCode: string,
-  targetLangName: string,
   onProgress?: (event: TranslationProgressEvent) => void
 ): Promise<Record<string, string>> {
-  const normCode = targetLangCode.toLowerCase();
+  const normCode = (targetLangCode || 'en').toLowerCase();
 
-  // English needs 0 translation
+  // English requires no translation
   if (normCode === 'en') {
-    onProgress?.({ percent: 100, provider: 'cache' });
+    onProgress?.({ percent: 100, provider: 'cache', message: 'English (Base)' });
     return { ...baseEnFlat };
   }
 
-  // Check cache
+  // Read existing cache
   const cached = getCachedTranslations(normCode) || {};
-  const missingKeys: Record<string, string> = {};
+  const missingEntries: { key: string; value: string }[] = [];
 
   for (const [key, value] of Object.entries(baseEnFlat)) {
     if (!cached[key]) {
-      missingKeys[key] = value;
+      missingEntries.push({ key, value });
     }
   }
 
-  const missingCount = Object.keys(missingKeys).length;
-
   // Fully cached!
-  if (missingCount === 0) {
+  if (missingEntries.length === 0) {
     onProgress?.({ percent: 100, provider: 'cache', message: 'Loaded from cache' });
     return cached;
   }
 
-  onProgress?.({ percent: 10, provider: 'gemini', message: 'Translating...' });
+  const option = getLanguageOption(normCode);
+  const googleLang = option.googleCode || normCode;
 
-  const apiKey = getStoredApiKey();
+  onProgress?.({ percent: 10, provider: 'google', message: `Downloading ${option.nativeName}...` });
+
+  // Batch missing entries into chunks of 15 strings for fast parallel execution
+  const CHUNK_SIZE = 15;
+  const chunks: { key: string; value: string }[][] = [];
+  for (let i = 0; i < missingEntries.length; i += CHUNK_SIZE) {
+    chunks.push(missingEntries.slice(i, i + CHUNK_SIZE));
+  }
+
   const newlyTranslated: Record<string, string> = {};
+  let completedChunks = 0;
 
-  if (apiKey) {
-    try {
-      // Split missing keys into chunks of 40 keys for fast parallel execution
-      const chunks = chunkObject(missingKeys, 40);
-      let completedChunks = 0;
+  const chunkPromises = chunks.map(async chunk => {
+    const chunkResult = await translateBatchWithGoogle(chunk, googleLang);
+    completedChunks++;
+    const pct = Math.min(95, Math.round(15 + (completedChunks / chunks.length) * 80));
+    onProgress?.({
+      percent: pct,
+      provider: 'google',
+      message: `Translating (${completedChunks}/${chunks.length})...`,
+    });
+    return chunkResult;
+  });
 
-      const chunkPromises = chunks.map(async chunk => {
-        const res = await translateBatchWithGemini(chunk, normCode, targetLangName, apiKey);
-        completedChunks++;
-        const pct = Math.min(95, Math.round(15 + (completedChunks / chunks.length) * 80));
-        onProgress?.({
-          percent: pct,
-          provider: 'gemini',
-          message: `Translated batch ${completedChunks}/${chunks.length}`,
-        });
-        return res;
-      });
-
-      const batchResults = await Promise.all(chunkPromises);
-      for (const batch of batchResults) {
-        Object.assign(newlyTranslated, batch);
-      }
-    } catch (err: any) {
-      console.warn('[DocMapper i18n] Gemini translation failed, attempting fallback...', err);
-      // Fallback
-      onProgress?.({ percent: 30, provider: 'fallback', message: 'Using fallback translation...' });
-      const fallbackResult = await translateBatchWithFallback(
-        missingKeys,
-        normCode,
-        (comp, tot) => {
-          const pct = Math.min(95, Math.round(30 + (comp / tot) * 65));
-          onProgress?.({ percent: pct, provider: 'fallback' });
-        }
-      );
-      Object.assign(newlyTranslated, fallbackResult);
-    }
-  } else {
-    // No Gemini key - use free fallback directly
-    onProgress?.({ percent: 15, provider: 'fallback', message: 'Translating with free service...' });
-    const fallbackResult = await translateBatchWithFallback(
-      missingKeys,
-      normCode,
-      (comp, tot) => {
-        const pct = Math.min(95, Math.round(15 + (comp / tot) * 80));
-        onProgress?.({ percent: pct, provider: 'fallback' });
-      }
-    );
-    Object.assign(newlyTranslated, fallbackResult);
+  const allChunkResults = await Promise.all(chunkPromises);
+  for (const res of allChunkResults) {
+    Object.assign(newlyTranslated, res);
   }
 
   // Merge newly translated into cached dictionary
   const merged: Record<string, string> = {
-    ...baseEnFlat, // Fallback to EN if any key couldn't be translated
+    ...baseEnFlat, // Fallback to EN if any key couldn't be reached
     ...cached,
     ...newlyTranslated,
   };
 
   saveCachedTranslations(normCode, merged);
-  onProgress?.({ percent: 100, provider: apiKey ? 'gemini' : 'fallback', message: 'Complete' });
+  onProgress?.({ percent: 100, provider: 'google', message: 'Download complete' });
 
   return merged;
 }
