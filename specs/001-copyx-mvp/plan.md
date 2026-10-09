@@ -1,11 +1,11 @@
-# Implementation Plan: Copyx MVP (Porting Reference App)
+# Implementation Plan: DocMapper MVP (Porting Reference App)
 
 **Branch**: `001-copyx-mvp` | **Date**: 2025-12-05 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `specs/001-copyx-mvp/spec.md`
 
 ## Summary
 
-Port the client-side logic from the reference application to the Copyx Vue 3 codebase. This involves replacing the current Tesseract-based extraction with the verified Regex logic, implementing PDF generation using `pdf-lib` with the embedded template, and simplifying the UI to a direct drag-and-drop workflow.
+Port the client-side logic from the reference application to the DocMapper Vue 3 codebase. This involves replacing the current Tesseract-based extraction with the verified Regex logic, implementing PDF generation using `pdf-lib` with the embedded template, and simplifying the UI to a direct drag-and-drop workflow.
 
 ## Technical Context
 

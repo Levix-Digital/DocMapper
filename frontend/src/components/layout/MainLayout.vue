@@ -42,9 +42,9 @@ const toggleTheme = () => {
         <!-- Logo -->
         <a href="#/" @click.prevent="navigate('processor')" class="flex items-center gap-2">
             <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-purple to-brand-green flex items-center justify-center text-white font-bold font-heading">
-                C
+                D
             </div>
-            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-heading">Copyx</span>
+            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-heading">DocMapper</span>
         </a>
 
         <!-- Center Nav Tabs -->
@@ -108,9 +108,9 @@ const toggleTheme = () => {
     </footer>
 
     <!-- Help Modal -->
-    <Modal :show="showHelp" title="How to use Copyx" @close="showHelp = false">
+    <Modal :show="showHelp" title="How to use DocMapper" @close="showHelp = false">
         <div class="space-y-4 text-gray-600 dark:text-gray-300">
-            <p>Copyx generates standard delivery documents from CMR transport documents securely in your browser.</p>
+            <p>DocMapper generates standard delivery documents from CMR transport documents securely in your browser.</p>
             
             <div class="space-y-2">
                 <h4 class="font-bold text-gray-900 dark:text-white">Instructions:</h4>

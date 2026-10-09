@@ -30,8 +30,8 @@
 | **Destination Template Placement** | US2, FR-009 | `DestinationPlacementCanvas.vue` | CHK016, CHK017 | T012 | ✅ Aligned |
 | **Render Modes (Text, Barcode, QR)** | US2, FR-010 | `dynamic-stamper.ts` | CHK018, CHK019, CHK020 | T001, T006, T013 | ✅ Aligned |
 | **Local Profile Persistence** | US2, FR-011 | `profile-store.ts` | CHK001, CHK021 | T007, T014 | ✅ Aligned |
-| **Self-Contained `.copyx` Export** | US4, FR-012 | `profile-store.ts` | CHK022 | T015 | ✅ Aligned |
-| **Portable `.copyx` Import & Deduplication** | US4, FR-013 | `profile-store.ts` | CHK023, CHK024 | T016 | ✅ Aligned |
+| **Self-Contained `.docmapper` Export** | US4, FR-012 | `profile-store.ts` | CHK022 | T015 | ✅ Aligned |
+| **Portable `.docmapper` Import & Deduplication** | US4, FR-013 | `profile-store.ts` | CHK023, CHK024 | T016 | ✅ Aligned |
 | **Profile Management Hub** | US4, FR-014 | `ProfileManagementModal.vue` | CHK025 | T017 | ✅ Aligned |
 | **Deterministic Batch Runtime** | US3, FR-015 | `mapping-runner.ts` | CHK002, CHK027 | T018 | ✅ Aligned |
 | **Confidence Scoring (0-100%)** | US3, FR-016 | `mapping-runner.ts` | CHK028 | T018, T020 | ✅ Aligned |

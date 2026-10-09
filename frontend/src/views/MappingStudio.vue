@@ -17,7 +17,7 @@ import {
   getAllProfiles,
   saveProfile,
   createBuiltinCmrProfile,
-  exportProfileAsCopyx
+  exportProfileAsDocMapper
 } from '../services/mapping/profile-store';
 import { loadPdf, extractTextInBox, isPageScanned } from '../services/pdf/spatial-extractor';
 import { generateValidationPattern } from '../services/llm/gemini-service';
@@ -232,7 +232,7 @@ async function onGenerateRuleWithAi(fieldId: string) {
 
   try {
     isAiGenerating.value = true;
-    console.log('[Copyx Gemini] Solicitando inferência de regra para:', {
+    console.log('[DocMapper Gemini] Solicitando inferência de regra para:', {
       fieldName: field.name,
       sampleValue: field.sampleExtractedValue,
       labelContext: labelText,
@@ -244,13 +244,13 @@ async function onGenerateRuleWithAi(fieldId: string) {
       labelContext: labelText,
     });
 
-    console.log('[Copyx Gemini] Resposta do modelo:', result);
+    console.log('[DocMapper Gemini] Resposta do modelo:', result);
     field.validationPattern = result.regex;
     field.dataType = result.dataType;
     saveCurrentProfile();
     showToast(`Regra gerada com sucesso para "${field.name}": ${result.regex}`);
   } catch (err: any) {
-    console.error('[Copyx Gemini] Erro ao gerar regra:', err);
+    console.error('[DocMapper Gemini] Erro ao gerar regra:', err);
     aiError.value = err?.message || String(err);
   } finally {
     isAiGenerating.value = false;
@@ -296,7 +296,7 @@ function saveCurrentProfile() {
 }
 
 function exportCurrentProfile() {
-  exportProfileAsCopyx(currentProfile.value);
+  exportProfileAsDocMapper(currentProfile.value);
 }
 
 function onProfileSelectedFromHub(profile: MappingProfile) {
@@ -372,10 +372,10 @@ async function generateSamplePreview() {
         <button
           @click="exportCurrentProfile"
           class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-sm"
-          title="Download .copyx portable profile"
+          title="Download .docmapper portable profile"
         >
           <Download class="w-4 h-4 text-brand-green" />
-          <span>Export .copyx</span>
+          <span>Export .docmapper</span>
         </button>
 
         <button

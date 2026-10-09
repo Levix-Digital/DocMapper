@@ -5,7 +5,7 @@ Sync Impact Report:
 - Status: Initial Draft based on Reference App alignment
 -->
 
-# Project Constitution: Copyx
+# Project Constitution: DocMapper
 
 **Version**: 1.0.0
 **Ratification Date**: 2025-12-05
@@ -13,7 +13,7 @@ Sync Impact Report:
 
 ## Preamble
 
-This constitution defines the non-negotiable architectural and design principles for Copyx. It serves as the primary alignment mechanism for all contributors, ensuring that every feature and refactor adheres to the core philosophy of simplicity, privacy, and performance derived from our successful MVP analysis.
+This constitution defines the non-negotiable architectural and design principles for DocMapper. It serves as the primary alignment mechanism for all contributors, ensuring that every feature and refactor adheres to the core philosophy of simplicity, privacy, and performance derived from our successful MVP analysis.
 
 ## Core Principles
 
@@ -24,7 +24,7 @@ This constitution defines the non-negotiable architectural and design principles
 
 ### 2. Privacy by Design (Client-Side Only)
 **Principle**: All document processing, OCR, and data extraction MUST occur locally within the user's browser.
-**Rationale**: Copyx processes sensitive logistics documents (CMRs). Uploading these to a server introduces liability and latency. Zero-knowledge architecture is our default.
+**Rationale**: DocMapper processes sensitive logistics documents (CMRs). Uploading these to a server introduces liability and latency. Zero-knowledge architecture is our default.
 
 ### 3. Deterministic over Probabilistic
 **Principle**: Prefer explicit extraction logic (Regex, coordinates) over probabilistic models (AI, LLMs) for core workflows.

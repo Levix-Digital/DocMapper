@@ -1,9 +1,9 @@
-# Feature Specification: Copyx MVP (Porting Reference App)
+# Feature Specification: DocMapper MVP (Porting Reference App)
 
 **Feature Branch**: `001-copyx-mvp`
 **Created**: 2025-12-05
 **Status**: Draft
-**Input**: Porting reference app `ikea-sdgen-main` logic to Copyx Vue 3 stack.
+**Input**: Porting reference app `ikea-sdgen-main` logic to DocMapper Vue 3 stack.
 
 ## User Scenarios & Testing *(mandatory)*
 

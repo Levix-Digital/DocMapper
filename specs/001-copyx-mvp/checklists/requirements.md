@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Copyx MVP (Porting Reference App)
+# Specification Quality Checklist: DocMapper MVP (Porting Reference App)
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2025-12-05

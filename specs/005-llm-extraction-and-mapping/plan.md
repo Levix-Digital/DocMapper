@@ -5,13 +5,13 @@
 
 ## Summary
 
-Build an interactive, browser-native **Visual Mapping Studio** (`/mapping`) and client-side extraction engine for Copyx. Operators can upload any sample PDF (e.g., CMR), visually draw paired Label/Value bounding boxes over an SVG-rendered PDF canvas, generate deterministic regex validation patterns via Google Gemini (setup phase only), map destination placement coordinates on target PDF templates (rendering as text, Code 128, or QR Code), and run high-speed batch extractions 100% locally in the browser with zero cloud document upload.
+Build an interactive, browser-native **Visual Mapping Studio** (`/mapping`) and client-side extraction engine for DocMapper. Operators can upload any sample PDF (e.g., CMR), visually draw paired Label/Value bounding boxes over an SVG-rendered PDF canvas, generate deterministic regex validation patterns via Google Gemini (setup phase only), map destination placement coordinates on target PDF templates (rendering as text, Code 128, or QR Code), and run high-speed batch extractions 100% locally in the browser with zero cloud document upload.
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9, Vue 3.5 (Composition API)  
 **Primary Dependencies**: `pdfjs-dist` (v5.4.x), `pdf-lib` (v1.17.x), `jsbarcode` (v3.12.x), `qrcode` (v1.5.x), `lucide-vue-next`, Tailwind CSS  
-**Storage**: Client-side `IndexedDB` / `localStorage` (`copyx_mapping_profiles`) + portable `.copyx` self-contained JSON packages (Base64 destination template included)  
+**Storage**: Client-side `IndexedDB` / `localStorage` (`docmapper_mapping_profiles`) + portable `.docmapper` self-contained JSON packages (Base64 destination template included)  
 **Testing**: Manual interactive test suite + component/service unit verification  
 **Target Platform**: Modern Desktop Browsers (Chrome, Edge, Firefox, Brave) on Windows/macOS/Linux  
 **Project Type**: Web Application (Single-Page App with client-side reactive routing)  
@@ -56,7 +56,7 @@ frontend/src/
 │   ├── llm/
 │   │   └── gemini-service.ts                # Direct client REST call to Gemini for pattern generation (Setup only)
 │   └── mapping/
-│       ├── profile-store.ts                 # LocalStorage/IndexedDB persistence + .copyx import/export
+│       ├── profile-store.ts                 # LocalStorage/IndexedDB persistence + .docmapper import/export
 │       └── mapping-runner.ts                # Batch runtime execution (spatial query + regex validation + confidence)
 ├── components/
 │   ├── layout/
@@ -65,7 +65,7 @@ frontend/src/
 │       ├── InteractivePdfCanvas.vue         # Reactive SVG overlay over PDF canvas (drag, resize, color grouping)
 │       ├── FieldListDrawer.vue              # Sidebar for field management, Gemini pattern triggers, regex testing
 │       ├── DestinationPlacementCanvas.vue   # Target template canvas to map destination coordinates and render modes
-│       └── ProfileManagementModal.vue       # Profile hub (Export .copyx, Duplicate, Delete, Rename)
+│       └── ProfileManagementModal.vue       # Profile hub (Export .docmapper, Duplicate, Delete, Rename)
 └── views/
     ├── MappingStudio.vue                    # Visual Mapping Studio view (/mapping)
     └── Editor.vue                           # Main document processor updated with Profile selector
@@ -93,7 +93,7 @@ frontend/src/
 - Prompts Gemini with: Label name, sample text extracted from Value Box, and surrounding document snippet.
 - Requests strict JSON schema response: `{ regex: string, dataType: string, sampleMatch: boolean, explanation: string }`.
 - Provides graceful fallback: if API key is not configured or network fails, user can manually input or refine regex pattern.
-- User API key saved in browser `localStorage.getItem('copyx_gemini_api_key')`.
+- User API key saved in browser `localStorage.getItem('docmapper_gemini_api_key')`.
 
 ### 4. Interactive SVG Canvas (`frontend/src/components/mapping/InteractivePdfCanvas.vue`)
 - Renders PDF page to underlying `<canvas>` via `pdfjs-dist`.
@@ -109,9 +109,9 @@ frontend/src/
 - For `QR_CODE`: renders QR code offscreen via `qrcode`, converts to PNG buffer, embeds in `PDFDocument`, and draws at `targetBox` coordinates.
 
 ### 6. Profile Store & Portability (`profile-store.ts`)
-- Manages profiles in `localStorage` under `copyx_mapping_profiles`.
-- Exports profile as a standalone `.copyx` JSON file with destination PDF template embedded as Base64.
-- Imports `.copyx` file, auto-resolving name collisions with numeric suffixes `Profile (1)`.
+- Manages profiles in `localStorage` under `docmapper_mapping_profiles`.
+- Exports profile as a standalone `.docmapper` JSON file with destination PDF template embedded as Base64.
+- Imports `.docmapper` file, auto-resolving name collisions with numeric suffixes `Profile (1)`.
 
 ### 7. Main Processor Integration (`Editor.vue` & `mapping-runner.ts`)
 - Adds a Profile Selector dropdown to the main document upload screen.
@@ -124,7 +124,7 @@ frontend/src/
 - **Phase 1: Dependencies & Core Types**: Install `qrcode`, implement `types/mapping.ts` contracts.
 - **Phase 2: PDF Spatial Extraction Service**: Implement `spatial-extractor.ts` and test coordinate extraction against PDF sample pages.
 - **Phase 3: Dynamic PDF Stamper Service**: Implement `dynamic-stamper.ts` supporting Text, Code 128, and QR Code stamping via `pdf-lib`.
-- **Phase 4: Profile Storage & Portability**: Implement `profile-store.ts` for local persistence and `.copyx` JSON import/export.
+- **Phase 4: Profile Storage & Portability**: Implement `profile-store.ts` for local persistence and `.docmapper` JSON import/export.
 - **Phase 5: Gemini Pattern Generator**: Implement `gemini-service.ts` for setup-time regex generation with manual fallback.
 - **Phase 6: Visual Mapping Studio UI**: Build `InteractivePdfCanvas.vue`, `FieldListDrawer.vue`, `DestinationPlacementCanvas.vue`, and assemble `MappingStudio.vue`.
 - **Phase 7: Navigation & Router**: Implement lightweight router and update `MainLayout.vue` with tab switcher.

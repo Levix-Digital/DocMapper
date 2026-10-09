@@ -1,4 +1,4 @@
-# Plan Quality Checklist: Copyx MVP
+# Plan Quality Checklist: DocMapper MVP
 
 **Purpose**: Validate technical plan completeness and safety
 **Feature**: [Link to spec.md](../spec.md)

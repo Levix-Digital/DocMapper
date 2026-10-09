@@ -1,7 +1,7 @@
 {
-    "name": "copyx-backend",
+    "name": "docmapper-backend",
     "version": "1.0.0",
-    "description": "Backend for Copyx Licensing",
+    "description": "Backend for DocMapper Licensing",
     "main": "src/index.ts",
     "scripts": {
         "start": "ts-node src/index.ts",

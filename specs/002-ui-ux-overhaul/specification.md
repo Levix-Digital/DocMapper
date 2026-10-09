@@ -3,7 +3,7 @@
 **Feature Name:** UI/UX Overhaul & Rebrand
 
 ## 1. Overview
-Transform the Copyx MVP into a professional SaaS application branded as "Levix Digital". The design focuses on a modern, high-tech "Robot Shell" aesthetic with discrete, animated details.
+Transform the DocMapper MVP into a professional SaaS application branded as "Levix Digital". The design focuses on a modern, high-tech "Robot Shell" aesthetic with discrete, animated details.
 
 ## 2. Design System Requirements
 
@@ -29,7 +29,7 @@ Transform the Copyx MVP into a professional SaaS application branded as "Levix D
 
 ### 2.4 Component Definitions
 - **MainLayout:** 
-    - Sticky header with Logo ("Copyx" branding).
+    - Sticky header with Logo ("DocMapper" branding).
     - Footer with links (Privacy/Terms).
     - Help/How-to Modal mechanism.
     - Generic layout container.

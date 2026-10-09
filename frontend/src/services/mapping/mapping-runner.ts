@@ -117,7 +117,7 @@ export async function executeBatchMapping(
                 }
               }
             } catch (visionErr) {
-              console.warn('[Copyx Anomaly Gate] Vision rescue unavailable:', visionErr);
+              console.warn('[DocMapper Anomaly Gate] Vision rescue unavailable:', visionErr);
             }
           }
 

@@ -1,4 +1,4 @@
-# Copyx
+# DocMapper
 
 High-performance client-side engine for deterministic spatial extraction, visual mapping, and dynamic stamping of logistics, shipping, and fiscal documents in the browser.
 
@@ -131,7 +131,7 @@ If a document experiences catastrophic structural deformation that violates geom
 
 ---
 
-### LSIE Advantages in Copyx
+### LSIE Advantages in DocMapper
 
 | Metric | Traditional Extractors | LSIE (Levi's Scale-Invariant Extraction) |
 | :--- | :--- | :--- |

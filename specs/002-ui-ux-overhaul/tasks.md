@@ -67,7 +67,7 @@ description: "Task list for UI/UX Overhaul implementation"
 
 ## Phase 5: User Refinements
 
-- [x] T015 Update Header Branding to "Copyx"
+- [x] T015 Update Header Branding to "DocMapper"
 - [x] T016 Implement Page Footer (Privacy, Terms, Version)
 - [x] T017 Implement "How it Works" Modal
 - [x] T018 Update "CMR Processor" H1 to Action Title "Generate Shipment Documents"

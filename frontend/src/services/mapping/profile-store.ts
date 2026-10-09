@@ -1,7 +1,8 @@
 import type { MappingProfile, FieldDefinition, DestinationFieldMapping } from '../../types/mapping';
 import { SHIPMENT_DOC_TEMPLATE_BASE64 } from '../pdf/assets';
 
-const STORAGE_KEY = 'copyx_mapping_profiles';
+const STORAGE_KEY = 'docmapper_mapping_profiles';
+const LEGACY_STORAGE_KEY = 'copyx_mapping_profiles';
 
 export const BUILTIN_CMR_PROFILE_ID = 'builtin-cmr-standard';
 
@@ -116,7 +117,10 @@ export function createBuiltinCmrProfile(): MappingProfile {
 export function getAllProfiles(): MappingProfile[] {
   if (typeof window === 'undefined') return [];
 
-  const raw = localStorage.getItem(STORAGE_KEY);
+  let raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+  }
   let profiles: MappingProfile[] = [];
 
   if (raw) {
@@ -226,9 +230,9 @@ export function duplicateProfile(id: string): MappingProfile | undefined {
 }
 
 /**
- * Exports a mapping profile as a downloadable `.copyx` self-contained JSON file.
+ * Exports a mapping profile as a downloadable `.docmapper` self-contained JSON file.
  */
-export function exportProfileAsCopyx(profile: MappingProfile): void {
+export function exportProfileAsDocMapper(profile: MappingProfile): void {
   const serialized = JSON.stringify(profile, null, 2);
   const blob = new Blob([serialized], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -236,21 +240,24 @@ export function exportProfileAsCopyx(profile: MappingProfile): void {
 
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `${sanitizedName}.copyx`;
+  anchor.download = `${sanitizedName}.docmapper`;
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
   URL.revokeObjectURL(url);
 }
 
+// Backwards compatibility alias
+export const exportProfileAsCopyx = exportProfileAsDocMapper;
+
 /**
- * Imports a profile from a `.copyx` JSON string with collision-safe naming.
+ * Imports a profile from a `.docmapper` or legacy `.copyx` JSON string with collision-safe naming.
  */
-export function importProfileFromCopyx(jsonContent: string): MappingProfile {
+export function importProfileFromDocMapper(jsonContent: string): MappingProfile {
   const parsed = JSON.parse(jsonContent);
 
   if (!parsed.name || !Array.isArray(parsed.fields) || !Array.isArray(parsed.destinationMappings)) {
-    throw new Error('Invalid .copyx file format: Missing name, fields, or destinationMappings.');
+    throw new Error('Invalid .docmapper file format: Missing name, fields, or destinationMappings.');
   }
 
   const profiles = getAllProfiles();
@@ -272,3 +279,6 @@ export function importProfileFromCopyx(jsonContent: string): MappingProfile {
   saveProfile(importedProfile);
   return importedProfile;
 }
+
+// Backwards compatibility alias
+export const importProfileFromCopyx = importProfileFromDocMapper;

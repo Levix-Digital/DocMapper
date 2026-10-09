@@ -5,7 +5,7 @@
 
 ## Summary
 
-Complete visual overhaul of the Copyx MVP to match the "Levix Digital" brand (Robot Shell aesthetic). Includes implementing `lucide-vue-next` for icons, Dual Mode (Dark/Light) using Tailwind, and extracting React-like components (`Button`, `Card`) in Vue 3.
+Complete visual overhaul of the DocMapper MVP to match the "Levix Digital" brand (Robot Shell aesthetic). Includes implementing `lucide-vue-next` for icons, Dual Mode (Dark/Light) using Tailwind, and extracting React-like components (`Button`, `Card`) in Vue 3.
 
 ## Technical Context
 

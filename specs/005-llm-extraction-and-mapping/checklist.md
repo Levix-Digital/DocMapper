@@ -50,8 +50,8 @@
 ## 5. Local Persistence & Portable Sharing (US2, US4)
 
 - [x] CHK021 **Browser Storage Persistence**: Are saved `MappingProfile` objects stored in `localStorage` / `IndexedDB` and reloaded automatically on app startup?
-- [x] CHK022 **Self-Contained `.copyx` Export**: Does exporting a profile download a single `.copyx` JSON file embedding field coordinates, regex rules, and the destination PDF template as Base64?
-- [x] CHK023 **Drop & Pick Import**: Can a `.copyx` file be imported by drag-and-drop or file picker in any browser session without external network requests?
+- [x] CHK022 **Self-Contained `.docmapper` Export**: Does exporting a profile download a single `.docmapper` JSON file embedding field coordinates, regex rules, and the destination PDF template as Base64?
+- [x] CHK023 **Drop & Pick Import**: Can a `.docmapper` file be imported by drag-and-drop or file picker in any browser session without external network requests?
 - [x] CHK024 **Duplicate Profile Naming**: When importing or duplicating a profile with an existing name, does the store append an incrementing suffix `(1)` to avoid overwriting existing profiles?
 - [x] CHK025 **Profile Management Actions**: Can users rename, duplicate, delete, and set default profiles from the Profile Management Hub?
 

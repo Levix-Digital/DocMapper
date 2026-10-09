@@ -67,12 +67,12 @@
 
 ## Phase 5: User Story 4 - Portable Profile Sharing (Priority: P1)
 
-**Goal**: Export and import self-contained `.copyx` files (including the destination PDF template encoded in Base64) with zero cloud dependencies and automatic collision deduplication.
+**Goal**: Export and import self-contained `.docmapper` files (including the destination PDF template encoded in Base64) with zero cloud dependencies and automatic collision deduplication.
 
-**Independent Test**: Export a saved profile to `.copyx`, clear browser storage or open a private window, import the `.copyx` file, and verify all field rules and destination template are fully restored.
+**Independent Test**: Export a saved profile to `.docmapper`, clear browser storage or open a private window, import the `.docmapper` file, and verify all field rules and destination template are fully restored.
 
-- [x] T015 [P] [US4] Implement `.copyx` self-contained JSON packager and exporter in `frontend/src/services/mapping/profile-store.ts` (bundling field rules, spatial coordinates, and destination PDF template Base64)
-- [x] T016 [P] [US4] Implement `.copyx` importer with drag-and-drop / file picker and duplicate naming collision resolution (e.g. `Profile (1)`) in `frontend/src/services/mapping/profile-store.ts`
+- [x] T015 [P] [US4] Implement `.docmapper` self-contained JSON packager and exporter in `frontend/src/services/mapping/profile-store.ts` (bundling field rules, spatial coordinates, and destination PDF template Base64)
+- [x] T016 [P] [US4] Implement `.docmapper` importer with drag-and-drop / file picker and duplicate naming collision resolution (e.g. `Profile (1)`) in `frontend/src/services/mapping/profile-store.ts`
 - [x] T017 [US4] Create Profile Management Hub modal in `frontend/src/components/mapping/ProfileManagementModal.vue` allowing operators to list, rename, duplicate, delete, and export/import profiles
 
 **Checkpoint**: User Story 4 complete — profiles are 100% portable across workstations.
@@ -124,8 +124,8 @@ graph TD
     T012 --> T013[T013: Destination Property Inspector]
     T013 & T006 --> T014[T014: Profile Save Flow]
     
-    T007 --> T015[T015: .copyx Exporter]
-    T007 --> T016[T016: .copyx Importer]
+    T007 --> T015[T015: .docmapper Exporter]
+    T007 --> T016[T016: .docmapper Importer]
     T015 & T016 --> T017[T017: ProfileManagementModal.vue]
     
     T005 & T006 & T014 --> T018[T018: mapping-runner.ts]
