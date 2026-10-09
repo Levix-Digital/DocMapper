@@ -26,7 +26,10 @@ import InteractivePdfCanvas from '../components/mapping/InteractivePdfCanvas.vue
 import FieldListDrawer from '../components/mapping/FieldListDrawer.vue';
 import DestinationPlacementCanvas from '../components/mapping/DestinationPlacementCanvas.vue';
 import ProfileManagementModal from '../components/mapping/ProfileManagementModal.vue';
+import LanguagePicker from '../components/common/LanguagePicker.vue';
+import { useI18n } from '../i18n';
 
+const { t } = useI18n();
 const activeTab = ref<'origin' | 'destination' | 'preview'>('origin');
 
 // Active Profile
@@ -92,7 +95,7 @@ async function handleOriginUpload(event: Event) {
 
     // Extract all existing mapped fields from sample
     await extractAllSampleFields();
-    showToast(`Loaded sample PDF: ${file.name}`);
+    showToast(t('nav.loadedToast', { name: file.name }));
   } catch (err: any) {
     alert(`Failed to parse sample PDF: ${err?.message || err}`);
   }
@@ -325,13 +328,13 @@ function onProfileSelectedFromHub(profile: MappingProfile) {
   if (profile.fields.length > 0) {
     selectedFieldId.value = profile.fields[0].id;
   }
-  showToast(`Switched active profile to: ${profile.name}`);
+  showToast(t('nav.switchToast', { name: profile.name }));
 }
 
 // Generate Sample Output Preview
 async function generateSamplePreview() {
   if (!currentProfile.value.destinationTemplateBase64) {
-    alert('Please upload a destination PDF template in Step 2 first.');
+    alert(t('preview.needTemplateAlert'));
     return;
   }
 
@@ -370,24 +373,26 @@ async function generateSamplePreview() {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
       <div>
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Visual Mapping Studio</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('nav.studioTitle') }}</h1>
           <span class="px-3 py-1 rounded-full text-xs font-semibold bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/20 dark:text-purple-300">
-            Profile: {{ currentProfile.name }}
+            {{ t('nav.profileLabel', { name: currentProfile.name }) }}
           </span>
         </div>
         <p class="text-xs text-gray-500 mt-1">
-          Calibrate origin document extraction zones (Value & Label Boxes) and map destination placement.
+          {{ t('nav.studioSubtitle') }}
         </p>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2">
+        <LanguagePicker />
+
         <button
           @click="showProfileHub = true"
           class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-sm"
         >
           <FolderOpen class="w-4 h-4 text-brand-purple" />
-          <span>Profiles</span>
+          <span>{{ t('nav.profiles') }}</span>
         </button>
 
         <button
@@ -396,15 +401,15 @@ async function generateSamplePreview() {
           title="Download .dmap portable profile"
         >
           <Download class="w-4 h-4 text-brand-green" />
-          <span>Export .dmap</span>
+          <span>{{ t('nav.exportDmap') }}</span>
         </button>
 
         <button
-          @click="saveCurrentProfile(true); showToast('Profile saved successfully!');"
+          @click="saveCurrentProfile(true); showToast(t('nav.savedToast'));"
           class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-purple hover:bg-brand-purple/90 text-white text-xs font-semibold shadow-md transition-all"
         >
           <Save class="w-4 h-4" />
-          <span>Save Profile</span>
+          <span>{{ t('nav.save') }}</span>
         </button>
       </div>
     </div>
@@ -426,7 +431,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'origin' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <FileText class="w-4 h-4" />
-        <span>1. Origin Document</span>
+        <span>{{ t('nav.tabOrigin') }}</span>
       </button>
 
       <button
@@ -435,7 +440,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'destination' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <FileCheck class="w-4 h-4" />
-        <span>2. Destination Placement</span>
+        <span>{{ t('nav.tabDestination') }}</span>
       </button>
 
       <button
@@ -444,7 +449,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'preview' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <Eye class="w-4 h-4" />
-        <span>3. Output Preview</span>
+        <span>{{ t('nav.tabPreview') }}</span>
       </button>
     </div>
 
@@ -457,7 +462,7 @@ async function generateSamplePreview() {
       >
         <AlertCircle class="w-5 h-5 flex-shrink-0 text-amber-500" />
         <span>
-          <strong>Scanned Document Notice:</strong> This PDF appears to be a pure raster image with no digital text stream. OCR pre-processing is required for automated spatial text extraction.
+          <strong>{{ t('origin.scannedNoticeTitle') }}</strong> {{ t('origin.scannedNoticeDesc') }}
         </span>
       </div>
 
@@ -474,14 +479,14 @@ async function generateSamplePreview() {
               <Upload class="w-10 h-10 animate-bounce" />
             </div>
             <h3 class="font-bold text-gray-900 dark:text-white text-base">
-              Upload a Sample PDF (e.g., CMR) to Calibrate
+              {{ t('origin.emptyTitle') }}
             </h3>
             <p class="text-xs text-gray-500 max-w-md">
-              Upload a sample document to draw bounding boxes (Value Box / Label Box) directly over the text and calibrate extraction rules.
+              {{ t('origin.emptyDesc') }}
             </p>
             <label class="cursor-pointer px-5 py-2.5 bg-brand-purple text-white text-sm font-semibold rounded-xl shadow-md hover:bg-brand-purple/90 transition-all flex items-center gap-2">
               <Upload class="w-4 h-4" />
-              <span>Upload Sample PDF</span>
+              <span>{{ t('origin.uploadSample') }}</span>
               <input type="file" accept="application/pdf,.pdf" class="hidden" @change="handleOriginUpload" />
             </label>
           </div>
@@ -490,10 +495,10 @@ async function generateSamplePreview() {
           <template v-else>
             <!-- Top info banner -->
             <div class="w-full flex items-center justify-between mb-2 px-2 text-xs text-gray-500">
-              <span class="font-medium">Sample: {{ sampleFileName }}</span>
+              <span class="font-medium">{{ t('origin.sampleLabel', { name: sampleFileName }) }}</span>
               <label class="cursor-pointer text-brand-purple hover:underline flex items-center gap-1 font-semibold">
                 <Upload class="w-3.5 h-3.5" />
-                <span>Change Sample PDF</span>
+                <span>{{ t('origin.changeSample') }}</span>
                 <input type="file" accept="application/pdf,.pdf" class="hidden" @change="handleOriginUpload" />
               </label>
             </div>
@@ -548,9 +553,9 @@ async function generateSamplePreview() {
     <div v-else-if="activeTab === 'preview'" class="space-y-4">
       <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
         <div>
-          <h3 class="font-bold text-gray-900 dark:text-white text-base">Destination PDF Generation Preview</h3>
+          <h3 class="font-bold text-gray-900 dark:text-white text-base">{{ t('preview.title') }}</h3>
           <p class="text-xs text-gray-500">
-            Preview of the destination delivery document filled with extracted sample values and generated barcodes.
+            {{ t('preview.desc') }}
           </p>
         </div>
 
@@ -560,7 +565,7 @@ async function generateSamplePreview() {
             :disabled="isGeneratingPreview"
             class="px-4 py-2 rounded-xl bg-brand-purple text-white text-xs font-semibold shadow-md hover:bg-brand-purple/90 transition-all disabled:opacity-40"
           >
-            {{ isGeneratingPreview ? 'Rendering...' : 'Re-render Preview' }}
+            {{ isGeneratingPreview ? t('preview.rendering') : t('preview.reRender') }}
           </button>
 
           <a
@@ -570,7 +575,7 @@ async function generateSamplePreview() {
             class="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300"
           >
             <ExternalLink class="w-4 h-4" />
-            <span>Open in New Tab</span>
+            <span>{{ t('preview.openInNewTab') }}</span>
           </a>
         </div>
       </div>
@@ -580,7 +585,7 @@ async function generateSamplePreview() {
         <iframe :key="previewPdfBlobUrl || 'preview'" :src="previewPdfBlobUrl" class="w-full h-full border-0"></iframe>
       </div>
       <div v-else class="text-center py-20 text-gray-400 text-sm">
-        Click "Re-render Preview" to compile and preview the destination document.
+        {{ t('preview.emptyNotice') }}
       </div>
     </div>
 

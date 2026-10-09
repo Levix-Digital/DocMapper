@@ -2,6 +2,9 @@
 import { ref, watch, onMounted, onUnmounted, computed, toRaw, nextTick } from 'vue';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Trash2 } from 'lucide-vue-next';
 import type { BoundingBox, FieldDefinition } from '../../types/mapping';
+import { useI18n } from '../../i18n';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -438,18 +441,18 @@ const draftBoxStyle = computed(() => {
           @click="prevPage"
           :disabled="currentPage <= 1"
           class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
-          title="Previous Page"
+          :title="t('origin.prevPage')"
         >
           <ChevronLeft class="w-4 h-4 text-gray-700 dark:text-gray-300" />
         </button>
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Page {{ currentPage }} / {{ totalPages }}
+          {{ t('origin.pageNav', { current: currentPage, total: totalPages }) }}
         </span>
         <button
           @click="nextPage"
           :disabled="currentPage >= totalPages"
           class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
-          title="Next Page"
+          :title="t('origin.nextPage')"
         >
           <ChevronRight class="w-4 h-4 text-gray-700 dark:text-gray-300" />
         </button>
@@ -462,10 +465,10 @@ const draftBoxStyle = computed(() => {
           class="px-2.5 py-1 rounded-full font-semibold animate-pulse"
           :style="{ backgroundColor: `${activeColor}20`, color: activeColor, borderColor: activeColor }"
         >
-          Drawing Mode: {{ activeDrawingType === 'value' ? 'Value Box [Solid]' : 'Label Box [Dashed]' }}
+          {{ activeDrawingType === 'value' ? t('origin.modeValue') : t('origin.modeLabel') }}
         </span>
         <span v-else class="text-gray-500 dark:text-gray-400">
-          Click a field in the drawer to draw its bounding box
+          {{ t('origin.promptDraw') }}
         </span>
       </div>
 
@@ -475,7 +478,7 @@ const draftBoxStyle = computed(() => {
           @click="zoomOut"
           :disabled="scale <= 0.75"
           class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
-          title="Zoom Out"
+          :title="t('origin.zoomOut')"
         >
           <ZoomOut class="w-4 h-4 text-gray-700 dark:text-gray-300" />
         </button>
@@ -486,7 +489,7 @@ const draftBoxStyle = computed(() => {
           @click="zoomIn"
           :disabled="scale >= 2.5"
           class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
-          title="Zoom In"
+          :title="t('origin.zoomIn')"
         >
           <ZoomIn class="w-4 h-4 text-gray-700 dark:text-gray-300" />
         </button>
@@ -494,7 +497,7 @@ const draftBoxStyle = computed(() => {
           v-if="selectedFieldId"
           @click="$emit('deleteBox', selectedFieldId, 'value')"
           class="p-1.5 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-colors ml-2"
-          title="Delete selected field boxes"
+          :title="t('origin.deleteSelected')"
         >
           <Trash2 class="w-4 h-4" />
         </button>

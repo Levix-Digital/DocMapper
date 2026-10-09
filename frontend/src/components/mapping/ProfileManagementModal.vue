@@ -19,6 +19,9 @@ import {
   saveProfile,
   BUILTIN_CMR_PROFILE_ID
 } from '../../services/mapping/profile-store';
+import { useI18n } from '../../i18n';
+
+const { t } = useI18n();
 
 defineProps<{
   show: boolean;
@@ -122,8 +125,8 @@ async function handleImportFile(event: Event) {
         <div class="flex items-center gap-2.5">
           <FolderOpen class="w-5 h-5 text-brand-purple" />
           <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Profile Management Hub</h3>
-            <p class="text-xs text-gray-500">Manage, export, and import your document mapping profiles locally.</p>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ t('profileModal.title') }}</h3>
+            <p class="text-xs text-gray-500">{{ t('profileModal.subtitle') }}</p>
           </div>
         </div>
 
@@ -153,7 +156,7 @@ async function handleImportFile(event: Event) {
         <!-- Import Button -->
         <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 text-xs font-semibold text-gray-700 dark:text-gray-200 shadow-sm transition-all">
           <Upload class="w-3.5 h-3.5 text-brand-purple" />
-          <span>Import .dmap File</span>
+          <span>{{ t('profileModal.import') }}</span>
           <input type="file" accept=".dmap,.docmapper,application/json" class="hidden" @change="handleImportFile" />
         </label>
       </div>
@@ -219,14 +222,14 @@ async function handleImportFile(event: Event) {
               @click="handleSelect(p)"
               class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 dark:bg-gray-800 hover:bg-brand-purple hover:text-white transition-all text-gray-700 dark:text-gray-300"
             >
-              Load Profile
+              {{ t('profileModal.switchProfile') }}
             </button>
 
             <!-- Export .dmap -->
             <button
               @click="handleExport(p)"
               class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-              title="Export as self-contained .dmap file"
+              :title="t('profileModal.export')"
             >
               <Download class="w-4 h-4" />
             </button>
@@ -235,7 +238,7 @@ async function handleImportFile(event: Event) {
             <button
               @click="handleDuplicate(p.id)"
               class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-              title="Duplicate Profile"
+              :title="t('profileModal.duplicate')"
             >
               <Copy class="w-4 h-4" />
             </button>
@@ -245,7 +248,7 @@ async function handleImportFile(event: Event) {
               v-if="p.id !== BUILTIN_CMR_PROFILE_ID"
               @click="handleDelete(p.id)"
               class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500"
-              title="Delete Profile"
+              :title="t('profileModal.delete')"
             >
               <Trash2 class="w-4 h-4" />
             </button>

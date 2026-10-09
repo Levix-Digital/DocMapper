@@ -21,6 +21,9 @@ import type {
   VerticalAlignment
 } from '../../types/mapping';
 import { loadPdf } from '../../services/pdf/spatial-extractor';
+import { useI18n } from '../../i18n';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fields: FieldDefinition[];
@@ -548,16 +551,18 @@ const draftBoxStyle = computed(() => {
             @click="prevPage"
             :disabled="currentPage <= 1 || !loadedPdfDoc"
             class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
+            :title="t('origin.prevPage')"
           >
             <ChevronLeft class="w-4 h-4 text-gray-700 dark:text-gray-300" />
           </button>
           <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Page {{ currentPage }} / {{ totalPages }}
+            {{ t('origin.pageNav', { current: currentPage, total: totalPages }) }}
           </span>
           <button
             @click="nextPage"
             :disabled="currentPage >= totalPages || !loadedPdfDoc"
             class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
+            :title="t('origin.nextPage')"
           >
             <ChevronRight class="w-4 h-4 text-gray-700 dark:text-gray-300" />
           </button>
@@ -567,7 +572,7 @@ const draftBoxStyle = computed(() => {
         <div class="flex items-center gap-3">
           <label class="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors">
             <Upload class="w-3.5 h-3.5 text-brand-purple" />
-            <span>{{ templateFileName || 'Upload Template PDF' }}</span>
+            <span>{{ templateFileName || t('destination.uploadTemplate') }}</span>
             <input type="file" accept="application/pdf,.pdf" class="hidden" @change="handleFileSelect" />
           </label>
         </div>
@@ -578,6 +583,7 @@ const draftBoxStyle = computed(() => {
             @click="scale = Math.max(scale - 0.25, 0.75)"
             :disabled="scale <= 0.75 || !loadedPdfDoc"
             class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
+            :title="t('origin.zoomOut')"
           >
             <ZoomOut class="w-4 h-4" />
           </button>
@@ -588,6 +594,7 @@ const draftBoxStyle = computed(() => {
             @click="scale = Math.min(scale + 0.25, 2.5)"
             :disabled="scale >= 2.5 || !loadedPdfDoc"
             class="p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
+            :title="t('origin.zoomIn')"
           >
             <ZoomIn class="w-4 h-4" />
           </button>
@@ -597,12 +604,12 @@ const draftBoxStyle = computed(() => {
       <!-- Canvas or Empty State -->
       <div v-if="!loadedPdfDoc" class="flex flex-col items-center justify-center p-16 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl w-full max-w-xl text-center space-y-4 my-8">
         <Upload class="w-12 h-12 text-brand-purple animate-bounce" />
-        <h3 class="text-base font-bold text-gray-900 dark:text-white">Upload Destination Delivery Note Template</h3>
+        <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ t('destination.emptyTitle') }}</h3>
         <p class="text-xs text-gray-500 max-w-sm">
-          Upload a PDF template (such as your standard delivery document or consignment note) to visually place fields and barcodes.
+          {{ t('destination.emptyDesc') }}
         </p>
         <label class="cursor-pointer px-4 py-2 bg-brand-purple text-white text-sm font-semibold rounded-xl shadow-md hover:bg-brand-purple/90 transition-all">
-          Select PDF Template
+          {{ t('destination.selectTemplate') }}
           <input type="file" accept="application/pdf,.pdf" class="hidden" @change="handleFileSelect" />
         </label>
       </div>
@@ -883,7 +890,7 @@ const draftBoxStyle = computed(() => {
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm space-y-3">
         <h4 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
           <FileCheck class="w-4 h-4 text-brand-purple" />
-          <span>Place on Template</span>
+          <span>{{ t('destination.placeOnTemplate') }}</span>
         </h4>
 
         <!-- Mode Toggle: Mapped Origin Field vs Custom Static Text -->
@@ -893,27 +900,27 @@ const draftBoxStyle = computed(() => {
             class="py-1.5 px-2 rounded-lg transition-all"
             :class="placementMode === 'field' ? 'bg-white dark:bg-gray-700 text-brand-purple dark:text-purple-300 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'"
           >
-            Campo de Origem
+            {{ t('destination.originFieldTab') }}
           </button>
           <button
             @click="placementMode = 'custom'"
             class="py-1.5 px-2 rounded-lg transition-all"
             :class="placementMode === 'custom' ? 'bg-white dark:bg-gray-700 text-brand-purple dark:text-purple-300 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'"
           >
-            + Texto Fixo
+            {{ t('destination.customTextTab') }}
           </button>
         </div>
 
         <!-- If Mapped Field -->
         <div v-if="placementMode === 'field'">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            Choose Origin Field:
+            {{ t('destination.chooseOriginField') }}
           </label>
           <select
             v-model="activeFieldIdToPlace"
             class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
           >
-            <option :value="null" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">-- Select Field --</option>
+            <option :value="null" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{{ t('destination.selectFieldPlaceholder') }}</option>
             <option v-for="f in fields" :key="f.id" :value="f.id" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               {{ f.name }}
             </option>
@@ -923,19 +930,19 @@ const draftBoxStyle = computed(() => {
         <!-- If Custom Text -->
         <div v-else>
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            Custom Text Content:
+            {{ t('destination.customTextLabel') }}
           </label>
           <input
             v-model="customTextToPlace"
             type="text"
-            placeholder="e.g. APPROVED, ISSUED IN 2026..."
+            :placeholder="t('destination.customTextPlaceholder')"
             class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
           />
         </div>
 
         <div>
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-            Render Format:
+            {{ t('destination.renderFormat') }}
           </label>
           <div class="grid grid-cols-3 gap-1.5">
             <button
@@ -944,7 +951,7 @@ const draftBoxStyle = computed(() => {
               :class="defaultRenderFormat === 'TEXT' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <Type class="w-4 h-4 mb-1" />
-              <span>Text</span>
+              <span>{{ t('destination.formatText') }}</span>
             </button>
             <button
               @click="defaultRenderFormat = 'CODE128'"
@@ -952,7 +959,7 @@ const draftBoxStyle = computed(() => {
               :class="defaultRenderFormat === 'CODE128' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <Barcode class="w-4 h-4 mb-1" />
-              <span>Code 128</span>
+              <span>{{ t('destination.formatCode128') }}</span>
             </button>
             <button
               @click="defaultRenderFormat = 'QR_CODE'"
@@ -960,13 +967,13 @@ const draftBoxStyle = computed(() => {
               :class="defaultRenderFormat === 'QR_CODE' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <QrCode class="w-4 h-4 mb-1" />
-              <span>QR Code</span>
+              <span>{{ t('destination.formatQrCode') }}</span>
             </button>
           </div>
         </div>
 
         <div v-if="isReadyToDraw" class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-xs text-brand-purple dark:text-purple-300 font-semibold animate-pulse text-center">
-          Click and drag on the document to draw the placement box!
+          {{ t('destination.drawBoxPrompt') }}
         </div>
       </div>
 
@@ -975,12 +982,12 @@ const draftBoxStyle = computed(() => {
         <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
           <span class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
             <Move class="w-4 h-4 text-brand-purple" />
-            <span>Box Properties</span>
+            <span>{{ t('destination.boxProperties') }}</span>
           </span>
           <button
             @click="$emit('removeMapping', selectedMapping.id); selectedMappingId = null;"
             class="text-red-500 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
-            title="Delete this placement box"
+            :title="t('destination.deleteBox')"
           >
             <Trash2 class="w-4 h-4" />
           </button>
@@ -989,7 +996,7 @@ const draftBoxStyle = computed(() => {
         <!-- 1. Content Definition (Custom Text or Mapped Field with Prefix/Suffix) -->
         <div v-if="selectedMapping.sourceType === 'custom'" class="space-y-1.5">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-            Custom Static Text:
+            {{ t('destination.customTextTitle') }}
           </label>
           <input
             type="text"
@@ -1002,10 +1009,10 @@ const draftBoxStyle = computed(() => {
         <div v-else class="space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-              Bound Field:
+              {{ t('destination.boundField') }}
             </label>
             <span class="text-xs font-bold text-gray-900 dark:text-white">
-              {{ fieldMap.get(selectedMapping.fieldId || '')?.name || 'Unknown' }}
+              {{ fieldMap.get(selectedMapping.fieldId || '')?.name || t('destination.unknown') }}
             </span>
           </div>
 
@@ -1013,11 +1020,11 @@ const draftBoxStyle = computed(() => {
           <div class="grid grid-cols-2 gap-2 pt-1">
             <div>
               <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-0.5">
-                Prefix (before):
+                {{ t('destination.prefixLabel') }}
               </label>
               <input
                 type="text"
-                placeholder="e.g. No: "
+                :placeholder="t('destination.prefixPlaceholder')"
                 :value="selectedMapping.prefix || ''"
                 @input="$emit('updateMapping', { ...selectedMapping, prefix: ($event.target as HTMLInputElement).value })"
                 class="w-full px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
@@ -1025,11 +1032,11 @@ const draftBoxStyle = computed(() => {
             </div>
             <div>
               <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-0.5">
-                Suffix (after):
+                {{ t('destination.suffixLabel') }}
               </label>
               <input
                 type="text"
-                placeholder="e.g.  (UN)"
+                :placeholder="t('destination.suffixPlaceholder')"
                 :value="selectedMapping.suffix || ''"
                 @input="$emit('updateMapping', { ...selectedMapping, suffix: ($event.target as HTMLInputElement).value })"
                 class="w-full px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
@@ -1039,7 +1046,7 @@ const draftBoxStyle = computed(() => {
 
           <!-- Live Combined Preview Tag -->
           <div class="p-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 text-[11px] leading-tight">
-            <span class="text-gray-400 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Rendered Output:</span>
+            <span class="text-gray-400 block text-[9px] uppercase font-bold tracking-wider mb-0.5">{{ t('destination.renderedOutput') }}</span>
             <span class="font-bold text-brand-purple">{{ selectedMapping.prefix || '' }}</span>
             <span class="font-medium text-gray-800 dark:text-gray-200">{{ fieldMap.get(selectedMapping.fieldId || '')?.sampleExtractedValue || fieldMap.get(selectedMapping.fieldId || '')?.name || 'Valor' }}</span>
             <span class="font-bold text-brand-purple">{{ selectedMapping.suffix || '' }}</span>
@@ -1049,18 +1056,18 @@ const draftBoxStyle = computed(() => {
         <!-- 2. Alignments (Horizontal & Vertical - Word-style symbols) -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-            Content Alignment:
+            {{ t('destination.contentAlignment') }}
           </label>
 
           <!-- Horizontal Alignment (Word Symbols) -->
           <div>
-            <span class="text-[10px] text-gray-400 block mb-1 font-medium">Horizontal:</span>
+            <span class="text-[10px] text-gray-400 block mb-1 font-medium">{{ t('destination.horizontal') }}</span>
             <div class="grid grid-cols-3 gap-1.5 bg-gray-50 dark:bg-gray-800/40 p-1 rounded-xl border border-gray-200 dark:border-gray-700/60">
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, horizontalAlign: 'left' })"
                 class="flex items-center justify-center py-2 rounded-lg transition-all"
                 :class="(selectedMapping.horizontalAlign || 'left') === 'left' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
-                title="Align Left"
+                :title="t('destination.alignLeft')"
               >
                 <AlignLeft class="w-4 h-4" />
               </button>
@@ -1068,7 +1075,7 @@ const draftBoxStyle = computed(() => {
                 @click="$emit('updateMapping', { ...selectedMapping, horizontalAlign: 'center' })"
                 class="flex items-center justify-center py-2 rounded-lg transition-all"
                 :class="selectedMapping.horizontalAlign === 'center' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
-                title="Align Center"
+                :title="t('destination.alignCenter')"
               >
                 <AlignCenter class="w-4 h-4" />
               </button>
@@ -1076,7 +1083,7 @@ const draftBoxStyle = computed(() => {
                 @click="$emit('updateMapping', { ...selectedMapping, horizontalAlign: 'right' })"
                 class="flex items-center justify-center py-2 rounded-lg transition-all"
                 :class="selectedMapping.horizontalAlign === 'right' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
-                title="Align Right"
+                :title="t('destination.alignRight')"
               >
                 <AlignRight class="w-4 h-4" />
               </button>
@@ -1085,13 +1092,13 @@ const draftBoxStyle = computed(() => {
 
           <!-- Vertical Alignment (Word/Table Symbols) -->
           <div>
-            <span class="text-[10px] text-gray-400 block mb-1 font-medium">Vertical:</span>
+            <span class="text-[10px] text-gray-400 block mb-1 font-medium">{{ t('destination.vertical') }}</span>
             <div class="grid grid-cols-3 gap-1.5 bg-gray-50 dark:bg-gray-800/40 p-1 rounded-xl border border-gray-200 dark:border-gray-700/60">
               <button
                 @click="$emit('updateMapping', { ...selectedMapping, verticalAlign: 'top' })"
                 class="flex items-center justify-center py-2 rounded-lg transition-all"
                 :class="selectedMapping.verticalAlign === 'top' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
-                title="Align Top"
+                :title="t('destination.alignTop')"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="3" y1="3" x2="21" y2="3" stroke-width="2.5" />
@@ -1102,7 +1109,7 @@ const draftBoxStyle = computed(() => {
                 @click="$emit('updateMapping', { ...selectedMapping, verticalAlign: 'middle' })"
                 class="flex items-center justify-center py-2 rounded-lg transition-all"
                 :class="(selectedMapping.verticalAlign || 'middle') === 'middle' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
-                title="Align Middle (Center)"
+                :title="t('destination.alignMiddle')"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="3" y1="12" x2="21" y2="12" stroke-width="2.5" />
@@ -1113,7 +1120,7 @@ const draftBoxStyle = computed(() => {
                 @click="$emit('updateMapping', { ...selectedMapping, verticalAlign: 'bottom' })"
                 class="flex items-center justify-center py-2 rounded-lg transition-all"
                 :class="selectedMapping.verticalAlign === 'bottom' ? 'bg-brand-purple text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-gray-700'"
-                title="Align Bottom"
+                :title="t('destination.alignBottom')"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="3" y1="21" x2="21" y2="21" stroke-width="2.5" />
@@ -1127,7 +1134,7 @@ const draftBoxStyle = computed(() => {
         <!-- 3. Format and Font Size -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
           <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-            Render Format:
+            {{ t('destination.renderFormat') }}
           </label>
           <div class="grid grid-cols-3 gap-1.5">
             <button
@@ -1136,7 +1143,7 @@ const draftBoxStyle = computed(() => {
               :class="selectedMapping.renderFormat === 'TEXT' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <Type class="w-4 h-4 mb-1" />
-              <span>Texto</span>
+              <span>{{ t('destination.formatText') }}</span>
             </button>
             <button
               @click="$emit('updateMapping', { ...selectedMapping, renderFormat: 'CODE128' })"
@@ -1144,7 +1151,7 @@ const draftBoxStyle = computed(() => {
               :class="selectedMapping.renderFormat === 'CODE128' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <Barcode class="w-4 h-4 mb-1" />
-              <span>Code 128</span>
+              <span>{{ t('destination.formatCode128') }}</span>
             </button>
             <button
               @click="$emit('updateMapping', { ...selectedMapping, renderFormat: 'QR_CODE' })"
@@ -1152,13 +1159,13 @@ const draftBoxStyle = computed(() => {
               :class="selectedMapping.renderFormat === 'QR_CODE' ? 'bg-brand-purple text-white border-brand-purple' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'"
             >
               <QrCode class="w-4 h-4 mb-1" />
-              <span>QR Code</span>
+              <span>{{ t('destination.formatQrCode') }}</span>
             </button>
           </div>
 
           <div v-if="selectedMapping.renderFormat === 'TEXT'">
             <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-              Font Size (pt):
+              {{ t('destination.fontSize') }}
             </label>
             <input
               type="number"
@@ -1175,10 +1182,10 @@ const draftBoxStyle = computed(() => {
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-              Position & Dimensions (%):
+              {{ t('destination.positionDimensions') }}
             </label>
             <div v-if="totalPages > 1" class="flex items-center gap-1">
-              <span class="text-[10px] text-gray-400">Page:</span>
+              <span class="text-[10px] text-gray-400">{{ t('destination.pageLabel') }}</span>
               <select
                 :value="selectedMapping.targetBox.page || 1"
                 @change="changeMappingPage(Number(($event.target as HTMLSelectElement).value))"
@@ -1215,7 +1222,7 @@ const draftBoxStyle = computed(() => {
               />
             </div>
             <div>
-              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">W (%)</label>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">{{ t('destination.widthLabel') }}</label>
               <input
                 type="number"
                 step="0.5"
@@ -1227,7 +1234,7 @@ const draftBoxStyle = computed(() => {
               />
             </div>
             <div>
-              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">H (%)</label>
+              <label class="text-[9px] uppercase tracking-wider text-gray-400 block font-mono">{{ t('destination.heightLabel') }}</label>
               <input
                 type="number"
                 step="0.5"
@@ -1242,33 +1249,33 @@ const draftBoxStyle = computed(() => {
 
           <!-- Quick Nudge Controls -->
           <div class="flex items-center justify-between pt-1">
-            <span class="text-[10px] text-gray-400">Nudge (+/- 0.5%):</span>
+            <span class="text-[10px] text-gray-400">{{ t('destination.nudge') }}</span>
             <div class="flex items-center gap-1">
               <button
                 @click="nudgeMapping(-0.5, 0)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Move 0.5% left"
+                :title="t('destination.nudgeLeft')"
               >
                 <ArrowLeft class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 @click="nudgeMapping(0, -0.5)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Move 0.5% up"
+                :title="t('destination.nudgeUp')"
               >
                 <ArrowUp class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 @click="nudgeMapping(0, 0.5)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Move 0.5% down"
+                :title="t('destination.nudgeDown')"
               >
                 <ArrowDown class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 @click="nudgeMapping(0.5, 0)"
                 class="p-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Move 0.5% right"
+                :title="t('destination.nudgeRight')"
               >
                 <ArrowRight class="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
@@ -1278,10 +1285,10 @@ const draftBoxStyle = computed(() => {
           <div class="p-2 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[11px] text-gray-600 dark:text-gray-400 space-y-1">
             <div class="flex items-center gap-1 font-semibold text-gray-900 dark:text-white">
               <MousePointer class="w-3.5 h-3.5 text-brand-purple" />
-              <span>Interactive Canvas Controls:</span>
+              <span>{{ t('destination.canvasControls') }}</span>
             </div>
-            <p>• Drag the box on the canvas to move it.</p>
-            <p>• Drag any of the 8 white handles to resize.</p>
+            <p>{{ t('destination.canvasTip1') }}</p>
+            <p>{{ t('destination.canvasTip2') }}</p>
           </div>
         </div>
       </div>

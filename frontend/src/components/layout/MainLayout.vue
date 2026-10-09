@@ -2,13 +2,16 @@
 import { ref, onMounted } from 'vue';
 import { Moon, Sun, CircleHelp, FileText, Layers } from 'lucide-vue-next';
 import Modal from '../ui/Modal.vue';
+import LanguagePicker from '../common/LanguagePicker.vue';
 import { useRouter } from '../../composables/useRouter';
+import { useI18n } from '../../i18n';
 
 // Dark Mode Logic
 const isDark = ref(false);
 const showHelp = ref(false);
 
 const { currentRoute, navigate } = useRouter();
+const { t } = useI18n();
 
 onMounted(() => {
   // Check system or local storage
@@ -56,7 +59,7 @@ const toggleTheme = () => {
             id="nav-processor"
           >
             <FileText class="w-4 h-4" />
-            <span>Processor</span>
+            <span>{{ t('nav.processor') }}</span>
           </button>
           <button 
             @click="navigate('mapping')"
@@ -65,16 +68,17 @@ const toggleTheme = () => {
             id="nav-mapping"
           >
             <Layers class="w-4 h-4" />
-            <span>Mapping Studio</span>
+            <span>{{ t('nav.mappingStudio') }}</span>
           </button>
         </nav>
 
         <!-- Controls -->
         <div class="flex items-center gap-2">
+            <LanguagePicker />
             <button 
                 @click="showHelp = true"
                 class="p-2 rounded-full text-gray-500 hover:text-brand-purple dark:text-gray-400 dark:hover:text-brand-green transition-colors"
-                aria-label="Help"
+                :aria-label="t('nav.helpTitle')"
             >
                 <CircleHelp class="w-5 h-5" />
             </button>
@@ -98,32 +102,32 @@ const toggleTheme = () => {
     <!-- Footer -->
     <footer class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-            <p>&copy; {{ new Date().getFullYear() }} Levix Digital. All rights reserved.</p>
+            <p>&copy; {{ new Date().getFullYear() }} Levix Digital. {{ t('nav.allRightsReserved') }}</p>
             <div class="flex gap-4 mt-2 md:mt-0">
-                <a href="#" class="hover:text-brand-purple transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-brand-purple transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-brand-purple transition-colors">{{ t('nav.privacyPolicy') }}</a>
+                <a href="#" class="hover:text-brand-purple transition-colors">{{ t('nav.termsOfService') }}</a>
                 <span>v1.0.0</span>
             </div>
         </div>
     </footer>
 
     <!-- Help Modal -->
-    <Modal :show="showHelp" title="How to use DocMapper" @close="showHelp = false">
+    <Modal :show="showHelp" :title="t('nav.helpTitle')" @close="showHelp = false">
         <div class="space-y-4 text-gray-600 dark:text-gray-300">
-            <p>DocMapper generates standard delivery documents from CMR transport documents securely in your browser.</p>
+            <p>{{ t('nav.helpDesc') }}</p>
             
             <div class="space-y-2">
-                <h4 class="font-bold text-gray-900 dark:text-white">Instructions:</h4>
+                <h4 class="font-bold text-gray-900 dark:text-white">{{ t('nav.instructions') }}</h4>
                 <ol class="list-decimal list-inside space-y-1 ml-1">
-                    <li>Drag and drop your <strong>CMR PDF</strong> files into the drop zone.</li>
-                    <li>Wait for the secure local processing to complete.</li>
-                    <li>Review the generated documents in the list.</li>
-                    <li>Click <strong>Download All</strong> to get a ZIP package with all documents.</li>
+                    <li>{{ t('nav.helpStep1') }}</li>
+                    <li>{{ t('nav.helpStep2') }}</li>
+                    <li>{{ t('nav.helpStep3') }}</li>
+                    <li>{{ t('nav.helpStep4') }}</li>
                 </ol>
             </div>
 
             <div class="p-3 bg-brand-purple/10 border border-brand-purple/20 rounded text-sm text-brand-purple dark:text-purple-300">
-                <strong>Privacy Note:</strong> All processing happened locally on your device. No documents were uploaded to any server.
+                {{ t('nav.privacyNote') }}
             </div>
         </div>
     </Modal>

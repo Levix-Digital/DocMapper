@@ -2,8 +2,8 @@
   <div class="max-w-4xl mx-auto space-y-8">
     <!-- Header Section -->
     <div class="text-center space-y-2">
-      <h1 class="text-4xl font-bold font-heading text-gray-900 dark:text-white">Document Processor</h1>
-      <p class="text-gray-500 dark:text-gray-400">Secure, client-side batch document processing. Zero cloud upload.</p>
+      <h1 class="text-4xl font-bold font-heading text-gray-900 dark:text-white">{{ t('processor.title') }}</h1>
+      <p class="text-gray-500 dark:text-gray-400">{{ t('processor.subtitle') }}</p>
     </div>
 
     <!-- Profile Selector Card -->
@@ -14,7 +14,7 @@
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400">
-            Active Processing Profile
+            {{ t('processor.activeProfile') }}
           </label>
           <select
             v-model="selectedProfileId"
@@ -26,7 +26,7 @@
               :value="prof.id"
               class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
             >
-              {{ prof.name }} ({{ prof.fields.length }} fields)
+              {{ prof.name }} ({{ t('processor.fieldsCount', { count: prof.fields.length }) }})
             </option>
           </select>
         </div>
@@ -37,7 +37,7 @@
         class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all w-full sm:w-auto justify-center"
       >
         <Sliders class="w-3.5 h-3.5 text-brand-purple" />
-        <span>Customize in Mapping Studio</span>
+        <span>{{ t('processor.customizeInStudio') }}</span>
       </button>
     </div>
 
@@ -75,12 +75,12 @@
         <!-- Text State -->
         <div class="space-y-1">
             <div v-if="isProcessing">
-                <p class="text-xl font-medium text-gray-900 dark:text-white">Processing Files...</p>
-                <p class="text-sm text-gray-500">{{ progressText || 'Executing client-side extraction...' }}</p>
+                <p class="text-xl font-medium text-gray-900 dark:text-white">{{ t('processor.processingFiles') }}</p>
+                <p class="text-sm text-gray-500">{{ progressText || t('processor.executingClient') }}</p>
             </div>
             <div v-else>
-                <p class="text-xl font-medium text-gray-900 dark:text-white">Drop PDF files here</p>
-                <p class="text-sm text-gray-500">or click to browse filesystem</p>
+                <p class="text-xl font-medium text-gray-900 dark:text-white">{{ t('processor.dropPrompt') }}</p>
+                <p class="text-sm text-gray-500">{{ t('processor.clickBrowse') }}</p>
             </div>
         </div>
       </div>
@@ -96,12 +96,12 @@
     <div v-if="displayResults.length > 0" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div class="flex justify-between items-end border-b border-gray-200 dark:border-gray-800 pb-4">
         <div>
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Output Stream</h2>
-          <p class="text-sm text-gray-500">{{ displayResults.length }} documents generated</p>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t('processor.outputStream') }}</h2>
+          <p class="text-sm text-gray-500">{{ t('processor.docsGenerated', { count: displayResults.length }) }}</p>
         </div>
         <Button variant="primary" @click="downloadAll">
             <template #icon><Download class="w-4 h-4" /></template>
-            Download All (ZIP)
+            {{ t('processor.downloadAllZip') }}
         </Button>
       </div>
 
@@ -140,7 +140,7 @@
                   : 'bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300'
               ]"
             >
-              {{ res.confidence }}% Confidence
+              {{ t('processor.confidenceBadge', { confidence: res.confidence }) }}
             </span>
 
             <!-- Preview in Tab -->
@@ -148,7 +148,7 @@
               v-if="res.blob"
               @click="previewDocument(res.blob)"
               class="p-2 rounded-lg text-gray-500 hover:text-brand-purple hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              title="Preview generated PDF"
+              :title="t('processor.previewGeneratedPdf')"
             >
               <ExternalLink class="w-4 h-4" />
             </button>
@@ -186,12 +186,14 @@ import { getAllProfiles, BUILTIN_CMR_PROFILE_ID, createBuiltinCmrProfile } from 
 import { executeBatchMapping } from '../services/mapping/mapping-runner';
 import type { MappingProfile } from '../types/mapping';
 import { useRouter } from '../composables/useRouter';
+import { useI18n } from '../i18n';
 
 // Set worker source using Vite's ?url import
 import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
 const { navigate } = useRouter();
+const { t } = useI18n();
 
 interface UnifiedResultItem {
   fileName: string;
@@ -256,14 +258,14 @@ const processFiles = async (files: File[]) => {
 
   try {
     const validFiles = files.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
-    if (validFiles.length === 0) throw new Error("Please upload valid PDF files (.pdf).");
+    if (validFiles.length === 0) throw new Error(t('processor.uploadValidPdfError'));
 
     const profile = activeProfile.value || createBuiltinCmrProfile();
     const results = await executeBatchMapping({
       files: validFiles,
       profile,
       onProgress: (done, total, name) => {
-        progressText.value = `Processing ${done + 1}/${total}: ${name}`;
+        progressText.value = t('processor.processingProgress', { current: done + 1, total, name });
       },
     });
 
@@ -279,11 +281,11 @@ const processFiles = async (files: File[]) => {
     }
 
     if (displayResults.value.length === 0) {
-      error.value = "Extraction completed, but no documents matched the profile with sufficient confidence. Please check field mappings in Mapping Studio.";
+      error.value = t('processor.noMatchError');
     }
   } catch (err: any) {
     console.error("Batch processing error:", err);
-    error.value = err.message || "An error occurred while processing files.";
+    error.value = err.message || t('processor.genericError');
   } finally {
     isProcessing.value = false;
     if (fileInput.value) fileInput.value.value = ''; 

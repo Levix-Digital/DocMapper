@@ -18,6 +18,9 @@ import {
   setStoredModel,
   AVAILABLE_GEMINI_MODELS
 } from '../../services/llm/gemini-service';
+import { useI18n } from '../../i18n';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   fields: FieldDefinition[];
@@ -176,7 +179,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
     <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-800">
       <div class="flex items-center gap-2">
         <Layers class="w-5 h-5 text-brand-purple" />
-        <h2 class="font-bold text-gray-900 dark:text-white">Field Rules & Mappings</h2>
+        <h2 class="font-bold text-gray-900 dark:text-white">{{ t('fields.drawerTitle') }}</h2>
       </div>
       <button
         @click="openApiKeyModal"
@@ -186,10 +189,10 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             ? 'border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
             : 'border-purple-200 dark:border-purple-700 text-brand-purple dark:text-purple-300 bg-purple-50/50 dark:bg-purple-950/20 hover:bg-purple-100 dark:hover:bg-purple-900/40'
         ]"
-        :title="hasStoredKey ? 'Chave Gemini configurada' : 'Configure Google Gemini API Key'"
+        :title="t('fields.configureKey')"
       >
         <Key class="w-3.5 h-3.5" />
-        <span>{{ hasStoredKey ? 'Gemini OK' : 'Chave IA' }}</span>
+        <span>{{ hasStoredKey ? t('fields.geminiConfigured') : t('fields.geminiKeyBtn') }}</span>
       </button>
     </div>
 
@@ -200,14 +203,14 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-brand-purple hover:bg-brand-purple/90 text-white font-medium shadow-md transition-all text-sm"
       >
         <Plus class="w-4 h-4" />
-        <span>Add Field Mapping</span>
+        <span>{{ t('fields.addField') }}</span>
       </button>
     </div>
 
     <!-- Field List -->
     <div class="space-y-3 flex-grow">
       <div v-if="fields.length === 0" class="text-center py-12 text-gray-400 text-sm">
-        No fields defined yet.<br />Click "+ Add Field Mapping" to start.
+        {{ t('fields.noFields') }}
       </div>
 
       <div
@@ -233,7 +236,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               :value="field.name"
               @change="updateFieldName(field, ($event.target as HTMLInputElement).value)"
               class="font-semibold text-gray-900 dark:text-white text-sm bg-transparent border-b border-brand-purple/40 focus:border-brand-purple focus:outline-none px-1 py-0.5 rounded w-full"
-              title="Click to edit field name"
+              :title="t('fields.clickToEdit')"
               @click.stop
             />
             <span v-else class="font-semibold text-gray-900 dark:text-white text-sm truncate">
@@ -244,7 +247,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
           <button
             @click.stop="$emit('removeField', field.id)"
             class="text-gray-400 hover:text-red-500 p-1 transition-colors"
-            title="Delete field"
+            :title="t('fields.deleteField')"
           >
             <Trash2 class="w-4 h-4" />
           </button>
@@ -265,10 +268,10 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
           >
             <span class="flex items-center gap-1">
               <Crosshair class="w-3.5 h-3.5" />
-              <span>Label Box</span>
+              <span>{{ t('fields.labelBox') }}</span>
             </span>
             <span class="text-[10px] opacity-75">
-              {{ field.labelBox ? `p.${field.labelBox.page}` : 'None' }}
+              {{ field.labelBox ? `p.${field.labelBox.page}` : t('fields.none') }}
             </span>
           </button>
 
@@ -285,10 +288,10 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
           >
             <span class="flex items-center gap-1">
               <Crosshair class="w-3.5 h-3.5" />
-              <span>Value Box</span>
+              <span>{{ t('fields.valueBox') }}</span>
             </span>
             <span class="text-[10px] opacity-75">
-              {{ field.valueBox ? `p.${field.valueBox.page}` : 'None' }}
+              {{ field.valueBox ? `p.${field.valueBox.page}` : t('fields.none') }}
             </span>
           </button>
         </div>
@@ -297,45 +300,45 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         <div v-if="selectedFieldId === field.id" class="p-2.5 my-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 space-y-2 text-xs" @click.stop>
           <div class="flex items-center justify-between gap-2">
             <label class="text-[11px] font-semibold text-gray-700 dark:text-gray-300">
-              Field Type:
+              {{ t('fields.fieldType') }}
             </label>
             <select
               :value="field.dataType || 'alphanumeric'"
               @change="updateFieldDataType(field, ($event.target as HTMLSelectElement).value as FieldDataType)"
               class="px-2 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-brand-purple"
             >
-              <option value="alphanumeric">Alphanumeric (letters & numbers)</option>
-              <option value="text">Texto Geral</option>
-              <option value="date">Data</option>
-              <option value="number">Numeric</option>
-              <option value="multiline">Multilinhas</option>
+              <option value="alphanumeric">{{ t('fields.typeAlphanumeric') }}</option>
+              <option value="text">{{ t('fields.typeText') }}</option>
+              <option value="date">{{ t('fields.typeDate') }}</option>
+              <option value="number">{{ t('fields.typeNumber') }}</option>
+              <option value="multiline">{{ t('fields.typeMultiline') }}</option>
             </select>
           </div>
 
           <!-- Value Box Coordinate Editor -->
           <div v-if="field.valueBox" class="pt-2 border-t border-purple-100 dark:border-purple-900/30 space-y-1">
             <div class="flex items-center justify-between text-[11px] font-semibold text-gray-600 dark:text-gray-400">
-              <span>Value Box Dimensions (Page {{ field.valueBox.page }}):</span>
+              <span>{{ t('fields.valueBoxDimensions', { page: field.valueBox.page }) }}</span>
               <div class="flex items-center gap-1">
                 <button
                   @click="nudgeBox(field, 'value', -0.5, 0)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Move left"
+                  :title="t('fields.moveLeft')"
                 >←</button>
                 <button
                   @click="nudgeBox(field, 'value', 0, -0.5)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Move up"
+                  :title="t('fields.moveUp')"
                 >↑</button>
                 <button
                   @click="nudgeBox(field, 'value', 0, 0.5)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Move down"
+                  :title="t('fields.moveDown')"
                 >↓</button>
                 <button
                   @click="nudgeBox(field, 'value', 0.5, 0)"
                   class="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 text-[10px] hover:bg-white dark:hover:bg-gray-700"
-                  title="Move right"
+                  :title="t('fields.moveRight')"
                 >→</button>
               </div>
             </div>
@@ -365,7 +368,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
                 />
               </div>
               <div>
-                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Larg (%)</label>
+                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">{{ t('fields.widthPct') }}</label>
                 <input
                   type="number"
                   step="0.5"
@@ -377,7 +380,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
                 />
               </div>
               <div>
-                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">Alt (%)</label>
+                <label class="text-[9px] uppercase tracking-wider text-gray-400 block">{{ t('fields.heightPct') }}</label>
                 <input
                   type="number"
                   step="0.5"
@@ -395,14 +398,14 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         <!-- Detected Text Preview -->
         <div class="bg-gray-50 dark:bg-gray-800/60 rounded-lg p-2.5 my-2 text-xs border border-gray-100 dark:border-gray-800">
           <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">
-            Texto Detectado (Preview):
+            {{ t('fields.detectedTextPreview') }}
           </div>
           <div class="font-mono text-gray-900 dark:text-white break-all text-xs font-medium">
             <span v-if="field.valueBox && field.sampleExtractedValue">
               "{{ field.sampleExtractedValue }}"
             </span>
             <span v-else class="text-gray-400 dark:text-gray-500 italic text-[11px] font-normal">
-              (Draw Value Box on PDF to capture)
+              {{ t('fields.drawToCapture') }}
             </span>
           </div>
         </div>
@@ -416,13 +419,13 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]"
             >
               <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />
-              <span>Calibrado (LSIE)</span>
+              <span>{{ t('fields.calibrated') }}</span>
             </span>
             <span
               v-else
               class="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 italic text-[11px]"
             >
-              <span>Awaiting box placement</span>
+              <span>{{ t('fields.awaitingPlacement') }}</span>
             </span>
 
             <!-- Required Toggle -->
@@ -433,27 +436,27 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
                 @change="toggleRequired(field)"
                 class="rounded border-gray-300 text-brand-purple focus:ring-brand-purple w-3.5 h-3.5 cursor-pointer"
               />
-              <span class="text-[11px] font-medium">Required</span>
+              <span class="text-[11px] font-medium">{{ t('fields.required') }}</span>
             </label>
           </div>
 
           <!-- Advanced Settings (Optional / Collapsed) -->
           <details class="text-xs text-gray-500 group pt-1" @click.stop>
             <summary class="cursor-pointer hover:text-gray-800 dark:hover:text-gray-300 text-[11px] flex items-center justify-between py-1 transition-colors select-none">
-              <span>Advanced Filter (Optional)</span>
+              <span>{{ t('fields.advancedFilter') }}</span>
               <span class="text-[10px] text-gray-400 group-open:rotate-180 transition-transform">▼</span>
             </summary>
             
             <div class="pt-2 space-y-2 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800 mt-1">
               <div>
                 <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1 font-medium">
-                  Regex Validation Pattern (optional):
+                  {{ t('fields.regexPattern') }}
                 </label>
                 <input
                   :value="field.validationPattern || ''"
                   @input="updateFieldPattern(field, ($event.target as HTMLInputElement).value)"
                   type="text"
-                  placeholder="e.g. ^[0-9]+$ (leave empty to accept any)"
+                  :placeholder="t('fields.regexPlaceholder')"
                   class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-purple"
                 />
               </div>
@@ -465,7 +468,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
                 class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border border-purple-200 dark:border-purple-800 text-[11px] font-medium text-brand-purple dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors disabled:opacity-50"
               >
                 <Sparkles class="w-3 h-3" :class="{ 'animate-spin': isAiGenerating }" />
-                <span>{{ isAiGenerating ? 'Inferring with Gemini...' : 'Suggest Regex with AI' }}</span>
+                <span>{{ isAiGenerating ? t('fields.inferringAi') : t('fields.suggestRegex') }}</span>
               </button>
             </div>
           </details>
@@ -479,31 +482,31 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
     >
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 w-full max-w-sm shadow-xl space-y-4">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Add New Field</h3>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ t('addFieldModal.modalTitle') }}</h3>
         <div>
           <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            Field Name
+            {{ t('addFieldModal.nameLabel') }}
           </label>
           <input
             v-model="newFieldName"
-            placeholder="e.g. Shipment Number, Carrier..."
+            :placeholder="t('addFieldModal.namePlaceholder')"
             class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple"
             @keyup.enter="confirmAddField"
           />
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            Data Type
+            {{ t('addFieldModal.typeLabel') }}
           </label>
           <select
             v-model="newFieldDataType"
             class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple"
           >
-            <option value="alphanumeric" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Alphanumeric (Letters & Numbers)</option>
-            <option value="text" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">General Text</option>
-            <option value="date" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Date</option>
-            <option value="number" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Number</option>
-            <option value="multiline" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Multiline</option>
+            <option value="alphanumeric" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{{ t('fields.typeAlphanumeric') }}</option>
+            <option value="text" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{{ t('fields.typeText') }}</option>
+            <option value="date" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{{ t('fields.typeDate') }}</option>
+            <option value="number" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{{ t('fields.typeNumber') }}</option>
+            <option value="multiline" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{{ t('fields.typeMultiline') }}</option>
           </select>
         </div>
         <div class="flex items-center justify-end gap-2 pt-2">
@@ -511,14 +514,14 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             @click="showAddModal = false"
             class="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            Cancel
+            {{ t('addFieldModal.cancel') }}
           </button>
           <button
             @click="confirmAddField"
             :disabled="!newFieldName.trim()"
             class="px-4 py-1.5 rounded-lg text-sm bg-brand-purple text-white hover:bg-brand-purple/90 font-medium disabled:opacity-40"
           >
-            Add Field
+            {{ t('addFieldModal.confirm') }}
           </button>
         </div>
       </div>
@@ -532,13 +535,13 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 w-full max-w-md shadow-xl space-y-4">
         <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <Key class="w-5 h-5 text-brand-purple" />
-          <span>Configurar Google Gemini API</span>
+          <span>{{ t('geminiModal.title') }}</span>
         </h3>
 
         <div class="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-100 dark:border-purple-900/40 text-xs text-purple-900 dark:text-purple-200 space-y-1.5">
-          <p class="font-semibold text-brand-purple dark:text-purple-300">How to get your free API key:</p>
+          <p class="font-semibold text-brand-purple dark:text-purple-300">{{ t('geminiModal.freeTierNotice') }}</p>
           <p class="text-[11px] text-gray-600 dark:text-gray-400">
-            AI is only used during initial profile calibration to infer regex patterns from sample values. All batch document processing runs 100% offline in your browser.
+            {{ t('geminiModal.freeTierDesc') }}
           </p>
           <a
             href="https://aistudio.google.com/app/apikey"
@@ -546,7 +549,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             rel="noopener noreferrer"
             class="inline-flex items-center gap-1 text-brand-purple dark:text-purple-300 font-semibold hover:underline pt-1 text-xs"
           >
-            <span>Get free API key on Google AI Studio</span>
+            <span>{{ t('geminiModal.getFreeKeyLink') }}</span>
             <ExternalLink class="w-3.5 h-3.5" />
           </a>
         </div>
@@ -555,7 +558,7 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
         <div class="p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700 text-xs space-y-2.5">
           <div>
             <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              Gemini Model:
+              {{ t('geminiModal.modelLabel') }}
             </label>
             <select
               v-model="selectedModel"
@@ -571,19 +574,19 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
               </option>
             </select>
             <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
-              {{ AVAILABLE_GEMINI_MODELS.find(m => m.id === selectedModel)?.description || 'Model optimized for rapid extraction and inference.' }}
+              {{ AVAILABLE_GEMINI_MODELS.find(m => m.id === selectedModel)?.description || t('geminiModal.defaultModelDesc') }}
             </p>
           </div>
 
           <div class="pt-1.5 border-t border-gray-200 dark:border-gray-700/80 flex items-center justify-between text-[11px]">
-            <span class="text-gray-600 dark:text-gray-400">Observability & Metrics:</span>
+            <span class="text-gray-600 dark:text-gray-400">{{ t('geminiModal.observability') }}</span>
             <a
               href="https://console.cloud.google.com/apis/api/generativelanguage.googleapis.com/metrics"
               target="_blank"
               rel="noopener noreferrer"
               class="text-brand-purple dark:text-purple-300 hover:underline inline-flex items-center gap-1 font-semibold"
             >
-              <span>View Metrics in GCP Console</span>
+              <span>{{ t('geminiModal.viewGcpMetrics') }}</span>
               <ExternalLink class="w-3 h-3" />
             </a>
           </div>
@@ -591,12 +594,12 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
 
         <div>
           <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            API Key:
+            {{ t('geminiModal.apiKeyLabel') }}
           </label>
           <input
             v-model="apiKeyInput"
             type="password"
-            placeholder="AIzaSy..."
+            :placeholder="t('geminiModal.apiKeyPlaceholder')"
             class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-purple"
             @keyup.enter="saveApiKey"
           />
@@ -606,13 +609,13 @@ function nudgeBox(field: FieldDefinition, type: 'value' | 'label', dx: number, d
             @click="showKeyModal = false"
             class="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            Cancelar
+            {{ t('geminiModal.cancel') }}
           </button>
           <button
             @click="saveApiKey"
             class="px-4 py-1.5 rounded-lg text-sm bg-brand-purple text-white hover:bg-brand-purple/90 font-medium"
           >
-            Salvar Chave
+            {{ t('geminiModal.saveKey') }}
           </button>
         </div>
       </div>
