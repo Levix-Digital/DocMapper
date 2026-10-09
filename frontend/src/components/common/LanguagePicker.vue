@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Search,
   RefreshCw,
-  Trash2,
 } from 'lucide-vue-next';
 import { useI18n } from '../../i18n';
 import type { LanguageOption } from '../../i18n/languages';
@@ -24,7 +23,6 @@ const {
   downloadLanguagePack,
   changeLanguage,
   reloadCurrentLanguage,
-  removeLanguagePack,
 } = useI18n();
 
 const isOpen = ref(false);
@@ -67,10 +65,6 @@ async function handleRowClick(langCode: string) {
 
 async function handleDownloadClick(langCode: string) {
   await downloadLanguagePack(langCode);
-}
-
-function handleDeletePack(langCode: string) {
-  removeLanguagePack(langCode);
 }
 
 function handleClickOutside(event: MouseEvent) {
@@ -173,48 +167,36 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <!-- Right: Fixed & Pinned to the right edge -->
-            <div class="ml-auto shrink-0 flex items-center justify-end min-w-[76px]" @click.stop>
+            <!-- Right: Fixed & Uniformly Aligned Pinned to the right edge -->
+            <div class="ml-auto shrink-0 flex items-center justify-end" @click.stop>
               <!-- STATE 2: DOWNLOADING (Spinner + Progress) -->
               <template v-if="downloadingLanguageCode === lang.code.toLowerCase()">
-                <span class="inline-flex items-center justify-center gap-1 text-[10px] font-bold text-brand-purple dark:text-purple-300 bg-brand-purple/10 dark:bg-brand-purple/25 px-2 py-0.5 rounded-full animate-pulse">
-                  <Loader2 class="w-3.5 h-3.5 animate-spin" />
+                <span class="w-[92px] h-6 inline-flex items-center justify-center gap-1.5 text-[10px] font-bold text-brand-purple dark:text-purple-300 bg-brand-purple/10 dark:bg-brand-purple/25 rounded-full animate-pulse border border-brand-purple/20">
+                  <Loader2 class="w-3.5 h-3.5 animate-spin shrink-0" />
                   <span>{{ translationProgress }}%</span>
                 </span>
               </template>
 
               <!-- STATE 1: DOWNLOADED (Green Checkmark) -->
               <template v-else-if="isDownloaded(lang.code)">
-                <div class="flex items-center gap-1.5 justify-end">
-                  <span
-                    class="inline-flex items-center justify-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
-                    :title="t('common.downloaded')"
-                  >
-                    <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />
-                    <span>{{ t('common.downloaded') }}</span>
-                  </span>
-
-                  <!-- Delete pack button (only for non-English cached languages) -->
-                  <button
-                    v-if="lang.code.toLowerCase() !== 'en'"
-                    @click.stop="handleDeletePack(lang.code)"
-                    class="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 rounded transition-opacity"
-                    :title="t('common.deletePack')"
-                  >
-                    <Trash2 class="w-3 h-3" />
-                  </button>
-                </div>
+                <span
+                  class="w-[92px] h-6 inline-flex items-center justify-center gap-1.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 rounded-full border border-emerald-200 dark:border-emerald-800"
+                  :title="t('common.downloaded')"
+                >
+                  <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span class="truncate">{{ t('common.downloaded') }}</span>
+                </span>
               </template>
 
-              <!-- STATE 3: NOT DOWNLOADED (Download button pinned to the right) -->
+              <!-- STATE 3: NOT DOWNLOADED (Download button) -->
               <template v-else>
                 <button
                   @click.stop="handleDownloadClick(lang.code)"
-                  class="inline-flex items-center justify-center gap-1 text-[10px] font-medium text-gray-600 dark:text-gray-300 hover:text-brand-purple dark:hover:text-purple-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-2.5 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 transition-colors shadow-2xs"
+                  class="w-[92px] h-6 inline-flex items-center justify-center gap-1.5 text-[10px] font-medium text-gray-600 dark:text-gray-300 hover:text-brand-purple dark:hover:text-purple-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-700 transition-colors shadow-2xs"
                   :title="t('common.download')"
                 >
-                  <Download class="w-3 h-3 text-brand-purple dark:text-purple-300" />
-                  <span>{{ t('common.download') }}</span>
+                  <Download class="w-3.5 h-3.5 text-brand-purple dark:text-purple-300 shrink-0" />
+                  <span class="truncate">{{ t('common.download') }}</span>
                 </button>
               </template>
             </div>
