@@ -375,10 +375,10 @@ async function generateSamplePreview() {
         <button
           @click="exportCurrentProfile"
           class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-sm"
-          title="Download .docmapper portable profile"
+          title="Download .dmap portable profile"
         >
           <Download class="w-4 h-4 text-brand-green" />
-          <span>Export .docmapper</span>
+          <span>Export .dmap</span>
         </button>
 
         <button
@@ -408,7 +408,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'origin' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <FileText class="w-4 h-4" />
-        <span>1. Origin Document & Fields</span>
+        <span>1. Origin Document</span>
       </button>
 
       <button
@@ -417,7 +417,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'destination' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <FileCheck class="w-4 h-4" />
-        <span>2. Destination Placement & Barcodes</span>
+        <span>2. Destination Placement</span>
       </button>
 
       <button
@@ -426,7 +426,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'preview' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <Eye class="w-4 h-4" />
-        <span>3. Output Preview Test</span>
+        <span>3. Output Preview</span>
       </button>
     </div>
 

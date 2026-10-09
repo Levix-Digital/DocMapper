@@ -230,7 +230,7 @@ export function duplicateProfile(id: string): MappingProfile | undefined {
 }
 
 /**
- * Exports a mapping profile as a downloadable `.docmapper` self-contained JSON file.
+ * Exports a mapping profile as a downloadable `.dmap` self-contained JSON file.
  */
 export function exportProfileAsDocMapper(profile: MappingProfile): void {
   const serialized = JSON.stringify(profile, null, 2);
@@ -240,24 +240,25 @@ export function exportProfileAsDocMapper(profile: MappingProfile): void {
 
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `${sanitizedName}.docmapper`;
+  anchor.download = `${sanitizedName}.dmap`;
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
   URL.revokeObjectURL(url);
 }
 
-// Backwards compatibility alias
+// Aliases
+export const exportProfileAsDMap = exportProfileAsDocMapper;
 export const exportProfileAsCopyx = exportProfileAsDocMapper;
 
 /**
- * Imports a profile from a `.docmapper` or legacy `.copyx` JSON string with collision-safe naming.
+ * Imports a profile from a `.dmap`, legacy `.docmapper`, or `.copyx` JSON string with collision-safe naming.
  */
 export function importProfileFromDocMapper(jsonContent: string): MappingProfile {
   const parsed = JSON.parse(jsonContent);
 
   if (!parsed.name || !Array.isArray(parsed.fields) || !Array.isArray(parsed.destinationMappings)) {
-    throw new Error('Invalid .docmapper file format: Missing name, fields, or destinationMappings.');
+    throw new Error('Invalid .dmap file format: Missing name, fields, or destinationMappings.');
   }
 
   const profiles = getAllProfiles();
@@ -281,4 +282,5 @@ export function importProfileFromDocMapper(jsonContent: string): MappingProfile 
 }
 
 // Backwards compatibility alias
+export const importProfileFromDMap = importProfileFromDocMapper;
 export const importProfileFromCopyx = importProfileFromDocMapper;

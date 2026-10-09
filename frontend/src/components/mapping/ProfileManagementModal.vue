@@ -56,7 +56,7 @@ function handleSelect(p: MappingProfile) {
 
 function handleExport(p: MappingProfile) {
   exportProfileAsDocMapper(p);
-  showNotice(`Exported ${p.name}.docmapper successfully!`);
+  showNotice(`Exported ${p.name}.dmap successfully!`);
 }
 
 function handleDuplicate(id: string) {
@@ -105,7 +105,7 @@ async function handleImportFile(event: Event) {
     emit('selectProfile', imported);
     showNotice(`Imported profile "${imported.name}" ready for use!`);
   } catch (err: any) {
-    alert(`Failed to import .docmapper file: ${err?.message || err}`);
+    alert(`Failed to import .dmap file: ${err?.message || err}`);
   }
 }
 </script>
@@ -153,8 +153,8 @@ async function handleImportFile(event: Event) {
         <!-- Import Button -->
         <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 text-xs font-semibold text-gray-700 dark:text-gray-200 shadow-sm transition-all">
           <Upload class="w-3.5 h-3.5 text-brand-purple" />
-          <span>Import .docmapper File</span>
-          <input type="file" accept=".docmapper,.copyx,application/json" class="hidden" @change="handleImportFile" />
+          <span>Import .dmap File</span>
+          <input type="file" accept=".dmap,.docmapper,.copyx,application/json" class="hidden" @change="handleImportFile" />
         </label>
       </div>
 
@@ -222,11 +222,11 @@ async function handleImportFile(event: Event) {
               Load Profile
             </button>
 
-            <!-- Export .docmapper -->
+            <!-- Export .dmap -->
             <button
               @click="handleExport(p)"
               class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-              title="Export as self-contained .docmapper file"
+              title="Export as self-contained .dmap file"
             >
               <Download class="w-4 h-4" />
             </button>

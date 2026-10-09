@@ -198,29 +198,9 @@ function handleAiButtonClick(field: FieldDefinition) {
           </button>
         </div>
 
-        <!-- Drawing Targets (Value Box & Label Box) -->
+        <!-- Drawing Targets (Label Box & Value Box) -->
         <div class="grid grid-cols-2 gap-2 my-2 text-xs">
-          <!-- Value Box Button -->
-          <button
-            @click.stop="$emit('setDrawingMode', field.id, 'value')"
-            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium"
-            :class="[
-              activeDrawingType === 'value' && selectedFieldId === field.id
-                ? 'bg-brand-purple text-white border-brand-purple'
-                : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
-            ]"
-            title="Draw or reposition Value bounding box"
-          >
-            <span class="flex items-center gap-1">
-              <Crosshair class="w-3.5 h-3.5" />
-              <span>Value Box</span>
-            </span>
-            <span class="text-[10px] opacity-75">
-              {{ field.valueBox ? `p.${field.valueBox.page}` : 'None' }}
-            </span>
-          </button>
-
-          <!-- Label Box Button -->
+          <!-- Label Box Button (Left) -->
           <button
             @click.stop="$emit('setDrawingMode', field.id, 'label')"
             class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium"
@@ -237,6 +217,26 @@ function handleAiButtonClick(field: FieldDefinition) {
             </span>
             <span class="text-[10px] opacity-75">
               {{ field.labelBox ? `p.${field.labelBox.page}` : 'None' }}
+            </span>
+          </button>
+
+          <!-- Value Box Button (Right) -->
+          <button
+            @click.stop="$emit('setDrawingMode', field.id, 'value')"
+            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all font-medium"
+            :class="[
+              activeDrawingType === 'value' && selectedFieldId === field.id
+                ? 'bg-brand-purple text-white border-brand-purple'
+                : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
+            ]"
+            title="Draw or reposition Value bounding box"
+          >
+            <span class="flex items-center gap-1">
+              <Crosshair class="w-3.5 h-3.5" />
+              <span>Value Box</span>
+            </span>
+            <span class="text-[10px] opacity-75">
+              {{ field.valueBox ? `p.${field.valueBox.page}` : 'None' }}
             </span>
           </button>
         </div>
