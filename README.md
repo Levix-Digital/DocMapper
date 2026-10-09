@@ -40,7 +40,7 @@ flowchart TD
         M3["Importação Externa (JSON / AcroForms / ERP Schema)"]
     end
     
-    M1 --> Mesh["Topologia Canônica Base G_0 (Campos, Âncoras e Coordenadas Relativas)"]
+    M1 --> Mesh["Topologia Canônica Base G_0 (Origem Top-Left (x, y), Calha w e Âncoras)"]
     M2 --> Mesh
     M3 --> Mesh
 
@@ -68,19 +68,19 @@ flowchart TD
 ### Formulação Matemática do LSIE
 
 #### 0. Fase 0: Topological Seeding (Entrada de Geometria Canônica)
-O algoritmo é **desacoplado do método de demarcação inicial**. Ele aceita como entrada uma tupla topológica canônica:
+O LSIE é **estritamente agnóstico ao método de identificação ou medição espacial**. O algoritmo não impõe nem depende de nenhuma ferramenta de interface específica: qualquer operador, sistema ou script pode aferir as coordenadas da forma que preferir (medição manual de pixels, clique interativo em tela, inspeção de streams PDF, scripts em Python/OpenCV, anotação em ferramentas como Label Studio ou extração via LLM).
+
+O requisito fundamental do LSIE é receber a geometria inicial dos campos delimitada pela sua **coordenada primária de origem: o canto superior esquerdo $(x, y)$**:
+
 $$\mathcal{G}_0 = \{ (F_i, B_i, A_i) \}_{i=1}^n$$
 Onde:
-- $F_i$ é o identificador semântico do campo (ex: `consignments`, `trailer_plate`, `shipper_name`).
-- $B_i = (x, y, w, h) \in [0, 1]^4$ são as coordenadas relativas normalizadas da caixa no documento gabarito.
-- $A_i$ é o texto contextual da âncora mais próxima (ex: `"Consignment no"`, `"Trailer No:"`), usado para guiar a calibração de marcos.
+- $F_i$: Identificador semântico do campo (ex: `consignments`, `trailer_plate`, `shipper_name`).
+- $B_i = (x, y, w, h) \in [0, 1]^4$: 
+  - **$(x, y)$ — Coordenada Primária (Canto Superior Esquerdo):** É o ponto de ancoragem canônico do campo. Por convenção de leitura ocidental e renderização vetorial, o texto se inicia no vértice superior esquerdo. Como o esticamento elástico de conteúdo se propaga para baixo ($+Y$) e para a direita ($+X$), o canto superior esquerdo permanece como a referência primordial estável de onde o fluxo textual se origina.
+  - **$(w, h)$ — Delimitação da Calha Espacial:** A largura $w$ define a coluna de contenção horizontal (evitando invasão de colunas vizinhas), e $h$ define a altura nominal de partida da primeira linha.
+- $A_i$: Texto contextual do rótulo/âncora mais próximo (ex: `"Consignment no"`, `"Trailer No:"`), utilizado para guiar a calibração de marcos relativos.
 
-Essa geometria inicial pode ser obtida por:
-1. **Demarcação Manual Direta:** O usuário desenha as caixas interativamente sobre uma página modelo.
-2. **Descoberta Automática / Heurística:** Modelos de visão (OCR + detecção de tabelas/linhas) geram os retângulos automaticamente.
-3. **Esquema Importado:** Qualquer sistema terceiro que possua um arquivo de coordenadas pode alimentar o LSIE diretamente.
-
-Uma vez fornecido $\mathcal{G}_0$, o LSIE constrói a malha elástica descrita a seguir.
+Uma vez fornecida essa malha canônica inicial $\mathcal{G}_0$ (seja por inspeção manual, automação de código ou schema externo), o LSIE assume a resolução determinística para qualquer documento elástico subsequente.
 
 #### 1. Invariância de Escala por Proporções Adimensionais
 Sejam $A_1, A_2, \dots, A_k$ as âncoras conhecidas ordenadas verticalmente pelo seu $Y$ de design.  
