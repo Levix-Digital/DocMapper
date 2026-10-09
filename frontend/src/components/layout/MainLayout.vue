@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Moon, Sun, CircleHelp } from 'lucide-vue-next';
+import { Moon, Sun, CircleHelp, FileText, Layers } from 'lucide-vue-next';
 import Modal from '../ui/Modal.vue';
+import { useRouter } from '../../composables/useRouter';
 
 // Dark Mode Logic
 const isDark = ref(false);
 const showHelp = ref(false);
+
+const { currentRoute, navigate } = useRouter();
 
 onMounted(() => {
   // Check system or local storage
@@ -37,12 +40,34 @@ const toggleTheme = () => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-2">
+        <a href="#/" @click.prevent="navigate('processor')" class="flex items-center gap-2">
             <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-purple to-brand-green flex items-center justify-center text-white font-bold font-heading">
                 C
             </div>
             <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white font-heading">Copyx</span>
         </a>
+
+        <!-- Center Nav Tabs -->
+        <nav class="flex items-center gap-1 sm:gap-2 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl">
+          <button 
+            @click="navigate('processor')"
+            :class="currentRoute === 'processor' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            id="nav-processor"
+          >
+            <FileText class="w-4 h-4" />
+            <span>Processor</span>
+          </button>
+          <button 
+            @click="navigate('mapping')"
+            :class="currentRoute === 'mapping' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            id="nav-mapping"
+          >
+            <Layers class="w-4 h-4" />
+            <span>Mapping Studio</span>
+          </button>
+        </nav>
 
         <!-- Controls -->
         <div class="flex items-center gap-2">

@@ -3,7 +3,42 @@
     <!-- Header Section -->
     <div class="text-center space-y-2">
       <h1 class="text-4xl font-bold font-heading text-gray-900 dark:text-white">Document Processor</h1>
-      <p class="text-gray-500 dark:text-gray-400">Secure, client-side generation. No data leaves your machine.</p>
+      <p class="text-gray-500 dark:text-gray-400">Secure, client-side batch document processing. Zero cloud upload.</p>
+    </div>
+
+    <!-- Profile Selector Card -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="p-2 rounded-xl bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/20 dark:text-purple-300">
+          <Layers class="w-5 h-5" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400">
+            Active Processing Profile
+          </label>
+          <select
+            v-model="selectedProfileId"
+            class="mt-0.5 bg-transparent font-bold text-gray-900 dark:text-white text-sm focus:outline-none cursor-pointer"
+          >
+            <option
+              v-for="prof in availableProfiles"
+              :key="prof.id"
+              :value="prof.id"
+              class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
+            >
+              {{ prof.name }} ({{ prof.fields.length }} fields)
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <button
+        @click="navigate('mapping')"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all w-full sm:w-auto justify-center"
+      >
+        <Sliders class="w-3.5 h-3.5 text-brand-purple" />
+        <span>Customize in Mapping Studio</span>
+      </button>
     </div>
 
     <!-- Drag & Drop Area -->
@@ -22,7 +57,7 @@
         type="file"
         ref="fileInput"
         multiple
-        accept="application/pdf"
+        accept="application/pdf,.pdf"
         class="hidden"
         @change="handleFileSelect"
       />
@@ -41,10 +76,10 @@
         <div class="space-y-1">
             <div v-if="isProcessing">
                 <p class="text-xl font-medium text-gray-900 dark:text-white">Processing Files...</p>
-                <p class="text-sm text-gray-500">Decrypting matrix patterns</p>
+                <p class="text-sm text-gray-500">{{ progressText || 'Executing client-side extraction...' }}</p>
             </div>
             <div v-else>
-                <p class="text-xl font-medium text-gray-900 dark:text-white">Drop source PDF here</p>
+                <p class="text-xl font-medium text-gray-900 dark:text-white">Drop PDF files here</p>
                 <p class="text-sm text-gray-500">or click to browse filesystem</p>
             </div>
         </div>
@@ -57,12 +92,12 @@
       <p>{{ error }}</p>
     </div>
 
-    <!-- Results -->
-    <div v-if="results.length > 0" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <!-- Results Section -->
+    <div v-if="displayResults.length > 0" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div class="flex justify-between items-end border-b border-gray-200 dark:border-gray-800 pb-4">
         <div>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">Output Stream</h2>
-          <p class="text-sm text-gray-500">{{ results.length }} documents generated</p>
+          <p class="text-sm text-gray-500">{{ displayResults.length }} documents generated</p>
         </div>
         <Button variant="primary" @click="downloadAll">
             <template #icon><Download class="w-4 h-4" /></template>
@@ -72,27 +107,57 @@
 
       <div class="grid gap-3">
         <Card 
-            v-for="res in results" 
+            v-for="res in displayResults" 
             :key="res.fileName" 
-            class="flex justify-between items-center group !p-3 hover:border-brand-green"
+            class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 group !p-4 hover:border-brand-green"
         >
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-brand-green">
+            <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-brand-green flex-shrink-0">
                 <FileCheck class="w-5 h-5" />
             </div>
             <div>
               <p class="font-medium text-gray-900 dark:text-white">{{ res.fileName }}</p>
-              <div class="flex gap-2 text-xs text-gray-500 font-mono mt-0.5">
-                <span>SHIP:{{ res.data.shipment }}</span>
-                <span class="text-gray-300">|</span>
-                <span>SEAL:{{ res.data.seal }}</span>
+              
+              <!-- Field Snippets -->
+              <div class="flex flex-wrap gap-2 text-xs text-gray-500 font-mono mt-1">
+                <span v-for="(val, key) in getSnippetEntries(res.extractedData)" :key="key">
+                  {{ key }}: {{ val }}
+                </span>
               </div>
             </div>
           </div>
           
-          <Button variant="ghost" @click="downloadOne(res)">
-            <Download class="w-4 h-4" />
-          </Button>
+          <div class="flex items-center gap-3 self-end sm:self-auto">
+            <!-- Confidence Badge -->
+            <span
+              v-if="res.confidence !== undefined"
+              class="px-2.5 py-1 rounded-full text-xs font-semibold"
+              :class="[
+                res.confidence >= 90
+                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                  : res.confidence >= 60
+                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                  : 'bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300'
+              ]"
+            >
+              {{ res.confidence }}% Confidence
+            </span>
+
+            <!-- Preview in Tab -->
+            <button
+              v-if="res.blob"
+              @click="previewDocument(res.blob)"
+              class="p-2 rounded-lg text-gray-500 hover:text-brand-purple hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Preview generated PDF"
+            >
+              <ExternalLink class="w-4 h-4" />
+            </button>
+
+            <!-- Download Single -->
+            <Button variant="ghost" @click="downloadOne(res)">
+              <Download class="w-4 h-4" />
+            </Button>
+          </div>
         </Card>
       </div>
     </div>
@@ -100,30 +165,64 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { UploadCloud, FileCheck, Download, Loader2, AlertCircle } from 'lucide-vue-next';
+import {
+  UploadCloud,
+  FileCheck,
+  Download,
+  Loader2,
+  AlertCircle,
+  Layers,
+  Sliders,
+  ExternalLink
+} from 'lucide-vue-next';
 
 import Card from '../components/ui/Card.vue';
 import Button from '../components/ui/Button.vue';
 import { WasmService } from '../services/WasmService';
 import { generateShipmentDocsPdf } from '../services/pdf/template-engine';
-import { ProcessingResult, CMRData } from '../modules/cmr/types';
+import { CMRData } from '../modules/cmr/types';
+import { getAllProfiles, BUILTIN_CMR_PROFILE_ID } from '../services/mapping/profile-store';
+import { executeBatchMapping } from '../services/mapping/mapping-runner';
+import type { MappingProfile } from '../types/mapping';
+import { useRouter } from '../composables/useRouter';
 
-// Set worker source using Vite's ?url import for reliable local loading
+// Set worker source using Vite's ?url import
 import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+
+const { navigate } = useRouter();
+
+interface UnifiedResultItem {
+  fileName: string;
+  blob?: Blob;
+  confidence?: number;
+  extractedData: Record<string, string>;
+}
 
 const isProcessing = ref(false);
 const isDragging = ref(false);
 const error = ref<string | null>(null);
-const results = ref<ProcessingResult[]>([]);
+const progressText = ref('');
+const displayResults = ref<UnifiedResultItem[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 
+const availableProfiles = ref<MappingProfile[]>([]);
+const selectedProfileId = ref<string>(BUILTIN_CMR_PROFILE_ID);
+
+onMounted(() => {
+  availableProfiles.value = getAllProfiles();
+});
+
+const activeProfile = computed(() => {
+  return availableProfiles.value.find(p => p.id === selectedProfileId.value) || availableProfiles.value[0];
+});
+
 const triggerFileInput = () => {
-    fileInput.value?.click();
+  fileInput.value?.click();
 };
 
 const handleFileSelect = (event: Event) => {
@@ -137,15 +236,56 @@ const handleDrop = (event: DragEvent) => {
   if (files) processFiles(Array.from(files));
 };
 
+function getSnippetEntries(data: Record<string, string>): Record<string, string> {
+  const entries: Record<string, string> = {};
+  let count = 0;
+  for (const [k, v] of Object.entries(data)) {
+    if (k.startsWith('field-') || !v) continue;
+    entries[k] = v;
+    count++;
+    if (count >= 3) break;
+  }
+  return entries;
+}
+
 const processFiles = async (files: File[]) => {
   isProcessing.value = true;
   error.value = null;
-  results.value = [];
+  displayResults.value = [];
+  progressText.value = '';
 
   try {
-    const validFiles = files.filter(f => f.type === 'application/pdf');
-    if (validFiles.length === 0) throw new Error("Please upload valid PDF files.");
+    const validFiles = files.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+    if (validFiles.length === 0) throw new Error("Please upload valid PDF files (.pdf).");
 
+    // Route 1: Custom Profile Selected -> Use Spatial Batch Mapping Engine
+    if (selectedProfileId.value !== BUILTIN_CMR_PROFILE_ID && activeProfile.value) {
+      const results = await executeBatchMapping({
+        files: validFiles,
+        profile: activeProfile.value,
+        onProgress: (done, total, name) => {
+          progressText.value = `Processing ${done + 1}/${total}: ${name}`;
+        },
+      });
+
+      for (const res of results) {
+        if (res.status === 'APPROVED' && res.pdfBlob) {
+          displayResults.value.push({
+            fileName: `${res.fileName.replace(/\.pdf$/i, '')}_processed.pdf`,
+            blob: res.pdfBlob,
+            confidence: res.overallConfidence,
+            extractedData: res.extractedData,
+          });
+        }
+      }
+
+      if (displayResults.value.length === 0) {
+        error.value = "Extraction completed, but no documents matched the profile with sufficient confidence.";
+      }
+      return;
+    }
+
+    // Route 2: Default Built-in CMR Profile -> Use original high-speed WASM parser
     for (const file of validFiles) {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
@@ -155,32 +295,34 @@ const processFiles = async (files: File[]) => {
         const textContent = await page.getTextContent();
         const text = textContent.items.map((item: any) => item.str).join(' ');
         
-        // Use WasmService (Async/Secure)
         try {
-            const jsonResult = await WasmService.getInstance().process('CMR', text);
-            console.log("WASM Output:", jsonResult);
-            const data = JSON.parse(jsonResult) as CMRData;
+          const jsonResult = await WasmService.getInstance().process('CMR', text);
+          const data = JSON.parse(jsonResult) as CMRData;
 
-            if (data.shipment) {
-                const pdfBytes = await generateShipmentDocsPdf(data);
-                const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
-                
-                results.value.push({
-                    fileName: `${data.shipment}.pdf`,
-                    blob,
-                    data
-                });
-            }
+          if (data.shipment) {
+            const pdfBytes = await generateShipmentDocsPdf(data);
+            const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+            
+            displayResults.value.push({
+              fileName: `${data.shipment}.pdf`,
+              blob,
+              confidence: 100,
+              extractedData: {
+                Shipment: data.shipment,
+                Seal: data.seal || '',
+                Trailer: data.trailer || '',
+                Consignments: data.consignments || '',
+              },
+            });
+          }
         } catch (wasmError) {
-            console.error("WASM Processing Error:", wasmError);
-            // Don't crash entire loop, but maybe valid to show error?
-            // For MVP, we continue.
+          console.error("WASM Processing Error:", wasmError);
         }
       }
     }
     
-    if (results.value.length === 0) {
-      error.value = "No valid CMR data found. (WASM Module might have failed to extract)";
+    if (displayResults.value.length === 0) {
+      error.value = "No valid CMR data found in the uploaded documents.";
     }
 
   } catch (err: any) {
@@ -192,21 +334,41 @@ const processFiles = async (files: File[]) => {
   }
 };
 
-const downloadOne = (res: ProcessingResult) => {
-  saveAs(res.blob, res.fileName);
+const previewDocument = (blob: Blob) => {
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+};
+
+const downloadOne = (res: UnifiedResultItem) => {
+  if (res.blob) {
+    saveAs(res.blob, res.fileName);
+  }
 };
 
 const downloadAll = async () => {
   const zip = new JSZip();
-  results.value.forEach(res => {
-    zip.file(res.fileName, res.blob);
+  displayResults.value.forEach(res => {
+    if (res.blob) {
+      zip.file(res.fileName, res.blob);
+    }
   });
   
-  // Add CSV summary
-  const csvHeader = "Shipment,Seal,Trailer,Consignments,Arrival Date,Arrival Time\n";
-  const csvRows = results.value.map(r => 
-    `${r.data.shipment},${r.data.seal},${r.data.trailer},"${r.data.consignments}",${r.data.est_arrival_date},${r.data.est_arrival_time}`
-  ).join("\n");
+  // Build dynamic CSV summary from extracted data fields
+  const allFieldKeys = Array.from(
+    new Set(
+      displayResults.value.flatMap(r =>
+        Object.keys(r.extractedData).filter(k => !k.startsWith('field-'))
+      )
+    )
+  );
+
+  const csvHeader = allFieldKeys.join(',') + '\n';
+  const csvRows = displayResults.value.map(r => {
+    return allFieldKeys
+      .map(k => `"${(r.extractedData[k] || '').replace(/"/g, '""')}"`)
+      .join(',');
+  }).join('\n');
+
   zip.file("summary.csv", csvHeader + csvRows);
 
   const content = await zip.generateAsync({ type: "blob" });
