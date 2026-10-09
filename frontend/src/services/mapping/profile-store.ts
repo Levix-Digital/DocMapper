@@ -14,45 +14,49 @@ export function createBuiltinCmrProfile(): MappingProfile {
       id: 'field-shipment',
       name: 'Shipment Number',
       color: '#6366f1', // Indigo
-      labelBox: { x: 58.0, y: 3.0, width: 20.0, height: 3.0, page: 1 },
-      valueBox: { x: 78.0, y: 3.0, width: 20.0, height: 3.5, page: 1 },
+      anchorText: 'Shipment:',
+      labelBox: { x: 6.76, y: 36.43, width: 3.78, height: 0.6, page: 1 },
+      valueBox: { x: 16.0, y: 36.30, width: 6.8, height: 0.6, page: 1 },
       validationPattern: '^[0-9A-Za-z\\-_/]+$',
       dataType: 'alphanumeric',
       isRequired: true,
-      sampleExtractedValue: '015-TSO-1234',
+      sampleExtractedValue: '015-TSO-S10000430442',
     },
     {
       id: 'field-consignments',
       name: 'Consignment Number',
       color: '#10b981', // Emerald
-      labelBox: { x: 5.0, y: 15.0, width: 20.0, height: 3.0, page: 1 },
-      valueBox: { x: 25.0, y: 15.0, width: 30.0, height: 3.5, page: 1 },
+      anchorText: 'Consignments:',
+      labelBox: { x: 6.76, y: 37.55, width: 5.6, height: 0.6, page: 1 },
+      valueBox: { x: 16.0, y: 37.50, width: 6.8, height: 0.6, page: 1 },
       validationPattern: '^[0-9A-Za-z\\-_/]+$',
       dataType: 'alphanumeric',
       isRequired: false,
-      sampleExtractedValue: 'CN-98765',
+      sampleExtractedValue: '23422-SUP-ECIS8459',
     },
     {
       id: 'field-transport-id',
       name: 'Transport ID / Trailer',
       color: '#f59e0b', // Amber
-      labelBox: { x: 5.0, y: 25.0, width: 20.0, height: 3.0, page: 1 },
-      valueBox: { x: 25.0, y: 25.0, width: 30.0, height: 3.5, page: 1 },
+      anchorText: 'Trailer',
+      labelBox: { x: 4.49, y: 88.0, width: 3.5, height: 1.0, page: 1 },
+      valueBox: { x: 9.0, y: 85.5, width: 15.0, height: 2.2, page: 1 },
       validationPattern: '.+',
       dataType: 'text',
       isRequired: false,
-      sampleExtractedValue: 'TR-456-XYZ',
+      sampleExtractedValue: 'EMHU200739',
     },
     {
       id: 'field-seal',
       name: 'Seal Number',
       color: '#ec4899', // Pink
-      labelBox: { x: 5.0, y: 35.0, width: 20.0, height: 3.0, page: 1 },
-      valueBox: { x: 25.0, y: 35.0, width: 30.0, height: 3.5, page: 1 },
+      anchorText: 'Plombe / Seal / Plomb',
+      labelBox: { x: 6.65, y: 30.7, width: 12.5, height: 0.8, page: 1 },
+      valueBox: { x: 20.0, y: 30.5, width: 10.0, height: 0.6, page: 1 },
       validationPattern: '^[0-9A-Za-z\\-_]+$',
       dataType: 'alphanumeric',
       isRequired: false,
-      sampleExtractedValue: 'SL-7890',
+      sampleExtractedValue: 'KSM1012290',
     },
   ];
 
@@ -60,34 +64,34 @@ export function createBuiltinCmrProfile(): MappingProfile {
     {
       id: 'dest-shipment-barcode',
       fieldId: 'field-shipment',
-      targetBox: { x: 55.0, y: 8.0, width: 40.0, height: 7.0, page: 1 },
+      targetBox: { x: 16.0, y: 13.3, width: 68.8, height: 20.2, page: 3 },
       renderFormat: 'CODE128',
     },
     {
       id: 'dest-shipment-text',
       fieldId: 'field-shipment',
-      targetBox: { x: 15.0, y: 8.0, width: 35.0, height: 4.0, page: 1 },
+      targetBox: { x: 29.0, y: 14.0, width: 25.0, height: 2.7, page: 1 },
       renderFormat: 'TEXT',
-      fontSize: 12,
+      fontSize: 11,
     },
     {
       id: 'dest-consignment-text',
       fieldId: 'field-consignments',
-      targetBox: { x: 15.0, y: 15.0, width: 35.0, height: 4.0, page: 1 },
+      targetBox: { x: 29.0, y: 16.4, width: 55.0, height: 2.7, page: 1 },
       renderFormat: 'TEXT',
       fontSize: 10,
     },
     {
       id: 'dest-transport-text',
       fieldId: 'field-transport-id',
-      targetBox: { x: 15.0, y: 22.0, width: 35.0, height: 4.0, page: 1 },
+      targetBox: { x: 29.0, y: 18.9, width: 25.0, height: 2.7, page: 1 },
       renderFormat: 'TEXT',
       fontSize: 10,
     },
     {
       id: 'dest-seal-text',
       fieldId: 'field-seal',
-      targetBox: { x: 15.0, y: 29.0, width: 35.0, height: 4.0, page: 1 },
+      targetBox: { x: 29.0, y: 21.3, width: 25.0, height: 2.7, page: 1 },
       renderFormat: 'TEXT',
       fontSize: 10,
     },
@@ -124,12 +128,20 @@ export function getAllProfiles(): MappingProfile[] {
     }
   }
 
-  // Ensure built-in CMR profile exists
-  const hasBuiltin = profiles.some(p => p.id === BUILTIN_CMR_PROFILE_ID);
-  if (!hasBuiltin) {
+  // Ensure built-in CMR profile exists and is updated to calibrated version if it had legacy fake coordinates
+  const builtinIndex = profiles.findIndex(p => p.id === BUILTIN_CMR_PROFILE_ID);
+  if (builtinIndex === -1) {
     const builtin = createBuiltinCmrProfile();
     profiles.unshift(builtin);
     saveAllProfiles(profiles);
+  } else {
+    // If the built-in profile in localStorage has old mock or uncalibrated coordinates, update it
+    const existing = profiles[builtinIndex];
+    const shipmentField = existing.fields.find(f => f.id === 'field-shipment');
+    if (shipmentField && (shipmentField.valueBox.y < 10 || shipmentField.valueBox.width > 10 || !shipmentField.anchorText)) {
+      profiles[builtinIndex] = createBuiltinCmrProfile();
+      saveAllProfiles(profiles);
+    }
   }
 
   return profiles;

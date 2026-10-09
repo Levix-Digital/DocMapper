@@ -182,10 +182,7 @@ import {
 
 import Card from '../components/ui/Card.vue';
 import Button from '../components/ui/Button.vue';
-import { WasmService } from '../services/WasmService';
-import { generateShipmentDocsPdf } from '../services/pdf/template-engine';
-import { CMRData } from '../modules/cmr/types';
-import { getAllProfiles, BUILTIN_CMR_PROFILE_ID } from '../services/mapping/profile-store';
+import { getAllProfiles, BUILTIN_CMR_PROFILE_ID, createBuiltinCmrProfile } from '../services/mapping/profile-store';
 import { executeBatchMapping } from '../services/mapping/mapping-runner';
 import type { MappingProfile } from '../types/mapping';
 import { useRouter } from '../composables/useRouter';
@@ -215,6 +212,9 @@ const selectedProfileId = ref<string>(BUILTIN_CMR_PROFILE_ID);
 
 onMounted(() => {
   availableProfiles.value = getAllProfiles();
+  if (availableProfiles.value.length > 0 && !availableProfiles.value.some(p => p.id === selectedProfileId.value)) {
+    selectedProfileId.value = availableProfiles.value[0].id;
+  }
 });
 
 const activeProfile = computed(() => {
@@ -243,7 +243,7 @@ function getSnippetEntries(data: Record<string, string>): Record<string, string>
     if (k.startsWith('field-') || !v) continue;
     entries[k] = v;
     count++;
-    if (count >= 3) break;
+    if (count >= 4) break;
   }
   return entries;
 }
@@ -258,75 +258,31 @@ const processFiles = async (files: File[]) => {
     const validFiles = files.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
     if (validFiles.length === 0) throw new Error("Please upload valid PDF files (.pdf).");
 
-    // Route 1: Custom Profile Selected -> Use Spatial Batch Mapping Engine
-    if (selectedProfileId.value !== BUILTIN_CMR_PROFILE_ID && activeProfile.value) {
-      const results = await executeBatchMapping({
-        files: validFiles,
-        profile: activeProfile.value,
-        onProgress: (done, total, name) => {
-          progressText.value = `Processing ${done + 1}/${total}: ${name}`;
-        },
-      });
+    const profile = activeProfile.value || createBuiltinCmrProfile();
+    const results = await executeBatchMapping({
+      files: validFiles,
+      profile,
+      onProgress: (done, total, name) => {
+        progressText.value = `Processing ${done + 1}/${total}: ${name}`;
+      },
+    });
 
-      for (const res of results) {
-        if (res.status === 'APPROVED' && res.pdfBlob) {
-          displayResults.value.push({
-            fileName: `${res.fileName.replace(/\.pdf$/i, '')}_processed.pdf`,
-            blob: res.pdfBlob,
-            confidence: res.overallConfidence,
-            extractedData: res.extractedData,
-          });
-        }
-      }
-
-      if (displayResults.value.length === 0) {
-        error.value = "Extraction completed, but no documents matched the profile with sufficient confidence.";
-      }
-      return;
-    }
-
-    // Route 2: Default Built-in CMR Profile -> Use original high-speed WASM parser
-    for (const file of validFiles) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const text = textContent.items.map((item: any) => item.str).join(' ');
-        
-        try {
-          const jsonResult = await WasmService.getInstance().process('CMR', text);
-          const data = JSON.parse(jsonResult) as CMRData;
-
-          if (data.shipment) {
-            const pdfBytes = await generateShipmentDocsPdf(data);
-            const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
-            
-            displayResults.value.push({
-              fileName: `${data.shipment}.pdf`,
-              blob,
-              confidence: 100,
-              extractedData: {
-                Shipment: data.shipment,
-                Seal: data.seal || '',
-                Trailer: data.trailer || '',
-                Consignments: data.consignments || '',
-              },
-            });
-          }
-        } catch (wasmError) {
-          console.error("WASM Processing Error:", wasmError);
-        }
+    for (const res of results) {
+      if (res.status === 'APPROVED' && res.pdfBlob) {
+        displayResults.value.push({
+          fileName: res.fileName,
+          blob: res.pdfBlob,
+          confidence: res.overallConfidence,
+          extractedData: res.extractedData,
+        });
       }
     }
-    
+
     if (displayResults.value.length === 0) {
-      error.value = "No valid CMR data found in the uploaded documents.";
+      error.value = "Extraction completed, but no documents matched the profile with sufficient confidence. Please check field mappings in Mapping Studio.";
     }
-
   } catch (err: any) {
-    console.error(err);
+    console.error("Batch processing error:", err);
     error.value = err.message || "An error occurred while processing files.";
   } finally {
     isProcessing.value = false;

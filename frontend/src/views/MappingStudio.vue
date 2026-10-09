@@ -110,6 +110,11 @@ async function extractAllSampleFields() {
       const text = await extractTextInBox(page, field.valueBox);
       field.sampleExtractedValue = text;
     }
+    if (field.labelBox) {
+      const pageNum = Math.min(Math.max(field.labelBox.page, 1), rawPdf.numPages);
+      const page = await rawPdf.getPage(pageNum);
+      field.anchorText = await extractTextInBox(page, field.labelBox);
+    }
   }
   saveCurrentProfile();
 }
@@ -121,16 +126,19 @@ async function onBoxDrawn(box: BoundingBox, type: 'value' | 'label') {
   const field = currentProfile.value.fields.find(f => f.id === selectedFieldId.value);
   if (!field) return;
 
+  const rawPdf = toRaw(samplePdfDoc.value);
   if (type === 'value') {
     field.valueBox = box;
-    // Immediately extract text from the drawn box
-    const rawPdf = toRaw(samplePdfDoc.value);
     if (rawPdf) {
       const page = await rawPdf.getPage(box.page);
       field.sampleExtractedValue = await extractTextInBox(page, box);
     }
   } else {
     field.labelBox = box;
+    if (rawPdf) {
+      const page = await rawPdf.getPage(box.page);
+      field.anchorText = await extractTextInBox(page, box);
+    }
   }
 
   activeDrawingType.value = 'none'; // reset drawing mode
@@ -141,9 +149,9 @@ function onUpdateBox(fieldId: string, type: 'value' | 'label', box: BoundingBox)
   const field = currentProfile.value.fields.find(f => f.id === fieldId);
   if (!field) return;
 
+  const rawPdf = toRaw(samplePdfDoc.value);
   if (type === 'value') {
     field.valueBox = box;
-    const rawPdf = toRaw(samplePdfDoc.value);
     if (rawPdf) {
       rawPdf.getPage(box.page).then(async (page: any) => {
         field.sampleExtractedValue = await extractTextInBox(page, box);
@@ -151,6 +159,11 @@ function onUpdateBox(fieldId: string, type: 'value' | 'label', box: BoundingBox)
     }
   } else {
     field.labelBox = box;
+    if (rawPdf) {
+      rawPdf.getPage(box.page).then(async (page: any) => {
+        field.anchorText = await extractTextInBox(page, box);
+      });
+    }
   }
   saveCurrentProfile();
 }
@@ -161,6 +174,7 @@ function onDeleteBox(fieldId: string, type: 'value' | 'label') {
 
   if (type === 'label') {
     field.labelBox = undefined;
+    field.anchorText = undefined;
   }
   saveCurrentProfile();
 }

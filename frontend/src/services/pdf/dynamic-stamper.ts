@@ -18,61 +18,111 @@ function dataUrlToUint8Array(dataUrl: string): Uint8Array {
 }
 
 /**
- * Generates a Code 128 barcode as PNG bytes.
+ * Generates a Code 128 barcode as PNG bytes safely.
  */
-function generateBarcodePng(value: string): Uint8Array {
-  const canvas = document.createElement('canvas');
-  JsBarcode(canvas, value, {
-    format: 'CODE128',
-    displayValue: false,
-    margin: 4,
-    background: '#ffffff',
-    lineColor: '#000000',
-  });
-  return dataUrlToUint8Array(canvas.toDataURL('image/png'));
+function generateBarcodePng(value: string): Uint8Array | null {
+  try {
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, value, {
+      format: 'CODE128',
+      displayValue: false,
+      margin: 4,
+      background: '#ffffff',
+      lineColor: '#000000',
+    });
+    return dataUrlToUint8Array(canvas.toDataURL('image/png'));
+  } catch (err) {
+    console.warn('Barcode generation failed for value:', value, err);
+    return null;
+  }
 }
 
 /**
- * Generates a 2D QR Code as PNG bytes.
+ * Generates a 2D QR Code as PNG bytes safely.
  */
-async function generateQrCodePng(value: string): Promise<Uint8Array> {
-  const dataUrl = await QRCode.toDataURL(value, {
-    margin: 1,
-    width: 300,
-    color: {
-      dark: '#000000',
-      light: '#ffffff',
-    },
-  });
-  return dataUrlToUint8Array(dataUrl);
+async function generateQrCodePng(value: string): Promise<Uint8Array | null> {
+  try {
+    const dataUrl = await QRCode.toDataURL(value, {
+      margin: 1,
+      width: 300,
+      color: {
+        dark: '#000000',
+        light: '#ffffff',
+      },
+    });
+    return dataUrlToUint8Array(dataUrl);
+  } catch (err) {
+    console.warn('QR Code generation failed for value:', value, err);
+    return null;
+  }
 }
 
 export interface StampOptions {
-  templatePdfBytes: ArrayBuffer | Uint8Array | string;
+  templatePdfBytes?: ArrayBuffer | Uint8Array | string | null;
   mappings: DestinationFieldMapping[];
   fields: FieldDefinition[];
   extractedValues: Record<string, string>;
 }
 
 /**
- * Stamps extracted values onto a destination PDF template at mapped coordinates.
+ * Stamps extracted values onto a destination PDF template at mapped coordinates,
+ * or generates a clean document if no template is supplied.
  */
 export async function stampDestinationPdf(options: StampOptions): Promise<Uint8Array> {
   const { templatePdfBytes, mappings, fields, extractedValues } = options;
 
-  let cleanBytes: Uint8Array;
-  if (typeof templatePdfBytes === 'string') {
-    const base64Clean = templatePdfBytes.includes(',') ? templatePdfBytes.split(',')[1] : templatePdfBytes;
-    cleanBytes = dataUrlToUint8Array(base64Clean);
-  } else if (templatePdfBytes instanceof ArrayBuffer) {
-    cleanBytes = new Uint8Array(templatePdfBytes);
+  let pdfDoc: PDFDocument;
+
+  if (templatePdfBytes && (typeof templatePdfBytes === 'string' ? templatePdfBytes.length > 50 : true)) {
+    let cleanBytes: Uint8Array;
+    if (typeof templatePdfBytes === 'string') {
+      const base64Clean = templatePdfBytes.includes(',') ? templatePdfBytes.split(',')[1] : templatePdfBytes;
+      cleanBytes = dataUrlToUint8Array(base64Clean);
+    } else if (templatePdfBytes instanceof ArrayBuffer) {
+      cleanBytes = new Uint8Array(templatePdfBytes);
+    } else {
+      cleanBytes = templatePdfBytes;
+    }
+    pdfDoc = await PDFDocument.load(cleanBytes);
   } else {
-    cleanBytes = templatePdfBytes;
+    // Generate clean A4 standalone document
+    pdfDoc = await PDFDocument.create();
+    pdfDoc.addPage([595.28, 841.89]);
   }
 
-  const pdfDoc = await PDFDocument.load(cleanBytes);
   const pages = pdfDoc.getPages();
   const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  // If the document has AcroForm fields (like legacy shipment checklist), fill them
+  try {
+    const form = pdfDoc.getForm();
+    const shipmentVal = extractedValues['Shipment Number'] || extractedValues['Shipment'] || '';
+    const shipmentLastPart = shipmentVal ? shipmentVal.split('-').pop() : '';
+    const sealVal = extractedValues['Seal Number'] || extractedValues['Seal'] || '';
+    const trailerVal = extractedValues['Transport ID / Trailer'] || extractedValues['Trailer'] || '';
+    const consignmentsVal = extractedValues['Consignment Number'] || extractedValues['Consignments'] || '';
+
+    const safeSetText = (fieldName: string, val: string | undefined) => {
+      try {
+        if (val) form.getTextField(fieldName).setText(val);
+      } catch (_) {}
+    };
+
+    if (shipmentLastPart) safeSetText('shipment_number', shipmentLastPart);
+    if (consignmentsVal) safeSetText('consignment_number', consignmentsVal);
+    if (trailerVal) {
+      safeSetText('transport_identification', trailerVal);
+      safeSetText('container_number', trailerVal);
+      safeSetText('carrier_id', `Carrier Id: ${trailerVal}`);
+    }
+    if (sealVal) safeSetText('seal_number', sealVal);
+    if (shipmentLastPart) safeSetText('shipment_manifest', shipmentLastPart);
+
+    form.flatten();
+  } catch (_) {
+    // Non-acroform template, proceed to visual coordinate stamping
+  }
 
   // Map fields by id and name for quick lookup
   const fieldById = new Map<string, FieldDefinition>();
@@ -108,26 +158,29 @@ export async function stampDestinationPdf(options: StampOptions): Promise<Uint8A
     try {
       if (mapping.renderFormat === 'CODE128') {
         const barcodeBytes = generateBarcodePng(value);
-        const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
-        targetPage.drawImage(barcodeImage, {
-          x: boxX,
-          y: boxBottomY,
-          width: boxWidth,
-          height: boxHeight,
-        });
+        if (barcodeBytes) {
+          const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
+          targetPage.drawImage(barcodeImage, {
+            x: boxX,
+            y: boxBottomY,
+            width: boxWidth,
+            height: boxHeight,
+          });
+        }
       } else if (mapping.renderFormat === 'QR_CODE') {
         const qrBytes = await generateQrCodePng(value);
-        const qrImage = await pdfDoc.embedPng(qrBytes);
-        // Square aspect ratio centered in box
-        const size = Math.min(boxWidth, boxHeight);
-        const offsetX = (boxWidth - size) / 2;
-        const offsetY = (boxHeight - size) / 2;
-        targetPage.drawImage(qrImage, {
-          x: boxX + offsetX,
-          y: boxBottomY + offsetY,
-          width: size,
-          height: size,
-        });
+        if (qrBytes) {
+          const qrImage = await pdfDoc.embedPng(qrBytes);
+          const size = Math.min(boxWidth, boxHeight);
+          const offsetX = (boxWidth - size) / 2;
+          const offsetY = (boxHeight - size) / 2;
+          targetPage.drawImage(qrImage, {
+            x: boxX + offsetX,
+            y: boxBottomY + offsetY,
+            width: size,
+            height: size,
+          });
+        }
       } else {
         // Render as plain text with dynamic auto-fit font sizing
         let fontSize = mapping.fontSize || 11;
@@ -155,6 +208,38 @@ export async function stampDestinationPdf(options: StampOptions): Promise<Uint8A
       }
     } catch (err) {
       console.warn(`Failed to stamp field ${field.name}:`, err);
+    }
+  }
+
+  // If this was a blank generated document with no mappings, draw a default layout
+  if (!templatePdfBytes && mappings.length === 0) {
+    const page = pages[0];
+    page.drawText('Transport & Delivery Note', {
+      x: 50,
+      y: 790,
+      size: 20,
+      font,
+      color: rgb(0.1, 0.1, 0.2),
+    });
+
+    let currentY = 740;
+    for (const [key, val] of Object.entries(extractedValues)) {
+      if (key.startsWith('field-') || !val) continue;
+      page.drawText(`${key}:`, {
+        x: 50,
+        y: currentY,
+        size: 11,
+        font,
+        color: rgb(0.2, 0.2, 0.3),
+      });
+      page.drawText(val, {
+        x: 200,
+        y: currentY,
+        size: 11,
+        font: regularFont,
+        color: rgb(0, 0, 0),
+      });
+      currentY -= 25;
     }
   }
 

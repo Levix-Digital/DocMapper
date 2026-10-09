@@ -24,6 +24,8 @@ export interface FieldDefinition {
   color: string;
   /** Optional bounding box for the field anchor label */
   labelBox?: BoundingBox;
+  /** Optional text captured from the anchor label */
+  anchorText?: string;
   /** Bounding box where the field value is extracted */
   valueBox: BoundingBox;
   /** Deterministic regex pattern for format validation */
