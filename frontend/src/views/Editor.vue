@@ -6,8 +6,23 @@
       <p class="text-gray-500 dark:text-gray-400">{{ t('processor.subtitle') }}</p>
     </div>
 
+    <!-- No Profiles Available Banner -->
+    <div v-if="availableProfiles.length === 0" class="p-8 rounded-2xl bg-white dark:bg-gray-800/80 border border-dashed border-gray-300 dark:border-gray-700 text-center space-y-4 shadow-sm">
+      <div class="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-brand-purple w-fit mx-auto">
+        <Layers class="w-8 h-8" />
+      </div>
+      <div class="space-y-1">
+        <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ t('processor.noProfilesTitle') }}</h3>
+        <p class="text-xs text-gray-500 max-w-md mx-auto">{{ t('processor.noProfilesDesc') }}</p>
+      </div>
+      <Button @click="navigate('mapping')" variant="primary" class="mx-auto flex items-center gap-2">
+        <Sliders class="w-4 h-4" />
+        <span>{{ t('processor.goToStudio') }}</span>
+      </Button>
+    </div>
+
     <!-- Profile Selector Card -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div v-else class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm">
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <div class="p-2 rounded-xl bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/20 dark:text-purple-300">
           <Layers class="w-5 h-5" />
@@ -16,19 +31,24 @@
           <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400">
             {{ t('processor.activeProfile') }}
           </label>
-          <select
-            v-model="selectedProfileId"
-            class="mt-0.5 bg-transparent font-bold text-gray-900 dark:text-white text-sm focus:outline-none cursor-pointer"
-          >
-            <option
-              v-for="prof in availableProfiles"
-              :key="prof.id"
-              :value="prof.id"
-              class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
+          <div class="flex flex-wrap items-center gap-2">
+            <select
+              v-model="selectedProfileId"
+              class="mt-0.5 bg-transparent font-bold text-gray-900 dark:text-white text-sm focus:outline-none cursor-pointer"
             >
-              {{ prof.name }} ({{ t('processor.fieldsCount', { count: prof.fields.length }) }})
-            </option>
-          </select>
+              <option
+                v-for="prof in availableProfiles"
+                :key="prof.id"
+                :value="prof.id"
+                class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
+              >
+                {{ prof.name }} ({{ t('processor.fieldsCount', { count: prof.fields.length }) }})
+              </option>
+            </select>
+            <span v-if="activeProfile?.outputFileNamePattern" class="text-[11px] font-mono px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/40 text-brand-purple dark:text-purple-300 border border-purple-200 dark:border-purple-800/50">
+              Pattern: {{ activeProfile.outputFileNamePattern }}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -182,7 +202,7 @@ import {
 
 import Card from '../components/ui/Card.vue';
 import Button from '../components/ui/Button.vue';
-import { getAllProfiles, BUILTIN_CMR_PROFILE_ID, createBuiltinCmrProfile } from '../services/mapping/profile-store';
+import { getAllProfiles } from '../services/mapping/profile-store';
 import { executeBatchMapping } from '../services/mapping/mapping-runner';
 import type { MappingProfile } from '../types/mapping';
 import { useRouter } from '../composables/useRouter';
@@ -210,17 +230,17 @@ const displayResults = ref<UnifiedResultItem[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const availableProfiles = ref<MappingProfile[]>([]);
-const selectedProfileId = ref<string>(BUILTIN_CMR_PROFILE_ID);
+const selectedProfileId = ref<string>('');
 
 onMounted(() => {
   availableProfiles.value = getAllProfiles();
-  if (availableProfiles.value.length > 0 && !availableProfiles.value.some(p => p.id === selectedProfileId.value)) {
+  if (availableProfiles.value.length > 0) {
     selectedProfileId.value = availableProfiles.value[0].id;
   }
 });
 
 const activeProfile = computed(() => {
-  return availableProfiles.value.find(p => p.id === selectedProfileId.value) || availableProfiles.value[0];
+  return availableProfiles.value.find(p => p.id === selectedProfileId.value) || null;
 });
 
 const triggerFileInput = () => {
@@ -260,7 +280,10 @@ const processFiles = async (files: File[]) => {
     const validFiles = files.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
     if (validFiles.length === 0) throw new Error(t('processor.uploadValidPdfError'));
 
-    const profile = activeProfile.value || createBuiltinCmrProfile();
+    if (!activeProfile.value) {
+      throw new Error(t('processor.noProfileSelectedError'));
+    }
+    const profile = activeProfile.value;
     const results = await executeBatchMapping({
       files: validFiles,
       profile,

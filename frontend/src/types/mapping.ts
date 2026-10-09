@@ -79,6 +79,8 @@ export interface MappingProfile {
   destinationTemplateBase64?: string;
   destinationTemplateName?: string;
   destinationMappings: DestinationFieldMapping[];
+  /** Pattern for output file naming, e.g. "{originalName}_{seq:001}" or "{Seal Number}" */
+  outputFileNamePattern?: string;
 }
 
 export interface ExtractionResult {

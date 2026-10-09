@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef, markRaw, toRaw, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, shallowRef, markRaw, toRaw, onMounted, computed } from 'vue';
 import {
   Upload,
   Save,
@@ -10,15 +10,18 @@ import {
   FileCheck,
   AlertCircle,
   Eye,
-  ExternalLink
+  ExternalLink,
+  FileSignature,
+  Tag,
+  RotateCcw
 } from 'lucide-vue-next';
 import type { MappingProfile, FieldDefinition, BoundingBox, DestinationFieldMapping } from '../types/mapping';
 import {
-  getAllProfiles,
   saveProfile,
-  createBuiltinCmrProfile,
+  createEmptyProfile,
   exportProfileAsDocMapper
 } from '../services/mapping/profile-store';
+import { formatOutputFileName } from '../services/mapping/filename-formatter';
 import { loadPdf, extractTextInBox, isPageScanned } from '../services/pdf/spatial-extractor';
 import { generateValidationPattern } from '../services/llm/gemini-service';
 import { stampDestinationPdf } from '../services/pdf/dynamic-stamper';
@@ -31,8 +34,9 @@ import { useI18n } from '../i18n';
 const { t } = useI18n();
 const activeTab = ref<'origin' | 'destination' | 'preview'>('origin');
 
-// Active Profile
-const currentProfile = ref<MappingProfile>(createBuiltinCmrProfile());
+// Active Profile: 100% empty by default on startup
+const currentProfile = ref<MappingProfile>(createEmptyProfile());
+const editingProfileId = ref<string | null>(null);
 const selectedFieldId = ref<string | null>(null);
 const activeDrawingType = ref<'value' | 'label' | 'none'>('none');
 
@@ -55,13 +59,8 @@ const previewPdfBlobUrl = ref<string | null>(null);
 const isGeneratingPreview = ref(false);
 
 onMounted(() => {
-  const profiles = getAllProfiles();
-  if (profiles.length > 0) {
-    currentProfile.value = profiles[0];
-  }
-  if (currentProfile.value.fields.length > 0) {
-    selectedFieldId.value = currentProfile.value.fields[0].id;
-  }
+  // App opens 100% empty - no default profiles or documents preloaded
+  clearStudioToEmpty();
 });
 
 function showToast(msg: string) {
@@ -293,41 +292,92 @@ function onRemoveDestinationMapping(id: string) {
   currentProfile.value.destinationMappings = currentProfile.value.destinationMappings.filter(
     m => m.id !== id
   );
-  saveCurrentProfile();
 }
 
-let saveTimer: any = null;
-function saveCurrentProfile(immediate = false) {
-  if (saveTimer) {
-    clearTimeout(saveTimer);
-    saveTimer = null;
-  }
-  if (immediate) {
-    saveProfile(currentProfile.value);
-  } else {
-    saveTimer = setTimeout(() => {
-      saveProfile(currentProfile.value);
-    }, 300);
-  }
+function saveCurrentProfile() {
+  // In-memory edits only until user explicitly clicks Save Profile
 }
 
-onBeforeUnmount(() => {
-  if (saveTimer) {
-    clearTimeout(saveTimer);
-    saveProfile(currentProfile.value);
+function clearStudioToEmpty() {
+  currentProfile.value = createEmptyProfile();
+  editingProfileId.value = null;
+  selectedFieldId.value = null;
+  activeDrawingType.value = 'none';
+  samplePdfBytes.value = null;
+  samplePdfDoc.value = null;
+  sampleFileName.value = '';
+  isOriginScannedWarning.value = false;
+  if (previewPdfBlobUrl.value) {
+    URL.revokeObjectURL(previewPdfBlobUrl.value);
+    previewPdfBlobUrl.value = null;
   }
-});
+  activeTab.value = 'origin';
+}
+
+function handleSaveProfile() {
+  if (currentProfile.value.fields.length === 0 && !currentProfile.value.destinationTemplateBase64) {
+    showToast(t('nav.saveValidationEmpty'));
+    return;
+  }
+
+  const profileName = currentProfile.value.name.trim() || 'Untitled Profile';
+  currentProfile.value.name = profileName;
+
+  // Persist to storage
+  saveProfile(currentProfile.value);
+
+  // Clear all studio fields back to 100% empty
+  clearStudioToEmpty();
+
+  // Show success toast
+  showToast(t('nav.savedAndClearedToast', { name: profileName }));
+}
 
 function exportCurrentProfile() {
   exportProfileAsDocMapper(currentProfile.value);
 }
 
-function onProfileSelectedFromHub(profile: MappingProfile) {
-  currentProfile.value = profile;
+function onEditProfileFromHub(profile: MappingProfile) {
+  currentProfile.value = JSON.parse(JSON.stringify(profile));
+  editingProfileId.value = profile.id;
   if (profile.fields.length > 0) {
     selectedFieldId.value = profile.fields[0].id;
+  } else {
+    selectedFieldId.value = null;
   }
-  showToast(t('nav.switchToast', { name: profile.name }));
+  samplePdfDoc.value = null;
+  samplePdfBytes.value = null;
+  sampleFileName.value = '';
+  if (previewPdfBlobUrl.value) {
+    URL.revokeObjectURL(previewPdfBlobUrl.value);
+    previewPdfBlobUrl.value = null;
+  }
+  activeTab.value = 'origin';
+  showToast(t('nav.editingToast', { name: profile.name }));
+}
+
+const computedLiveFileNamePreview = computed(() => {
+  const sampleValues: Record<string, string> = {};
+  for (const f of currentProfile.value.fields) {
+    sampleValues[f.name] = f.sampleExtractedValue || '185462';
+    sampleValues[f.id] = f.sampleExtractedValue || '185462';
+  }
+  return formatOutputFileName({
+    pattern: currentProfile.value.outputFileNamePattern,
+    originalFileName: sampleFileName.value || 'Document.pdf',
+    extractedData: sampleValues,
+    docIndex: 0,
+    totalDocs: 1,
+  });
+});
+
+function insertNamingToken(token: string) {
+  const cur = currentProfile.value.outputFileNamePattern || '';
+  if (!cur.trim()) {
+    currentProfile.value.outputFileNamePattern = token;
+  } else {
+    currentProfile.value.outputFileNamePattern = `${cur}_${token}`;
+  }
 }
 
 // Generate Sample Output Preview
@@ -371,10 +421,25 @@ async function generateSamplePreview() {
     <!-- Top Bar: Title, Profile Selector, Actions -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
       <div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('nav.studioTitle') }}</h1>
-          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/20 dark:text-purple-300">
-            {{ t('nav.profileLabel', { name: currentProfile.name }) }}
+          
+          <!-- Editable Profile Name Badge -->
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 shadow-sm">
+            <Tag class="w-3.5 h-3.5 text-brand-purple flex-shrink-0" />
+            <span class="text-xs text-gray-500 font-medium">Profile:</span>
+            <input
+              v-model="currentProfile.name"
+              class="bg-transparent text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-brand-purple rounded px-1.5 py-0.5 min-w-[130px]"
+              placeholder="Profile Name"
+            />
+          </div>
+
+          <span
+            v-if="editingProfileId"
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+          >
+            Editing Profile
           </span>
         </div>
         <p class="text-xs text-gray-500 mt-1">
@@ -393,6 +458,15 @@ async function generateSamplePreview() {
         </button>
 
         <button
+          @click="clearStudioToEmpty"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-sm"
+          title="Clear all fields back to 100% empty"
+        >
+          <RotateCcw class="w-4 h-4 text-gray-500" />
+          <span>{{ t('nav.clear') }}</span>
+        </button>
+
+        <button
           @click="exportCurrentProfile"
           class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-all shadow-sm"
           title="Download .dmap portable profile"
@@ -402,7 +476,7 @@ async function generateSamplePreview() {
         </button>
 
         <button
-          @click="saveCurrentProfile(true); showToast(t('nav.savedToast'));"
+          @click="handleSaveProfile"
           class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-purple hover:bg-brand-purple/90 text-white text-xs font-semibold shadow-md transition-all"
         >
           <Save class="w-4 h-4" />
@@ -546,8 +620,94 @@ async function generateSamplePreview() {
       />
     </div>
 
-    <!-- TAB 3: Output Preview Test -->
-    <div v-else-if="activeTab === 'preview'" class="space-y-4">
+    <!-- TAB 3: Output Preview Test & File Naming -->
+    <div v-else-if="activeTab === 'preview'" class="space-y-6">
+      <!-- Output File Naming Configuration Card -->
+      <div class="p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-xl bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/20 dark:text-purple-300">
+              <FileSignature class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-gray-900 dark:text-white">{{ t('preview.namingTitle') }}</h3>
+              <p class="text-xs text-gray-500">{{ t('preview.namingDesc') }}</p>
+            </div>
+          </div>
+
+          <!-- Live Filename Preview Pill -->
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-xs font-mono text-brand-purple dark:text-purple-300 shadow-inner">
+            <span class="text-gray-400 font-sans text-[11px] font-normal">{{ t('preview.namingPreview') }}</span>
+            <span class="font-bold truncate max-w-xs">{{ computedLiveFileNamePreview }}</span>
+          </div>
+        </div>
+
+        <!-- Pattern Input & Quick Tokens -->
+        <div class="space-y-2">
+          <div class="relative">
+            <input
+              v-model="currentProfile.outputFileNamePattern"
+              type="text"
+              :placeholder="t('preview.namingPlaceholder')"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
+            />
+          </div>
+
+          <!-- Quick-Insert Token Chips -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-xs text-gray-400 font-medium mr-1">{{ t('preview.insertToken') }}</span>
+            
+            <!-- Standard Tokens -->
+            <button
+              type="button"
+              @click="insertNamingToken('{originalName}')"
+              class="px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 hover:bg-purple-100 dark:bg-gray-800 dark:hover:bg-purple-950/60 text-gray-700 dark:text-gray-300 hover:text-brand-purple border border-gray-200 dark:border-gray-700 transition-colors"
+              :title="t('preview.tokenOriginalName')"
+            >
+              + {originalName}
+            </button>
+            <button
+              type="button"
+              @click="insertNamingToken('{seq:001}')"
+              class="px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 hover:bg-purple-100 dark:bg-gray-800 dark:hover:bg-purple-950/60 text-gray-700 dark:text-gray-300 hover:text-brand-purple border border-gray-200 dark:border-gray-700 transition-colors"
+              :title="t('preview.tokenSeq')"
+            >
+              + {seq:001}
+            </button>
+            <button
+              type="button"
+              @click="insertNamingToken('{index}')"
+              class="px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 hover:bg-purple-100 dark:bg-gray-800 dark:hover:bg-purple-950/60 text-gray-700 dark:text-gray-300 hover:text-brand-purple border border-gray-200 dark:border-gray-700 transition-colors"
+              :title="t('preview.tokenIndex')"
+            >
+              + {index}
+            </button>
+            <button
+              type="button"
+              @click="insertNamingToken('{date}')"
+              class="px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 hover:bg-purple-100 dark:bg-gray-800 dark:hover:bg-purple-950/60 text-gray-700 dark:text-gray-300 hover:text-brand-purple border border-gray-200 dark:border-gray-700 transition-colors"
+              :title="t('preview.tokenDate')"
+            >
+              + {date}
+            </button>
+
+            <!-- Dynamic Field Tokens from Profile -->
+            <button
+              v-for="f in currentProfile.fields"
+              :key="f.id"
+              type="button"
+              @click="insertNamingToken(`{${f.name}}`)"
+              class="px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/30 dark:hover:bg-purple-900/50 text-brand-purple dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 transition-colors flex items-center gap-1.5"
+              :title="f.name"
+            >
+              <span class="w-2 h-2 rounded-full flex-shrink-0" :style="{ backgroundColor: f.color }"></span>
+              <span>+ {<!-- -->{{ f.name }}}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Header & Actions -->
       <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
         <div>
           <h3 class="font-bold text-gray-900 dark:text-white text-base">{{ t('preview.title') }}</h3>
@@ -589,9 +749,10 @@ async function generateSamplePreview() {
     <!-- Profile Management Hub Modal -->
     <ProfileManagementModal
       :show="showProfileHub"
-      :activeProfileId="currentProfile.id"
+      :activeProfileId="editingProfileId"
       @close="showProfileHub = false"
-      @selectProfile="onProfileSelectedFromHub"
+      @selectProfile="onEditProfileFromHub"
+      @editProfile="onEditProfileFromHub"
       @profilesUpdated="showToast('Profiles updated.')"
     />
   </div>

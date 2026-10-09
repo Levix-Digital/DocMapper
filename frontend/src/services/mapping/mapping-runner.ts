@@ -9,6 +9,13 @@ export interface BatchProcessingOptions {
   onProgress?: (processed: number, total: number, fileName: string) => void;
 }
 
+import {
+  formatOutputFileName,
+  type FormatFileNameOptions,
+} from './filename-formatter';
+
+export { formatOutputFileName, type FormatFileNameOptions };
+
 /**
  * Smart fallback text extractor for standard logistics fields when spatial
  * coordinates encounter printer jitter or scanned margin offsets.
@@ -165,21 +172,14 @@ export async function executeBatchMapping(
           console.warn(`Failed to stamp destination PDF for ${file.name} doc ${docIdx + 1}:`, stampErr);
         }
 
-        // Determine dynamic filename based on primary extracted identifier
-        const shipmentKey =
-          extractedData['Shipment Number'] ||
-          extractedData['Shipment'] ||
-          extractedData['shipment'] ||
-          Object.entries(extractedData).find(([k, v]) => !k.startsWith('field-') && v && v.length >= 5)?.[1];
-
-        let outFileName: string;
-        if (shipmentKey && shipmentKey.length >= 3) {
-          outFileName = `${shipmentKey}.pdf`;
-        } else if (docCount > 1) {
-          outFileName = `${file.name.replace(/\.pdf$/i, '')}_page${docIdx + 1}.pdf`;
-        } else {
-          outFileName = `${file.name.replace(/\.pdf$/i, '')}_processed.pdf`;
-        }
+        // Format output filename based on profile naming pattern
+        const outFileName = formatOutputFileName({
+          pattern: profile.outputFileNamePattern,
+          originalFileName: file.name,
+          extractedData,
+          docIndex: docIdx,
+          totalDocs: docCount,
+        });
 
         results.push({
           documentIndex: results.length,

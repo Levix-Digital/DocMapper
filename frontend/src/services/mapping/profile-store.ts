@@ -111,7 +111,24 @@ export function createBuiltinCmrProfile(): MappingProfile {
 }
 
 /**
- * Retrieves all stored profiles from localStorage, auto-seeding built-in CMR profile if missing.
+ * Creates a brand new, 100% empty profile for fresh setup in Mapping Studio.
+ */
+export function createEmptyProfile(name: string = 'Untitled Profile'): MappingProfile {
+  return {
+    id: `profile-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    name,
+    version: 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    fields: [],
+    destinationMappings: [],
+    outputFileNamePattern: '{originalName}_{seq:001}',
+  };
+}
+
+/**
+ * Retrieves all stored profiles from localStorage without auto-seeding defaults.
+ * Purges legacy built-in defaults if found so the workspace remains completely clean.
  */
 export function getAllProfiles(): MappingProfile[] {
   if (typeof window === 'undefined') return [];
@@ -128,20 +145,10 @@ export function getAllProfiles(): MappingProfile[] {
     }
   }
 
-  // Ensure built-in CMR profile exists and is updated to calibrated version if it had legacy fake coordinates
-  const builtinIndex = profiles.findIndex(p => p.id === BUILTIN_CMR_PROFILE_ID);
-  if (builtinIndex === -1) {
-    const builtin = createBuiltinCmrProfile();
-    profiles.unshift(builtin);
+  // Purge legacy auto-seeded builtin profile to guarantee 100% clean state
+  if (profiles.some(p => p.id === BUILTIN_CMR_PROFILE_ID)) {
+    profiles = profiles.filter(p => p.id !== BUILTIN_CMR_PROFILE_ID);
     saveAllProfiles(profiles);
-  } else {
-    // If the built-in profile in localStorage has old mock or uncalibrated coordinates, update it
-    const existing = profiles[builtinIndex];
-    const shipmentField = existing.fields.find(f => f.id === 'field-shipment');
-    if (shipmentField && (!shipmentField.valueBox || shipmentField.valueBox.y < 10 || shipmentField.valueBox.width > 10 || !shipmentField.anchorText)) {
-      profiles[builtinIndex] = createBuiltinCmrProfile();
-      saveAllProfiles(profiles);
-    }
   }
 
   return profiles;
@@ -186,13 +193,9 @@ export function saveProfile(profile: MappingProfile): void {
 }
 
 /**
- * Deletes a profile by ID. Built-in profile cannot be deleted (returns false).
+ * Deletes a profile by ID.
  */
 export function deleteProfile(id: string): boolean {
-  if (id === BUILTIN_CMR_PROFILE_ID) {
-    return false; // Prevent removing built-in default
-  }
-
   const profiles = getAllProfiles().filter(p => p.id !== id);
   saveAllProfiles(profiles);
   return true;

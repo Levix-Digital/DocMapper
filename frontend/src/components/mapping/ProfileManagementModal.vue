@@ -7,7 +7,8 @@ import {
   Copy,
   Trash2,
   CheckCircle,
-  FolderOpen
+  FolderOpen,
+  Pencil
 } from 'lucide-vue-next';
 import type { MappingProfile } from '../../types/mapping';
 import {
@@ -17,7 +18,6 @@ import {
   exportProfileAsDocMapper,
   importProfileFromDocMapper,
   saveProfile,
-  BUILTIN_CMR_PROFILE_ID
 } from '../../services/mapping/profile-store';
 import { useI18n } from '../../i18n';
 
@@ -25,12 +25,13 @@ const { t } = useI18n();
 
 defineProps<{
   show: boolean;
-  activeProfileId: string;
+  activeProfileId?: string | null;
 }>();
 
 const emit = defineEmits<{
   (e: 'close'): void;
   (e: 'selectProfile', profile: MappingProfile): void;
+  (e: 'editProfile', profile: MappingProfile): void;
   (e: 'profilesUpdated'): void;
 }>();
 
@@ -52,8 +53,9 @@ function showNotice(msg: string) {
   }, 3500);
 }
 
-function handleSelect(p: MappingProfile) {
+function handleEdit(p: MappingProfile) {
   emit('selectProfile', p);
+  emit('editProfile', p);
   emit('close');
 }
 
@@ -81,7 +83,6 @@ function handleDelete(id: string) {
 }
 
 function startRename(p: MappingProfile) {
-  if (p.id === BUILTIN_CMR_PROFILE_ID) return;
   editingNameId.value = p.id;
   editedName.value = p.name;
 }
@@ -197,12 +198,6 @@ async function handleImportFile(event: Event) {
                 {{ p.name }}
               </h4>
               <span
-                v-if="p.id === BUILTIN_CMR_PROFILE_ID"
-                class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
-              >
-                Built-in
-              </span>
-              <span
                 v-if="activeProfileId === p.id"
                 class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-purple/15 text-brand-purple dark:text-purple-300"
               >
@@ -217,12 +212,14 @@ async function handleImportFile(event: Event) {
 
           <!-- Actions -->
           <div class="flex items-center gap-2 flex-shrink-0">
+            <!-- Edit Profile in Studio -->
             <button
-              v-if="activeProfileId !== p.id"
-              @click="handleSelect(p)"
-              class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 dark:bg-gray-800 hover:bg-brand-purple hover:text-white transition-all text-gray-700 dark:text-gray-300"
+              @click="handleEdit(p)"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-purple text-white hover:bg-brand-purple/90 transition-all shadow-sm"
+              :title="t('profileModal.editProfile')"
             >
-              {{ t('profileModal.switchProfile') }}
+              <Pencil class="w-3.5 h-3.5" />
+              <span>{{ t('profileModal.editProfile') }}</span>
             </button>
 
             <!-- Export .dmap -->
@@ -245,7 +242,6 @@ async function handleImportFile(event: Event) {
 
             <!-- Delete -->
             <button
-              v-if="p.id !== BUILTIN_CMR_PROFILE_ID"
               @click="handleDelete(p.id)"
               class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500"
               :title="t('profileModal.delete')"
@@ -253,6 +249,13 @@ async function handleImportFile(event: Event) {
               <Trash2 class="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        <!-- Empty Profiles State -->
+        <div v-if="profiles.length === 0" class="py-12 text-center space-y-2 text-gray-400">
+          <FolderOpen class="w-10 h-10 mx-auto text-gray-300 dark:text-gray-600" />
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ t('profileModal.noProfiles') }}</p>
+          <p class="text-xs text-gray-400">{{ t('profileModal.noProfilesSubtitle') }}</p>
         </div>
       </div>
     </div>

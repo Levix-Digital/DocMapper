@@ -1,13 +1,13 @@
 import { getLanguageOption } from '../../i18n/languages';
 
-const CACHE_KEY_PREFIX = 'docmapper_i18n_v2_';
+const CACHE_KEY_PREFIX = 'docmapper_i18n_v3_';
 
-// Automatically purge legacy v1 cache (which may contain crowdsourced semicolons)
+// Automatically purge legacy v1 & v2 cache when dictionary expands
 if (typeof window !== 'undefined') {
   try {
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
-      if (key && (key.startsWith('docmapper_i18n_cache_') || key.startsWith('docmapper_i18n_v1_'))) {
+      if (key && (key.startsWith('docmapper_i18n_cache_') || key.startsWith('docmapper_i18n_v1_') || key.startsWith('docmapper_i18n_v2_'))) {
         localStorage.removeItem(key);
       }
     }
