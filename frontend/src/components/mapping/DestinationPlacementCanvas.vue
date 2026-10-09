@@ -406,10 +406,10 @@ const draftBoxStyle = computed(() => {
           </label>
           <select
             v-model="activeFieldIdToPlace"
-            class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
           >
-            <option :value="null">-- Select Field --</option>
-            <option v-for="f in fields" :key="f.id" :value="f.id">
+            <option :value="null" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">-- Select Field --</option>
+            <option v-for="f in fields" :key="f.id" :value="f.id" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               {{ f.name }}
             </option>
           </select>
@@ -518,7 +518,7 @@ const draftBoxStyle = computed(() => {
             max="18"
             :value="selectedMapping.fontSize || 11"
             @input="$emit('updateMapping', { ...selectedMapping, fontSize: Number(($event.target as HTMLInputElement).value) })"
-            class="w-full px-3 py-1.5 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            class="w-full px-3 py-1.5 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple"
           />
         </div>
 

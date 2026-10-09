@@ -303,7 +303,7 @@ function handleAiButtonClick(field: FieldDefinition) {
               v-model="editSampleValue"
               type="text"
               placeholder="ex: 015-TSO-1234, 123456, 12/05/2024..."
-              class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+              class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-purple"
               @keyup.enter="saveEditingSample(field)"
               @click.stop
               autofocus
@@ -375,7 +375,7 @@ function handleAiButtonClick(field: FieldDefinition) {
                   @input="updateFieldPattern(field, ($event.target as HTMLInputElement).value)"
                   type="text"
                   placeholder="ex: ^[0-9]+$ (deixe vazio para aceitar tudo)"
-                  class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+                  class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-purple"
                 />
               </div>
 
@@ -408,7 +408,7 @@ function handleAiButtonClick(field: FieldDefinition) {
           <input
             v-model="newFieldName"
             placeholder="e.g. Shipment Number, Carrier..."
-            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple"
+            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple"
             @keyup.enter="confirmAddField"
           />
         </div>
@@ -418,19 +418,19 @@ function handleAiButtonClick(field: FieldDefinition) {
           </label>
           <select
             v-model="newFieldDataType"
-            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple"
+            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple"
           >
-            <option value="alphanumeric">Alphanumeric (Letters & Numbers)</option>
-            <option value="text">General Text</option>
-            <option value="date">Date</option>
-            <option value="number">Number</option>
-            <option value="multiline">Multiline</option>
+            <option value="alphanumeric" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Alphanumeric (Letters & Numbers)</option>
+            <option value="text" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">General Text</option>
+            <option value="date" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Date</option>
+            <option value="number" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Number</option>
+            <option value="multiline" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Multiline</option>
           </select>
         </div>
         <div class="flex items-center justify-end gap-2 pt-2">
           <button
             @click="showAddModal = false"
-            class="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             Cancel
           </button>
@@ -480,12 +480,13 @@ function handleAiButtonClick(field: FieldDefinition) {
             </label>
             <select
               v-model="selectedModel"
-              class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-purple"
+              class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-purple"
             >
               <option
                 v-for="m in AVAILABLE_GEMINI_MODELS"
                 :key="m.id"
                 :value="m.id"
+                class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               >
                 {{ m.name }} — {{ m.tag }}
               </option>
@@ -517,14 +518,14 @@ function handleAiButtonClick(field: FieldDefinition) {
             v-model="apiKeyInput"
             type="password"
             placeholder="AIzaSy..."
-            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-purple"
+            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-purple"
             @keyup.enter="saveApiKey"
           />
         </div>
         <div class="flex items-center justify-end gap-2 pt-2">
           <button
             @click="showKeyModal = false"
-            class="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            class="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             Cancelar
           </button>

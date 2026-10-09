@@ -7,6 +7,10 @@
         font-family: 'Inter', sans-serif;
     }
 
+    html.dark {
+        color-scheme: dark;
+    }
+
     h1,
     h2,
     h3,
@@ -14,6 +18,19 @@
     h5,
     h6 {
         font-family: 'Outfit', sans-serif;
+    }
+
+    /* Global contrast guarantee for inputs and selects in dark mode */
+    input, select, textarea {
+        @apply text-gray-900 dark:text-white;
+    }
+
+    input::placeholder, textarea::placeholder {
+        @apply text-gray-400 dark:text-gray-500;
+    }
+
+    select option {
+        @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white;
     }
 }
 
