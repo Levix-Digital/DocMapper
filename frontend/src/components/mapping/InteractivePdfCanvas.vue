@@ -43,21 +43,21 @@ const isDrawing = ref(false);
 const drawStart = ref<{ x: number; y: number } | null>(null);
 const drawCurrent = ref<{ x: number; y: number } | null>(null);
 
-// Moving state
-const movingTarget = ref<{
-  fieldId: string;
-  type: 'value' | 'label';
-  initialBox: BoundingBox;
-  startCoords: { x: number; y: number };
-} | null>(null);
+type ResizeHandle = 'nw' | 'ne' | 'se' | 'sw' | 'n' | 's' | 'e' | 'w';
 
-// Resizing state
-const resizingTarget = ref<{
+interface ActiveOriginTransform {
   fieldId: string;
   type: 'value' | 'label';
-  handle: 'nw' | 'ne' | 'se' | 'sw';
+  mode: 'move' | 'resize';
+  handle?: ResizeHandle;
   initialBox: BoundingBox;
-} | null>(null);
+  currentBox: BoundingBox;
+  startPercent: { x: number; y: number };
+}
+
+// Local transform state for 60 FPS silky smooth movement
+const activeTransform = ref<ActiveOriginTransform | null>(null);
+const selectedBoxType = ref<'value' | 'label' | null>(null);
 
 const activeBoxesOnPage = computed(() => {
   const result: Array<{
@@ -87,6 +87,34 @@ const activeBoxesOnPage = computed(() => {
   }
 
   return result;
+});
+
+function getBoxToRender(item: { field: FieldDefinition; type: 'value' | 'label'; box: BoundingBox }): BoundingBox {
+  if (
+    activeTransform.value &&
+    activeTransform.value.fieldId === item.field.id &&
+    activeTransform.value.type === item.type
+  ) {
+    return activeTransform.value.currentBox;
+  }
+  return item.box;
+}
+
+const activeSelectedBoxItem = computed(() => {
+  const selectedBoxes = activeBoxesOnPage.value.filter(b => b.isSelected);
+  if (selectedBoxes.length === 0) return null;
+  if (selectedBoxType.value) {
+    const match = selectedBoxes.find(b => b.type === selectedBoxType.value);
+    if (match) return match;
+  }
+  return selectedBoxes[0];
+});
+
+const activeSelectedRenderBox = computed<BoundingBox>(() => {
+  if (!activeSelectedBoxItem.value) {
+    return { x: 0, y: 0, width: 0, height: 0, page: 1 };
+  }
+  return getBoxToRender(activeSelectedBoxItem.value);
 });
 
 // Render PDF Page
@@ -192,8 +220,11 @@ function getRelativeCoords(e: MouseEvent): { xPercent: number; yPercent: number 
 }
 
 // Mouse Handlers
-function onMouseDown(e: MouseEvent) {
-  if (props.activeDrawingType === 'none') return;
+function onCanvasMouseDown(e: MouseEvent) {
+  if (props.activeDrawingType === 'none') {
+    selectedBoxType.value = null;
+    return;
+  }
   const coords = getRelativeCoords(e);
   if (!coords) return;
 
@@ -202,20 +233,16 @@ function onMouseDown(e: MouseEvent) {
   drawCurrent.value = { x: coords.xPercent, y: coords.yPercent };
 }
 
-function onMouseMove(e: MouseEvent) {
-  const coords = getRelativeCoords(e);
-  if (!coords) return;
-
+function onCanvasMouseMove(e: MouseEvent) {
   if (isDrawing.value && drawStart.value) {
-    drawCurrent.value = { x: coords.xPercent, y: coords.yPercent };
-  } else if (resizingTarget.value) {
-    handleResizing(coords.xPercent, coords.yPercent);
-  } else if (movingTarget.value) {
-    handleMoving(coords.xPercent, coords.yPercent);
+    const coords = getRelativeCoords(e);
+    if (coords) {
+      drawCurrent.value = { x: coords.xPercent, y: coords.yPercent };
+    }
   }
 }
 
-function onMouseUp() {
+function onCanvasMouseUp() {
   if (isDrawing.value && drawStart.value && drawCurrent.value && props.activeDrawingType !== 'none') {
     const minX = Math.min(drawStart.value.x, drawCurrent.value.x);
     const maxX = Math.max(drawStart.value.x, drawCurrent.value.x);
@@ -225,7 +252,6 @@ function onMouseUp() {
     const width = maxX - minX;
     const height = maxY - minY;
 
-    // Minimum size filter (0.5% of page)
     if (width >= 0.5 && height >= 0.5) {
       const newBox: BoundingBox = {
         x: Number(minX.toFixed(2)),
@@ -241,8 +267,6 @@ function onMouseUp() {
   isDrawing.value = false;
   drawStart.value = null;
   drawCurrent.value = null;
-  resizingTarget.value = null;
-  movingTarget.value = null;
 }
 
 function startMove(
@@ -254,88 +278,135 @@ function startMove(
   if (props.activeDrawingType !== 'none') return;
   e.stopPropagation();
   emit('selectField', fieldId);
+  selectedBoxType.value = type;
+
   const coords = getRelativeCoords(e);
   if (!coords) return;
-  movingTarget.value = {
+
+  const cur = { ...box };
+  activeTransform.value = {
     fieldId,
     type,
-    initialBox: { ...box },
-    startCoords: { x: coords.xPercent, y: coords.yPercent },
+    mode: 'move',
+    initialBox: { ...cur },
+    currentBox: { ...cur },
+    startPercent: { x: coords.xPercent, y: coords.yPercent },
   };
+
+  window.addEventListener('mousemove', onGlobalMouseMove, { passive: false });
+  window.addEventListener('mouseup', onGlobalMouseUp);
 }
 
-function handleMoving(currX: number, currY: number) {
-  if (!movingTarget.value) return;
-  const { fieldId, type, initialBox, startCoords } = movingTarget.value;
-  const deltaX = currX - startCoords.x;
-  const deltaY = currY - startCoords.y;
-
-  const newX = Math.min(Math.max(initialBox.x + deltaX, 0), 100 - initialBox.width);
-  const newY = Math.min(Math.max(initialBox.y + deltaY, 0), 100 - initialBox.height);
-
-  const updatedBox: BoundingBox = {
-    ...initialBox,
-    x: Number(newX.toFixed(2)),
-    y: Number(newY.toFixed(2)),
-  };
-  emit('updateBox', fieldId, type, updatedBox);
-}
-
-// Start resize from handle
 function startResize(
   e: MouseEvent,
   fieldId: string,
   type: 'value' | 'label',
-  handle: 'nw' | 'ne' | 'se' | 'sw',
+  handle: ResizeHandle,
   box: BoundingBox
 ) {
   e.stopPropagation();
-  resizingTarget.value = {
+  emit('selectField', fieldId);
+  selectedBoxType.value = type;
+
+  const coords = getRelativeCoords(e);
+  if (!coords) return;
+
+  const cur = { ...box };
+  activeTransform.value = {
     fieldId,
     type,
+    mode: 'resize',
     handle,
-    initialBox: { ...box },
+    initialBox: { ...cur },
+    currentBox: { ...cur },
+    startPercent: { x: coords.xPercent, y: coords.yPercent },
   };
+
+  window.addEventListener('mousemove', onGlobalMouseMove, { passive: false });
+  window.addEventListener('mouseup', onGlobalMouseUp);
 }
 
-function handleResizing(currX: number, currY: number) {
-  if (!resizingTarget.value) return;
-  const { fieldId, type, handle, initialBox } = resizingTarget.value;
+function onGlobalMouseMove(e: MouseEvent) {
+  if (!activeTransform.value) return;
+  e.preventDefault();
 
-  let newX = initialBox.x;
-  let newY = initialBox.y;
-  let newW = initialBox.width;
-  let newH = initialBox.height;
+  const coords = getRelativeCoords(e);
+  if (!coords) return;
 
-  if (handle === 'nw') {
-    newW = initialBox.x + initialBox.width - currX;
-    newH = initialBox.y + initialBox.height - currY;
-    newX = currX;
-    newY = currY;
-  } else if (handle === 'ne') {
-    newW = currX - initialBox.x;
-    newH = initialBox.y + initialBox.height - currY;
-    newY = currY;
-  } else if (handle === 'se') {
-    newW = currX - initialBox.x;
-    newH = currY - initialBox.y;
-  } else if (handle === 'sw') {
-    newW = initialBox.x + initialBox.width - currX;
-    newX = currX;
-    newH = currY - initialBox.y;
-  }
+  const { mode, handle, initialBox, startPercent } = activeTransform.value;
+  const deltaX = coords.xPercent - startPercent.x;
+  const deltaY = coords.yPercent - startPercent.y;
 
-  if (newW > 0.5 && newH > 0.5) {
-    const updatedBox: BoundingBox = {
+  if (mode === 'move') {
+    const newX = Math.min(Math.max(initialBox.x + deltaX, 0), 100 - initialBox.width);
+    const newY = Math.min(Math.max(initialBox.y + deltaY, 0), 100 - initialBox.height);
+
+    activeTransform.value.currentBox = {
+      ...initialBox,
+      x: Number(newX.toFixed(2)),
+      y: Number(newY.toFixed(2)),
+    };
+  } else if (mode === 'resize' && handle) {
+    let newX = initialBox.x;
+    let newY = initialBox.y;
+    let newW = initialBox.width;
+    let newH = initialBox.height;
+
+    // Horizontal
+    if (handle.includes('w')) {
+      const targetX = initialBox.x + deltaX;
+      const maxX = initialBox.x + initialBox.width - 0.5;
+      newX = Math.max(0, Math.min(targetX, maxX));
+      newW = initialBox.x + initialBox.width - newX;
+    } else if (handle.includes('e')) {
+      const targetW = initialBox.width + deltaX;
+      newW = Math.max(0.5, Math.min(targetW, 100 - initialBox.x));
+    }
+
+    // Vertical
+    if (handle.includes('n')) {
+      const targetY = initialBox.y + deltaY;
+      const maxY = initialBox.y + initialBox.height - 0.5;
+      newY = Math.max(0, Math.min(targetY, maxY));
+      newH = initialBox.y + initialBox.height - newY;
+    } else if (handle.includes('s')) {
+      const targetH = initialBox.height + deltaY;
+      newH = Math.max(0.5, Math.min(targetH, 100 - initialBox.y));
+    }
+
+    activeTransform.value.currentBox = {
+      ...initialBox,
       x: Number(newX.toFixed(2)),
       y: Number(newY.toFixed(2)),
       width: Number(newW.toFixed(2)),
       height: Number(newH.toFixed(2)),
-      page: currentPage.value,
     };
-    emit('updateBox', fieldId, type, updatedBox);
   }
 }
+
+function onGlobalMouseUp() {
+  window.removeEventListener('mousemove', onGlobalMouseMove);
+  window.removeEventListener('mouseup', onGlobalMouseUp);
+
+  if (!activeTransform.value) return;
+
+  const { fieldId, type, currentBox, initialBox } = activeTransform.value;
+  activeTransform.value = null;
+
+  if (
+    currentBox.x !== initialBox.x ||
+    currentBox.y !== initialBox.y ||
+    currentBox.width !== initialBox.width ||
+    currentBox.height !== initialBox.height
+  ) {
+    emit('updateBox', fieldId, type, { ...currentBox });
+  }
+}
+
+onUnmounted(() => {
+  window.removeEventListener('mousemove', onGlobalMouseMove);
+  window.removeEventListener('mouseup', onGlobalMouseUp);
+});
 
 // Compute drawing preview box
 const draftBoxStyle = computed(() => {
@@ -459,35 +530,34 @@ const draftBoxStyle = computed(() => {
             height: canvasHeight ? `${canvasHeight}px` : '100%'
           }"
           :viewBox="canvasWidth && canvasHeight ? `0 0 ${canvasWidth} ${canvasHeight}` : undefined"
-          @mousedown="onMouseDown"
-          @mousemove="onMouseMove"
-          @mouseup="onMouseUp"
+          @mousedown="onCanvasMouseDown"
+          @mousemove="onCanvasMouseMove"
+          @mouseup="onCanvasMouseUp"
         >
-          <!-- Drawn Boxes -->
+          <!-- 1. Drawn Boxes on page -->
           <g
             v-for="item in activeBoxesOnPage"
             :key="`${item.field.id}-${item.type}`"
-            @mousedown.stop="$emit('selectField', item.field.id)"
-            class="cursor-pointer group"
+            class="group cursor-grab active:cursor-grabbing"
+            @mousedown="startMove($event, item.field.id, item.type, getBoxToRender(item))"
           >
             <rect
-              :x="(item.box.x * canvasWidth) / 100"
-              :y="(item.box.y * canvasHeight) / 100"
-              :width="(item.box.width * canvasWidth) / 100"
-              :height="(item.box.height * canvasHeight) / 100"
+              :x="(getBoxToRender(item).x * canvasWidth) / 100"
+              :y="(getBoxToRender(item).y * canvasHeight) / 100"
+              :width="(getBoxToRender(item).width * canvasWidth) / 100"
+              :height="(getBoxToRender(item).height * canvasHeight) / 100"
               :fill="item.field.color"
-              :fill-opacity="item.isSelected ? 0.25 : 0.12"
+              :fill-opacity="item.isSelected ? 0.3 : 0.12"
               :stroke="item.field.color"
-              :stroke-width="item.isSelected ? 2.5 : 1.5"
+              :stroke-width="item.isSelected ? 2 : 1.5"
               :stroke-dasharray="item.type === 'label' ? '4,4' : 'none'"
-              :class="activeDrawingType === 'none' ? 'cursor-move' : 'cursor-crosshair'"
-              @mousedown="startMove($event, item.field.id, item.type, item.box)"
+              rx="3"
             />
 
             <!-- Tag Label -->
             <text
-              :x="(item.box.x * canvasWidth) / 100"
-              :y="Math.max(((item.box.y * canvasHeight) / 100) - 6, 14)"
+              :x="(getBoxToRender(item).x * canvasWidth) / 100"
+              :y="Math.max(((getBoxToRender(item).y * canvasHeight) / 100) - 6, 14)"
               :fill="item.field.color"
               font-size="11"
               font-weight="bold"
@@ -495,50 +565,178 @@ const draftBoxStyle = computed(() => {
             >
               {{ item.type === 'label' ? '[Label]' : '[Value]' }} {{ item.field.name }}
             </text>
+          </g>
 
-            <!-- Corner Handles for Resizing (if selected) -->
-            <template v-if="item.isSelected">
-              <!-- NW -->
-              <rect
-                :x="((item.box.x * canvasWidth) / 100) - 4"
-                :y="((item.box.y * canvasHeight) / 100) - 4"
-                width="8"
-                height="8"
-                :fill="item.field.color"
-                class="cursor-nw-resize"
-                @mousedown="startResize($event, item.field.id, item.type, 'nw', item.box)"
-              />
-              <!-- NE -->
-              <rect
-                :x="(((item.box.x + item.box.width) * canvasWidth) / 100) - 4"
-                :y="((item.box.y * canvasHeight) / 100) - 4"
-                width="8"
-                height="8"
-                :fill="item.field.color"
-                class="cursor-ne-resize"
-                @mousedown="startResize($event, item.field.id, item.type, 'ne', item.box)"
-              />
-              <!-- SE -->
-              <rect
-                :x="(((item.box.x + item.box.width) * canvasWidth) / 100) - 4"
-                :y="(((item.box.y + item.box.height) * canvasHeight) / 100) - 4"
-                width="8"
-                height="8"
-                :fill="item.field.color"
-                class="cursor-se-resize"
-                @mousedown="startResize($event, item.field.id, item.type, 'se', item.box)"
-              />
-              <!-- SW -->
-              <rect
-                :x="((item.box.x * canvasWidth) / 100) - 4"
-                :y="(((item.box.y + item.box.height) * canvasHeight) / 100) - 4"
-                width="8"
-                height="8"
-                :fill="item.field.color"
-                class="cursor-sw-resize"
-                @mousedown="startResize($event, item.field.id, item.type, 'sw', item.box)"
-              />
-            </template>
+          <!-- 2. TOP-LAYER SELECTION & 8-HANDLE RESIZING OVERLAY (Always on top) -->
+          <g
+            v-if="activeSelectedBoxItem"
+            class="pointer-events-auto"
+          >
+            <!-- Highlight Ring -->
+            <rect
+              :x="(activeSelectedRenderBox.x * canvasWidth) / 100 - 1"
+              :y="(activeSelectedRenderBox.y * canvasHeight) / 100 - 1"
+              :width="(activeSelectedRenderBox.width * canvasWidth) / 100 + 2"
+              :height="(activeSelectedRenderBox.height * canvasHeight) / 100 + 2"
+              fill="none"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2"
+              stroke-dasharray="4,3"
+              rx="4"
+              class="pointer-events-none"
+            />
+
+            <!-- NW Handle -->
+            <circle
+              :cx="(activeSelectedRenderBox.x * canvasWidth) / 100"
+              :cy="(activeSelectedRenderBox.y * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-nwse-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'nw', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="(activeSelectedRenderBox.x * canvasWidth) / 100"
+              :cy="(activeSelectedRenderBox.y * canvasHeight) / 100"
+              r="6"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2.5"
+              class="cursor-nwse-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- N Handle -->
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width / 2) * canvasWidth) / 100"
+              :cy="(activeSelectedRenderBox.y * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-ns-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'n', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width / 2) * canvasWidth) / 100"
+              :cy="(activeSelectedRenderBox.y * canvasHeight) / 100"
+              r="5"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2"
+              class="cursor-ns-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- NE Handle -->
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width) * canvasWidth) / 100"
+              :cy="(activeSelectedRenderBox.y * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-nesw-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'ne', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width) * canvasWidth) / 100"
+              :cy="(activeSelectedRenderBox.y * canvasHeight) / 100"
+              r="6"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2.5"
+              class="cursor-nesw-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- E Handle -->
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width) * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height / 2) * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-ew-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'e', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width) * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height / 2) * canvasHeight) / 100"
+              r="5"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2"
+              class="cursor-ew-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- SE Handle -->
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width) * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height) * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-nwse-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'se', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width) * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height) * canvasHeight) / 100"
+              r="6"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2.5"
+              class="cursor-nwse-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- S Handle -->
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width / 2) * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height) * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-ns-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 's', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="((activeSelectedRenderBox.x + activeSelectedRenderBox.width / 2) * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height) * canvasHeight) / 100"
+              r="5"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2"
+              class="cursor-ns-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- SW Handle -->
+            <circle
+              :cx="(activeSelectedRenderBox.x * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height) * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-nesw-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'sw', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="(activeSelectedRenderBox.x * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height) * canvasHeight) / 100"
+              r="6"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2.5"
+              class="cursor-nesw-resize pointer-events-none drop-shadow-md"
+            />
+
+            <!-- W Handle -->
+            <circle
+              :cx="(activeSelectedRenderBox.x * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height / 2) * canvasHeight) / 100"
+              r="14"
+              fill="transparent"
+              class="cursor-ew-resize"
+              @mousedown.stop="startResize($event, activeSelectedBoxItem.field.id, activeSelectedBoxItem.type, 'w', activeSelectedRenderBox)"
+            />
+            <circle
+              :cx="(activeSelectedRenderBox.x * canvasWidth) / 100"
+              :cy="((activeSelectedRenderBox.y + activeSelectedRenderBox.height / 2) * canvasHeight) / 100"
+              r="5"
+              fill="#ffffff"
+              :stroke="activeSelectedBoxItem.field.color"
+              stroke-width="2"
+              class="cursor-ew-resize pointer-events-none drop-shadow-md"
+            />
           </g>
 
           <!-- Draft Drawing Box Preview -->

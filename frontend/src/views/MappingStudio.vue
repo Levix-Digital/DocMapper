@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef, markRaw, toRaw, onMounted, computed } from 'vue';
+import { ref, shallowRef, markRaw, toRaw, onMounted, onBeforeUnmount, computed } from 'vue';
 import {
   Upload,
   Save,
@@ -294,9 +294,27 @@ function onRemoveDestinationMapping(id: string) {
   saveCurrentProfile();
 }
 
-function saveCurrentProfile() {
-  saveProfile(currentProfile.value);
+let saveTimer: any = null;
+function saveCurrentProfile(immediate = false) {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  if (immediate) {
+    saveProfile(currentProfile.value);
+  } else {
+    saveTimer = setTimeout(() => {
+      saveProfile(currentProfile.value);
+    }, 300);
+  }
 }
+
+onBeforeUnmount(() => {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveProfile(currentProfile.value);
+  }
+});
 
 function exportCurrentProfile() {
   exportProfileAsDocMapper(currentProfile.value);
@@ -382,7 +400,7 @@ async function generateSamplePreview() {
         </button>
 
         <button
-          @click="saveCurrentProfile(); showToast('Profile saved successfully!');"
+          @click="saveCurrentProfile(true); showToast('Profile saved successfully!');"
           class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-purple hover:bg-brand-purple/90 text-white text-xs font-semibold shadow-md transition-all"
         >
           <Save class="w-4 h-4" />
