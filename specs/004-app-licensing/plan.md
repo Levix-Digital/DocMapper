@@ -1,7 +1,7 @@
 # Implementation Plan: App-Level Licensing
 
 **Feature Branch**: `004-app-licensing`
-**Spec**: [Spec](file:///c:/Users/guilh/source/repos/Copyx/specs/004-app-licensing/spec.md)
+**Spec**: [Spec](file:///c:/Users/guilh/source/repos/DocMapper/specs/004-app-licensing/spec.md)
 
 ## Goal Description
 Implement a "phone home" license check (Legal Shield). The app must verify its license key with a backend server before loading the critical WASM module. If verification fails (or network is down after retries), the app blocks access.
@@ -13,16 +13,16 @@ Implement a "phone home" license check (Legal Shield). The app must verify its l
 ## Proposed Changes
 
 ### Configuration
-#### [NEW] [.env.example](file:///c:/Users/guilh/source/repos/Copyx/.env.example)
+#### [NEW] [.env.example](file:///c:/Users/guilh/source/repos/DocMapper/.env.example)
 - Add `VITE_LICENSE_KEY` (Client) and `VITE_LICENSE_SERVER` (Client).
 - Remove `VALID_KEYS` (Backend) - moved to Database.
 
 ### Backend (Initialization & Logic)
-#### [NEW] [backend/package.json](file:///c:/Users/guilh/source/repos/Copyx/backend/package.json)
+#### [NEW] [backend/package.json](file:///c:/Users/guilh/source/repos/DocMapper/backend/package.json)
 - Initialize minimal `package.json` with `express`, `cors`, `dotenv`, `ts-node`.
 - **Add Dependency**: `sqlite3` (and `@types/sqlite3`).
 
-#### [NEW] [backend/src/index.ts](file:///c:/Users/guilh/source/repos/Copyx/backend/src/index.ts)
+#### [NEW] [backend/src/index.ts](file:///c:/Users/guilh/source/repos/DocMapper/backend/src/index.ts)
 - Create entry point:
     - Configure CORS.
     - Load env vars.
@@ -30,7 +30,7 @@ Implement a "phone home" license check (Legal Shield). The app must verify its l
     - Register `licenseRoutes`.
     - Start server on port 3000 (default).
 
-#### [NEW] [backend/src/routes/license.ts](file:///c:/Users/guilh/source/repos/Copyx/backend/src/routes/license.ts)
+#### [NEW] [backend/src/routes/license.ts](file:///c:/Users/guilh/source/repos/DocMapper/backend/src/routes/license.ts)
 - Implement `POST /api/verify`.
 - Logic:
     - Get `key` and `domain` from body.
@@ -38,7 +38,7 @@ Implement a "phone home" license check (Legal Shield). The app must verify its l
     - Return `{ valid: true/false }`.
 
 ### Frontend Services
-#### [NEW] [frontend/src/services/license-service.ts](file:///c:/Users/guilh/source/repos/Copyx/frontend/src/services/license-service.ts)
+#### [NEW] [frontend/src/services/license-service.ts](file:///c:/Users/guilh/source/repos/DocMapper/frontend/src/services/license-service.ts)
 - Implement singleton `LicenseService`.
 - `verify()`:
     - Retries up to 3 times with 1-second delay between attempts on network error.
@@ -46,14 +46,14 @@ Implement a "phone home" license check (Legal Shield). The app must verify its l
     - Returns `boolean` (total timeout: ~3 seconds).
 - `isLicenseValid()`: Returns cached status.
 
-#### [MODIFY] [frontend/src/services/WasmService.ts](file:///c:/Users/guilh/source/repos/Copyx/frontend/src/services/WasmService.ts)
+#### [MODIFY] [frontend/src/services/WasmService.ts](file:///c:/Users/guilh/source/repos/DocMapper/frontend/src/services/WasmService.ts)
 - Import `LicenseService`.
 - In `init()`:
     - Check `LicenseService.isLicenseValid()`.
     - If false, throw `Error("Security Module Missing: License Invalid")`.
 
 ### Application Entry
-#### [MODIFY] [frontend/src/main.ts](file:///c:/Users/guilh/source/repos/Copyx/frontend/src/main.ts)
+#### [MODIFY] [frontend/src/main.ts](file:///c:/Users/guilh/source/repos/DocMapper/frontend/src/main.ts)
 - Import `LicenseService`.
 - Wrap startup in `init()`.
 - Call `await LicenseService.verify()`.

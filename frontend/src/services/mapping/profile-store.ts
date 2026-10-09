@@ -2,7 +2,6 @@ import type { MappingProfile, FieldDefinition, DestinationFieldMapping } from '.
 import { SHIPMENT_DOC_TEMPLATE_BASE64 } from '../pdf/assets';
 
 const STORAGE_KEY = 'docmapper_mapping_profiles';
-const LEGACY_STORAGE_KEY = 'copyx_mapping_profiles';
 
 export const BUILTIN_CMR_PROFILE_ID = 'builtin-cmr-standard';
 
@@ -118,9 +117,6 @@ export function getAllProfiles(): MappingProfile[] {
   if (typeof window === 'undefined') return [];
 
   let raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    raw = localStorage.getItem(LEGACY_STORAGE_KEY);
-  }
   let profiles: MappingProfile[] = [];
 
   if (raw) {
@@ -249,10 +245,9 @@ export function exportProfileAsDocMapper(profile: MappingProfile): void {
 
 // Aliases
 export const exportProfileAsDMap = exportProfileAsDocMapper;
-export const exportProfileAsCopyx = exportProfileAsDocMapper;
 
 /**
- * Imports a profile from a `.dmap`, legacy `.docmapper`, or `.copyx` JSON string with collision-safe naming.
+ * Imports a profile from a `.dmap`, legacy `.docmapper` JSON string with collision-safe naming.
  */
 export function importProfileFromDocMapper(jsonContent: string): MappingProfile {
   const parsed = JSON.parse(jsonContent);
@@ -283,4 +278,3 @@ export function importProfileFromDocMapper(jsonContent: string): MappingProfile 
 
 // Backwards compatibility alias
 export const importProfileFromDMap = importProfileFromDocMapper;
-export const importProfileFromCopyx = importProfileFromDocMapper;

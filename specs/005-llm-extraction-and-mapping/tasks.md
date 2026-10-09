@@ -1,7 +1,7 @@
 # Tasks: Visual Mapping Studio & LLM Pattern Extraction
 
 **Branch**: `005-llm-extraction-and-mapping` | **Date**: 2026-10-08  
-**Input**: [spec.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/spec.md), [plan.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/plan.md), [checklist.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/checklist.md)  
+**Input**: [spec.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/spec.md), [plan.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/plan.md), [checklist.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/checklist.md)  
 **Status**: Completed (100%)
 
 ---

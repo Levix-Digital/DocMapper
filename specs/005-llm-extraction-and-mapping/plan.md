@@ -1,6 +1,6 @@
 # Implementation Plan: Visual Mapping Studio & LLM Pattern Extraction
 
-**Branch**: `005-llm-extraction-and-mapping` | **Date**: 2026-10-08 | **Spec**: [specs/005-llm-extraction-and-mapping/spec.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/spec.md)  
+**Branch**: `005-llm-extraction-and-mapping` | **Date**: 2026-10-08 | **Spec**: [specs/005-llm-extraction-and-mapping/spec.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/spec.md)  
 **Input**: Feature specification from `specs/005-llm-extraction-and-mapping/spec.md`
 
 ## Summary

@@ -2,7 +2,7 @@
 
 **Purpose**: Validate requirements completeness, architectural clarity, edge case coverage, and consistency  
 **Created**: 2026-10-08  
-**Feature**: [spec.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/spec.md) | [plan.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/plan.md)  
+**Feature**: [spec.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/spec.md) | [plan.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/plan.md)  
 **Status**: 100% Verified
 
 ---

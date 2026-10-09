@@ -1,9 +1,7 @@
 import type { GeminiPatternResponse, FieldDataType, FieldDefinition } from '../../types/mapping';
 
 const API_KEY_STORAGE_KEY = 'docmapper_gemini_api_key';
-const LEGACY_API_KEY_STORAGE_KEY = 'copyx_gemini_api_key';
 const MODEL_STORAGE_KEY = 'docmapper_gemini_model';
-const LEGACY_MODEL_STORAGE_KEY = 'copyx_gemini_model';
 
 export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
@@ -37,7 +35,7 @@ export const AVAILABLE_GEMINI_MODELS: GeminiModelInfo[] = [
 
 export function getStoredApiKey(): string {
   if (typeof window === 'undefined') return '';
-  return localStorage.getItem(API_KEY_STORAGE_KEY) || localStorage.getItem(LEGACY_API_KEY_STORAGE_KEY) || '';
+  return localStorage.getItem(API_KEY_STORAGE_KEY) || '';
 }
 
 export function setStoredApiKey(key: string): void {
@@ -48,7 +46,7 @@ export function setStoredApiKey(key: string): void {
 
 export function getStoredModel(): string {
   if (typeof window === 'undefined') return DEFAULT_GEMINI_MODEL;
-  return localStorage.getItem(MODEL_STORAGE_KEY) || localStorage.getItem(LEGACY_MODEL_STORAGE_KEY) || DEFAULT_GEMINI_MODEL;
+  return localStorage.getItem(MODEL_STORAGE_KEY) || DEFAULT_GEMINI_MODEL;
 }
 
 export function setStoredModel(model: string): void {

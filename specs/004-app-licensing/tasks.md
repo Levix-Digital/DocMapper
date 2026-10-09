@@ -1,8 +1,8 @@
 # Task Breakdown: App-Level Licensing (Legal Shield)
 
 **Feature Branch**: `004-app-licensing`
-**Spec**: [spec.md](file:///c:/Users/guilh/source/repos/Copyx/specs/004-app-licensing/spec.md)
-**Plan**: [plan.md](file:///c:/Users/guilh/source/repos/Copyx/specs/004-app-licensing/plan.md)
+**Spec**: [spec.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/004-app-licensing/spec.md)
+**Plan**: [plan.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/004-app-licensing/plan.md)
 
 ## Overview
 

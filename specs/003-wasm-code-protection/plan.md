@@ -1,6 +1,6 @@
 # Implementation Plan: WASM Code Protection
 
-**Branch**: `003-WASM-code-protection` | **Date**: 2025-12-06 | **Spec**: [Spec](file:///c:/Users/guilh/source/repos/Copyx/specs/003-wasm-code-protection/spec.md)
+**Branch**: `003-WASM-code-protection` | **Date**: 2025-12-06 | **Spec**: [Spec](file:///c:/Users/guilh/source/repos/DocMapper/specs/003-wasm-code-protection/spec.md)
 **Input**: Feature specification from `/specs/003-wasm-code-protection/spec.md`
 
 ## Summary

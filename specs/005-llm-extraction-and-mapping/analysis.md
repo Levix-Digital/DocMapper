@@ -2,7 +2,7 @@
 
 **Branch**: `005-llm-extraction-and-mapping`  
 **Date**: 2026-10-08  
-**Scope**: Verification of cross-artifact consistency among [spec.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/spec.md), [plan.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/plan.md), [checklist.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/checklist.md), [tasks.md](file:///c:/Users/guilh/source/repos/Copyx/specs/005-llm-extraction-and-mapping/tasks.md), [constitution.md](file:///c:/Users/guilh/source/repos/Copyx/.specify/constitution.md), and the active codebase.
+**Scope**: Verification of cross-artifact consistency among [spec.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/spec.md), [plan.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/plan.md), [checklist.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/checklist.md), [tasks.md](file:///c:/Users/guilh/source/repos/DocMapper/specs/005-llm-extraction-and-mapping/tasks.md), [constitution.md](file:///c:/Users/guilh/source/repos/DocMapper/.specify/constitution.md), and the active codebase.
 
 ---
 

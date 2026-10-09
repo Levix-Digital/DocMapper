@@ -1,6 +1,6 @@
 # Tasks: DocMapper MVP (Porting Reference App)
 
-**Input**: Design documents from `/specs/001-copyx-mvp/`
+**Input**: Design documents from `/specs/001-docmapper-mvp/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories)
 
 **Tests**: Manual verification against reference app output.

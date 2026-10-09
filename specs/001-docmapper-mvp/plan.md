@@ -1,7 +1,7 @@
 # Implementation Plan: DocMapper MVP (Porting Reference App)
 
-**Branch**: `001-copyx-mvp` | **Date**: 2025-12-05 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `specs/001-copyx-mvp/spec.md`
+**Branch**: `001-docmapper-mvp` | **Date**: 2025-12-05 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `specs/001-docmapper-mvp/spec.md`
 
 ## Summary
 
@@ -35,7 +35,7 @@ Port the client-side logic from the reference application to the DocMapper Vue 3
 ### Documentation (this feature)
 
 ```text
-specs/001-copyx-mvp/
+specs/001-docmapper-mvp/
 ├── plan.md              # This file
 ├── research.md          # N/A (Methodology defined by reference app)
 ├── data-model.md        # N/A (Simple flat types)

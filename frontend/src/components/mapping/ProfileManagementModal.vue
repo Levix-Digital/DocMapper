@@ -154,7 +154,7 @@ async function handleImportFile(event: Event) {
         <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 text-xs font-semibold text-gray-700 dark:text-gray-200 shadow-sm transition-all">
           <Upload class="w-3.5 h-3.5 text-brand-purple" />
           <span>Import .dmap File</span>
-          <input type="file" accept=".dmap,.docmapper,.copyx,application/json" class="hidden" @change="handleImportFile" />
+          <input type="file" accept=".dmap,.docmapper,application/json" class="hidden" @change="handleImportFile" />
         </label>
       </div>
 
