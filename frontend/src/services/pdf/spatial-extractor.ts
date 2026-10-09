@@ -60,7 +60,7 @@ export async function isPageScanned(page: any): Promise<boolean> {
 export async function extractTextInBox(
   page: any,
   box: BoundingBox,
-  tolerancePercent = 1.0
+  tolerancePercent = 0.15
 ): Promise<string> {
   const viewport = page.getViewport({ scale: 1.0 });
   const pageWidth = viewport.width;
@@ -93,15 +93,27 @@ export async function extractTextInBox(
     const widthPercent = (itemWidth / pageWidth) * 100;
     const heightPercent = (itemHeight / pageHeight) * 100;
 
+    const midX = xPercent + (widthPercent / 2);
+    const midY = yPercent + (heightPercent / 2);
+
     const glyphRight = xPercent + widthPercent;
     const glyphBottom = yPercent + heightPercent;
 
-    // Overlap / intersection check with tolerance
-    const intersects =
-      xPercent <= boxMaxX &&
-      glyphRight >= boxMinX &&
-      yPercent <= boxMaxY &&
-      glyphBottom >= boxMinY;
+    // Check if the glyph's center point is within the bounding box (with tolerance)
+    const centerInside =
+      midX >= boxMinX &&
+      midX <= boxMaxX &&
+      midY >= boxMinY &&
+      midY <= boxMaxY;
+
+    // Or significant overlap: at least 45% of the glyph's area is enclosed by the box
+    const hOverlap = Math.max(0, Math.min(glyphRight, boxMaxX) - Math.max(xPercent, boxMinX));
+    const vOverlap = Math.max(0, Math.min(glyphBottom, boxMaxY) - Math.max(yPercent, boxMinY));
+    const areaOverlapRatio = (widthPercent > 0 && heightPercent > 0)
+      ? (hOverlap * vOverlap) / (widthPercent * heightPercent)
+      : 0;
+
+    const intersects = centerInside || areaOverlapRatio >= 0.45;
 
     if (intersects) {
       glyphs.push({
@@ -119,7 +131,7 @@ export async function extractTextInBox(
   }
 
   // Sort glyphs: group into lines by vertical proximity, then sort left-to-right
-  const lineThreshold = 1.2; // vertical % difference to consider same line
+  const lineThreshold = 0.8; // vertical % difference to consider same line
   const lines: ExtractedGlyph[][] = [];
 
   // Sort primarily by Y
