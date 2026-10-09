@@ -355,7 +355,7 @@ async function generateSamplePreview() {
           </span>
         </div>
         <p class="text-xs text-gray-500 mt-1">
-          Calibrate origin document extraction zones, test deterministic regex rules with AI, and map destination placement.
+          Calibrate origin document extraction zones (Value & Label Boxes) and map destination placement.
         </p>
       </div>
 
@@ -405,7 +405,7 @@ async function generateSamplePreview() {
         :class="activeTab === 'origin' ? 'border-brand-purple text-brand-purple dark:text-purple-300' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
       >
         <FileText class="w-4 h-4" />
-        <span>1. Origin Document & AI Rules</span>
+        <span>1. Origin Document & Fields</span>
       </button>
 
       <button

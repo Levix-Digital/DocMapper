@@ -6,10 +6,7 @@ import {
   Sparkles,
   Key,
   CheckCircle2,
-  AlertTriangle,
   Edit2,
-  Check,
-  X,
   Crosshair,
   Layers,
   ExternalLink
@@ -20,8 +17,7 @@ import {
   setStoredApiKey,
   getStoredModel,
   setStoredModel,
-  AVAILABLE_GEMINI_MODELS,
-  testRegexPattern,
+  AVAILABLE_GEMINI_MODELS
 } from '../../services/llm/gemini-service';
 
 const props = defineProps<{
@@ -65,10 +61,7 @@ const apiKeyInput = ref(getStoredApiKey());
 const selectedModel = ref(getStoredModel());
 const hasStoredKey = ref(!!getStoredApiKey());
 
-// Manual Edit Rule State
-const editingFieldId = ref<string | null>(null);
-const editPattern = ref('');
-const editDataType = ref<FieldDataType>('text');
+
 
 // Manual Edit Sample Value State
 const editingSampleFieldId = ref<string | null>(null);
@@ -89,7 +82,7 @@ function confirmAddField() {
     name: newFieldName.value.trim(),
     color,
     valueBox: { x: 20, y: 20, width: 25, height: 4, page: 1 },
-    validationPattern: '.+',
+    validationPattern: '',
     dataType: newFieldDataType.value,
     isRequired: true,
   };
@@ -97,6 +90,20 @@ function confirmAddField() {
   emit('addField', newField);
   emit('selectField', newField.id);
   showAddModal.value = false;
+}
+
+function toggleRequired(field: FieldDefinition) {
+  emit('updateField', {
+    ...field,
+    isRequired: !field.isRequired,
+  });
+}
+
+function updateFieldPattern(field: FieldDefinition, pattern: string) {
+  emit('updateField', {
+    ...field,
+    validationPattern: pattern.trim(),
+  });
 }
 
 function openApiKeyModal() {
@@ -147,30 +154,7 @@ function handleAiButtonClick(field: FieldDefinition) {
   emit('generateRuleWithAi', field.id);
 }
 
-function startEditingRule(field: FieldDefinition) {
-  editingFieldId.value = field.id;
-  editPattern.value = field.validationPattern;
-  editDataType.value = field.dataType;
-}
 
-function saveEditingRule(field: FieldDefinition) {
-  const updated: FieldDefinition = {
-    ...field,
-    validationPattern: editPattern.value.trim() || '.+',
-    dataType: editDataType.value,
-  };
-  emit('updateField', updated);
-  editingFieldId.value = null;
-}
-
-function cancelEditingRule() {
-  editingFieldId.value = null;
-}
-
-function checkPatternMatch(field: FieldDefinition) {
-  if (!field.sampleExtractedValue) return null;
-  return testRegexPattern(field.validationPattern, field.sampleExtractedValue);
-}
 </script>
 
 <template>
@@ -344,126 +328,68 @@ function checkPatternMatch(field: FieldDefinition) {
           </div>
         </div>
 
-        <!-- Pattern Rule & AI Generator -->
-        <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-          <!-- Normal View -->
-          <div v-if="editingFieldId !== field.id" class="space-y-2">
-            <div class="flex items-center justify-between text-xs">
-              <div class="flex items-center gap-1.5 font-mono text-[11px] text-gray-600 dark:text-gray-400 truncate max-w-[170px]" :title="field.validationPattern">
-                Rule: {{ field.validationPattern }}
+        <!-- Extraction Status & Field Options -->
+        <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
+          <!-- Status Row -->
+          <div class="flex items-center justify-between text-xs">
+            <span
+              v-if="field.sampleExtractedValue"
+              class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]"
+            >
+              <CheckCircle2 class="w-3.5 h-3.5 text-emerald-500" />
+              <span>Capturado (LSIE)</span>
+            </span>
+            <span
+              v-else
+              class="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 italic text-[11px]"
+            >
+              <span>Aguardando captura</span>
+            </span>
+
+            <!-- Required Toggle -->
+            <label class="flex items-center gap-1.5 cursor-pointer text-gray-600 dark:text-gray-400 text-xs select-none" @click.stop>
+              <input
+                type="checkbox"
+                :checked="field.isRequired"
+                @change="toggleRequired(field)"
+                class="rounded border-gray-300 text-brand-purple focus:ring-brand-purple w-3.5 h-3.5 cursor-pointer"
+              />
+              <span class="text-[11px] font-medium">Obrigatório</span>
+            </label>
+          </div>
+
+          <!-- Advanced Settings (Optional / Collapsed) -->
+          <details class="text-xs text-gray-500 group pt-1" @click.stop>
+            <summary class="cursor-pointer hover:text-gray-800 dark:hover:text-gray-300 text-[11px] flex items-center justify-between py-1 transition-colors select-none">
+              <span>Filtro Avançado (Opcional)</span>
+              <span class="text-[10px] text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            
+            <div class="pt-2 space-y-2 bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800 mt-1">
+              <div>
+                <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1 font-medium">
+                  Máscara Regex (opcional):
+                </label>
+                <input
+                  :value="field.validationPattern || ''"
+                  @input="updateFieldPattern(field, ($event.target as HTMLInputElement).value)"
+                  type="text"
+                  placeholder="ex: ^[0-9]+$ (deixe vazio para aceitar tudo)"
+                  class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-purple"
+                />
               </div>
-              <button
-                @click.stop="startEditingRule(field)"
-                class="text-brand-purple hover:underline text-[11px] flex items-center gap-0.5"
-              >
-                <Edit2 class="w-3 h-3" /> Edit
-              </button>
-            </div>
 
-            <!-- Validation Match Status -->
-            <div v-if="field.sampleExtractedValue" class="flex items-center justify-between text-[11px]">
-              <span
-                v-if="checkPatternMatch(field)?.matches"
-                class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold"
-              >
-                <CheckCircle2 class="w-3.5 h-3.5" /> 100% Match on Sample
-              </span>
-              <span
-                v-else
-                class="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold"
-              >
-                <AlertTriangle class="w-3.5 h-3.5" /> Pattern Mismatch
-              </span>
-            </div>
-
-            <!-- AI Rule Trigger -->
-            <div class="space-y-1 pt-0.5">
               <button
+                v-if="hasStoredKey && field.sampleExtractedValue"
                 @click.stop="handleAiButtonClick(field)"
                 :disabled="isAiGenerating"
-                class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border text-xs font-semibold transition-all shadow-sm cursor-pointer disabled:opacity-50"
-                :class="[
-                  !hasStoredKey
-                    ? 'border-amber-200 dark:border-amber-800/80 bg-amber-50/80 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100/70'
-                    : !field.sampleExtractedValue
-                      ? 'border-purple-200 dark:border-purple-800 bg-purple-50/60 dark:bg-purple-950/20 text-brand-purple dark:text-purple-300 hover:bg-purple-100/60'
-                      : 'border-purple-300 dark:border-purple-700 bg-brand-purple hover:bg-brand-purple/90 text-white shadow-purple-500/20'
-                ]"
+                class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border border-purple-200 dark:border-purple-800 text-[11px] font-medium text-brand-purple dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors disabled:opacity-50"
               >
-                <Sparkles class="w-3.5 h-3.5" :class="{ 'animate-spin': isAiGenerating }" />
-                <span v-if="isAiGenerating">Gerando regra com Gemini...</span>
-                <span v-else-if="!hasStoredKey">Configurar Chave do Gemini (🔑)</span>
-                <span v-else-if="!field.sampleExtractedValue">Definir Exemplo p/ Ativar Gemini</span>
-                <span v-else>Gerar Regra com IA (Gemini)</span>
-              </button>
-
-              <p
-                v-if="!field.sampleExtractedValue && hasStoredKey"
-                class="text-[10px] text-gray-500 dark:text-gray-400 text-center"
-              >
-                Desenhe a caixa no PDF ou clique em "+ digitar" acima
-              </p>
-
-              <!-- AI Error Message Display -->
-              <div
-                v-if="aiError && selectedFieldId === field.id"
-                class="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-300 text-[11px] space-y-1"
-              >
-                <div class="font-semibold flex items-center gap-1">
-                  <AlertTriangle class="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
-                  <span>Erro do Gemini:</span>
-                </div>
-                <div class="font-mono text-[10px] break-words">
-                  {{ aiError }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Inline Edit View -->
-          <div v-else class="space-y-2 bg-purple-50 dark:bg-purple-950/40 p-2.5 rounded-lg border border-purple-200 dark:border-purple-800">
-            <div>
-              <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-                Regex Validation Pattern:
-              </label>
-              <input
-                v-model="editPattern"
-                type="text"
-                class="w-full px-2 py-1 text-xs font-mono rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-              />
-            </div>
-            <div>
-              <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-300 mb-1">
-                Data Type:
-              </label>
-              <select
-                v-model="editDataType"
-                class="w-full px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-              >
-                <option value="text">Text (General)</option>
-                <option value="alphanumeric">Alphanumeric (Letters & Digits)</option>
-                <option value="number">Number (Numeric)</option>
-                <option value="date">Date</option>
-                <option value="multiline">Multiline</option>
-              </select>
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-1">
-              <button
-                @click.stop="cancelEditingRule"
-                class="p-1 rounded text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800"
-                title="Cancel"
-              >
-                <X class="w-4 h-4" />
-              </button>
-              <button
-                @click.stop="saveEditingRule(field)"
-                class="p-1 rounded bg-brand-purple text-white hover:bg-brand-purple/90"
-                title="Save Pattern"
-              >
-                <Check class="w-4 h-4" />
+                <Sparkles class="w-3 h-3" :class="{ 'animate-spin': isAiGenerating }" />
+                <span>{{ isAiGenerating ? 'Sugerindo com Gemini...' : 'Sugerir Regex com IA' }}</span>
               </button>
             </div>
-          </div>
+          </details>
         </div>
       </div>
     </div>

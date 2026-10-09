@@ -133,12 +133,14 @@ export async function executeBatchMapping(
             extractedData[field.name] = val;
             extractedData[field.id] = val;
 
-            // Calculate confidence: purely advisory, never rejecting values
+            // Calculate confidence: 100% when extracted, 0% only when required & empty
             if (!val) {
-              confidenceScores[field.name] = field.isRequired ? 0 : 80;
-            } else {
+              confidenceScores[field.name] = field.isRequired ? 0 : 100;
+            } else if (field.validationPattern && field.validationPattern.trim().length > 0) {
               const test = testRegexPattern(field.validationPattern, val);
-              confidenceScores[field.name] = test.matches ? 100 : 85;
+              confidenceScores[field.name] = test.matches ? 100 : 90;
+            } else {
+              confidenceScores[field.name] = 100;
             }
           }
         }
