@@ -112,13 +112,24 @@ export async function stampDestinationPdf(options: StampOptions): Promise<Uint8A
   }
 
   for (const mapping of mappings) {
-    const field = fieldById.get(mapping.fieldId);
-    if (!field) continue;
+    const isCustomText = mapping.sourceType === 'custom' || (!mapping.fieldId && !!mapping.customText);
+    const field = mapping.fieldId ? fieldById.get(mapping.fieldId) : undefined;
 
-    // Resolve value (by field name or id)
-    const rawValue = extractedValues[field.name] ?? extractedValues[field.id] ?? '';
-    const value = rawValue.trim();
-    if (!value) continue;
+    if (!isCustomText && !field) continue;
+
+    // Resolve base raw value
+    let rawValue = '';
+    if (isCustomText) {
+      rawValue = mapping.customText || '';
+    } else if (field) {
+      rawValue = extractedValues[field.name] ?? extractedValues[field.id] ?? field.sampleExtractedValue ?? '';
+    }
+
+    // Apply prefix and suffix
+    const prefix = mapping.prefix || '';
+    const suffix = mapping.suffix || '';
+    const fullValue = `${prefix}${rawValue}${suffix}`.trim();
+    if (!fullValue) continue;
 
     const pageIndex = Math.min(Math.max((mapping.targetBox.page || 1) - 1, 0), pages.length - 1);
     const targetPage = pages[pageIndex];
@@ -134,9 +145,12 @@ export async function stampDestinationPdf(options: StampOptions): Promise<Uint8A
     // In pdf-lib, y=0 is at page bottom
     const boxBottomY = pageHeight - (boxTop + boxHeight);
 
+    const hAlign = mapping.horizontalAlign || 'left';
+    const vAlign = mapping.verticalAlign || 'middle';
+
     try {
       if (mapping.renderFormat === 'CODE128') {
-        const barcodeBytes = generateBarcodePng(value);
+        const barcodeBytes = generateBarcodePng(fullValue);
         if (barcodeBytes) {
           const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
           targetPage.drawImage(barcodeImage, {
@@ -147,46 +161,68 @@ export async function stampDestinationPdf(options: StampOptions): Promise<Uint8A
           });
         }
       } else if (mapping.renderFormat === 'QR_CODE') {
-        const qrBytes = await generateQrCodePng(value);
+        const qrBytes = await generateQrCodePng(fullValue);
         if (qrBytes) {
           const qrImage = await pdfDoc.embedPng(qrBytes);
           const size = Math.min(boxWidth, boxHeight);
-          const offsetX = (boxWidth - size) / 2;
-          const offsetY = (boxHeight - size) / 2;
+          
+          let offsetX = 0;
+          if (hAlign === 'center') offsetX = (boxWidth - size) / 2;
+          else if (hAlign === 'right') offsetX = boxWidth - size;
+
+          let offsetY = 0;
+          if (vAlign === 'middle') offsetY = (boxHeight - size) / 2;
+          else if (vAlign === 'top') offsetY = boxHeight - size;
+
           targetPage.drawImage(qrImage, {
-            x: boxX + offsetX,
-            y: boxBottomY + offsetY,
+            x: boxX + Math.max(offsetX, 0),
+            y: boxBottomY + Math.max(offsetY, 0),
             width: size,
             height: size,
           });
         }
       } else {
-        // Render as plain text with dynamic auto-fit font sizing
+        // Render as plain text with dynamic auto-fit font sizing and alignments
         let fontSize = mapping.fontSize || 11;
         const minFontSize = 7;
-        const maxFontSize = 14;
+        const maxFontSize = 18;
         fontSize = Math.min(Math.max(fontSize, minFontSize), maxFontSize);
 
-        let textWidth = font.widthOfTextAtSize(value, fontSize);
-        while (textWidth > boxWidth && fontSize > minFontSize) {
+        let textWidth = font.widthOfTextAtSize(fullValue, fontSize);
+        while (textWidth > (boxWidth - 4) && fontSize > minFontSize) {
           fontSize -= 0.5;
-          textWidth = font.widthOfTextAtSize(value, fontSize);
+          textWidth = font.widthOfTextAtSize(fullValue, fontSize);
         }
 
         const fontHeight = font.heightAtSize(fontSize);
-        const verticalPadding = Math.max((boxHeight - fontHeight) / 2, 2);
 
-        targetPage.drawText(value, {
-          x: boxX + 2,
-          y: boxBottomY + verticalPadding,
+        // Calculate Horizontal Alignment
+        let stampX = boxX + 2;
+        if (hAlign === 'center') {
+          stampX = boxX + Math.max(0, (boxWidth - textWidth) / 2);
+        } else if (hAlign === 'right') {
+          stampX = boxX + Math.max(0, boxWidth - textWidth - 2);
+        }
+
+        // Calculate Vertical Alignment (in pdf-lib, y is text baseline)
+        let stampY = boxBottomY + Math.max((boxHeight - fontHeight) / 2, 2);
+        if (vAlign === 'top') {
+          stampY = boxBottomY + Math.max(boxHeight - fontHeight - 2, 2);
+        } else if (vAlign === 'bottom') {
+          stampY = boxBottomY + 2;
+        }
+
+        targetPage.drawText(fullValue, {
+          x: stampX,
+          y: stampY,
           size: fontSize,
           font,
           color: rgb(0, 0, 0),
-          maxWidth: boxWidth - 4,
+          maxWidth: Math.max(boxWidth - 4, 10),
         });
       }
     } catch (err) {
-      console.warn(`Failed to stamp field ${field.name}:`, err);
+      console.warn(`Failed to stamp ${isCustomText ? 'custom field' : field?.name}:`, err);
     }
   }
 

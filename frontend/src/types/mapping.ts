@@ -40,16 +40,32 @@ export interface FieldDefinition {
 
 export type RenderFormat = 'TEXT' | 'CODE128' | 'QR_CODE';
 
+export type HorizontalAlignment = 'left' | 'center' | 'right';
+export type VerticalAlignment = 'top' | 'middle' | 'bottom';
+export type DestinationMappingSourceType = 'field' | 'custom';
+
 export interface DestinationFieldMapping {
   id: string;
-  /** Refers to FieldDefinition.id */
-  fieldId: string;
+  /** 'field' if bound to origin field, 'custom' if static text */
+  sourceType?: DestinationMappingSourceType;
+  /** Refers to FieldDefinition.id (when sourceType is 'field') */
+  fieldId?: string | null;
+  /** Static or custom literal text (when sourceType is 'custom') */
+  customText?: string;
+  /** Text prefix prepended before the value */
+  prefix?: string;
+  /** Text suffix appended after the value */
+  suffix?: string;
   /** Target placement box on destination template */
   targetBox: BoundingBox;
   /** Render format: plain text, 1D Code128, or 2D QR */
   renderFormat: RenderFormat;
   /** Optional manual font size (otherwise auto-fit 8 - 14pt) */
   fontSize?: number;
+  /** Horizontal alignment inside bounding box ('left' | 'center' | 'right') */
+  horizontalAlign?: HorizontalAlignment;
+  /** Vertical alignment inside bounding box ('top' | 'middle' | 'bottom') */
+  verticalAlign?: VerticalAlignment;
 }
 
 export interface MappingProfile {
