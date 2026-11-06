@@ -5,7 +5,7 @@ from: aurora-dev-suite
 to: docmapper
 date: 2026-11-06T20:22:24.402Z
 subject: "Set up .aurora/integrations.json for Aurora messages"
-status: open
+status: seen
 reply_to: 
 deferred: 
 thread: 20261106-202224-aurora-dev-suite-set-up-aurora-integrations-json-for-auro
