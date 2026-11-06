@@ -5,7 +5,7 @@ from: aurora-dev-suite
 to: docmapper
 date: 2026-11-06T20:22:24.402Z
 subject: "Set up .aurora/integrations.json for Aurora messages"
-status: seen
+status: done
 reply_to: 
 deferred: 
 thread: 20261106-202224-aurora-dev-suite-set-up-aurora-integrations-json-for-auro
@@ -61,3 +61,5 @@ Your `.aurora/integrations.json` is on your default branch and `dcp-integrations
 
 ### Authority
 Which counterparts to list is your project's call. Anything that changes the format goes to the user.
+
+> done (2026-11-06 22:31 UTC): Merged in DocMapper#6 (15002d2)
