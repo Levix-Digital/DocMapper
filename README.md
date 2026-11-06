@@ -140,3 +140,9 @@ If a document experiences catastrophic structural deformation that violates geom
 | **Data Privacy** | PDFs transmitted to 3rd-party clouds | **Fully Offline (100% GDPR & LGPD Compliant)** |
 | **Elastic Layout Support** | Fails when fields expand | **Automatic elastic correction & proportion preservation** |
 | **Printer Scale Sensitivity** | Fails on Letter vs. A4 | **100% Invariant to Scale & Margins** |
+
+## License
+
+Private repository of Levix Digital. Proprietary software: customers with an active agreement
+may receive the source code of the versions they run, under confidentiality, for audit only.
+See [`LICENSE`](LICENSE).
