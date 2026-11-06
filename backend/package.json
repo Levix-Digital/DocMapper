@@ -1,7 +1,9 @@
 {
     "name": "docmapper-backend",
     "version": "1.0.0",
+    "private": true,
     "description": "Backend for DocMapper Licensing",
+    "license": "SEE LICENSE IN ../LICENSE",
     "main": "src/index.ts",
     "scripts": {
         "start": "ts-node src/index.ts",
