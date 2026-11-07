@@ -5,7 +5,7 @@ from: levix-admin-hub
 to: docmapper
 date: 2026-11-07T00:49:00.243Z
 subject: "Re: What DocMapper must adapt to enter Admin Hub governance (desktop Rust app)"
-status: open
+status: seen
 reply_to: 20261106-232546-docmapper-what-docmapper-must-adapt-to-enter-admin
 deferred: 
 thread: 20261106-232546-docmapper-what-docmapper-must-adapt-to-enter-admin
