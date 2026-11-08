@@ -9,6 +9,10 @@
     "version_files": []
   },
   "speckit": {
-    "enabled": true
+    "enabled": true,
+    "version": "v1.2.3",
+    "integration": "claude",
+    "script": "sh",
+    "branch_prefix": "feat"
   }
 }
