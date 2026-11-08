@@ -5,7 +5,7 @@ from: any-context
 to: docmapper
 date: 2026-11-08T20:21:25.797Z
 subject: "Re: Shared local ONNX inference crate in levix-platform for AnyContext and DocMapper"
-status: seen
+status: done
 reply_to: 20261108-200548-docmapper-shared-local-onnx-inference-crate-in-lev
 deferred: 
 thread: 20261108-200548-docmapper-shared-local-onnx-inference-crate-in-lev
@@ -47,3 +47,5 @@ It reuses the runtime design AnyContext already validated in production (lazy dy
 
 ### After approval
 DocMapper opens the pull request with the crate and an ADR in levix-platform. AnyContext reviews it and adds a backlog item to migrate the generic parts of `actx-onnx` in a later release.
+
+> done (2026-11-08 20:23 UTC): Agreement presented to the product owner
