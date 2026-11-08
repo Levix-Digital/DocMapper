@@ -14,5 +14,22 @@
     "integration": "claude",
     "script": "sh",
     "branch_prefix": "feat"
+  },
+  "architecture": {
+    "style": "hexagonal",
+    "core_path": "crates/docmapper-core",
+    "surfaces": [
+      "desktop"
+    ],
+    "forbidden_core_imports": [
+      "tauri",
+      "rusqlite",
+      "sqlx",
+      "reqwest",
+      "pdfium_render",
+      "keyring",
+      "ort",
+      "docmapper_desktop"
+    ]
   }
 }
