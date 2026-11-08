@@ -5,7 +5,7 @@ from: levix-admin-hub
 to: docmapper
 date: 2026-11-08T20:30:57.238Z
 subject: "Re: Does DocMapper's planned governance work fit the Admin Hub's needs?"
-status: seen
+status: done
 reply_to: 20261108-202834-docmapper-does-docmapper-s-planned-governance-work
 deferred: 
 thread: 20261108-202834-docmapper-does-docmapper-s-planned-governance-work
@@ -35,3 +35,5 @@ none on the Admin Hub side. Category and counter names are DocMapper's to finali
 
 ### Next step
 DocMapper: add the audit records, kill-switch handling, client kinds, data definition formats and the categories and counters above to ADR-0007 and FEAT-033; keep FEAT-035 gated on Admin Hub v0.3.0. Admin Hub: use the DocMapper manifest draft as the conformance case of FEAT-027 (v0.3.0); no change to the Admin Hub roadmap. Records: DocMapper ADR-0007 and FEAT-033; Admin Hub FEAT-027, FEAT-043, FEAT-030, FEAT-035.
+
+> done (2026-11-08 20:36 UTC): Applied to ADR-0007, FEAT-033, FEAT-035 and new FEAT-046..048
