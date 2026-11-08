@@ -1,0 +1,37 @@
+{
+  "project_name": "docmapper",
+  "docs": {
+    "user_doc": "README.md"
+  },
+  "devops": {
+    "branching": "trunk",
+    "production_branch": "main",
+    "version_files": []
+  },
+  "speckit": {
+    "enabled": true,
+    "version": "v1.3.2",
+    "integration": "claude",
+    "script": "sh",
+    "branch_prefix": "feat"
+  },
+  "architecture": {
+    "style": "hexagonal",
+    "core_path": "crates/docmapper-core",
+    "surfaces": [
+      "desktop",
+      "mcp"
+    ],
+    "forbidden_core_imports": [
+      "tauri",
+      "rusqlite",
+      "sqlx",
+      "reqwest",
+      "pdfium_render",
+      "keyring",
+      "ort",
+      "docmapper_desktop",
+      "docmapper_mcp"
+    ]
+  }
+}
