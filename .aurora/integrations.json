@@ -5,8 +5,25 @@
   "name": "DocMapper",
   "repository": "https://github.com/Levix-Digital/DocMapper",
   "counterparts": [
-    {"slug": "aurora-dev-suite", "name": "Aurora Dev Suite", "url": "https://github.com/Levix-Digital/aurora-dev-suite.git"},
-    {"slug": "levix-admin-hub", "name": "Levix Admin Hub", "url": "https://github.com/Levix-Digital/levix-admin-hub.git"},
-    {"slug": "levix-platform", "name": "Levix Platform", "url": "https://github.com/Levix-Digital/levix-platform.git"}
+    {
+      "slug": "aurora-dev-suite",
+      "name": "Aurora Dev Suite",
+      "url": "https://github.com/Levix-Digital/aurora-dev-suite.git"
+    },
+    {
+      "slug": "levix-admin-hub",
+      "name": "Levix Admin Hub",
+      "url": "https://github.com/Levix-Digital/levix-admin-hub.git"
+    },
+    {
+      "slug": "levix-platform",
+      "name": "Levix Platform",
+      "url": "https://github.com/Levix-Digital/levix-platform.git"
+    },
+    {
+      "slug": "any-context",
+      "name": "AnyContext",
+      "url": "https://github.com/Levix-Digital/any-context"
+    }
   ]
 }
