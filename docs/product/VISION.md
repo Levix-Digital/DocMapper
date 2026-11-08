@@ -34,7 +34,8 @@ DocMapper is a horizontal product: it serves any team that repeatedly moves data
 - **Annual subscription per seat**, delivered as a Levix-signed license verified offline on the device.
 - **Up to five machines**: the customer imports a signed license file on each device, with no server.
 - **Above five machines**: paid use requires the Levix Admin Hub, which delivers licenses, policies and seats to the company's devices and adds governance (policy, audit, usage counters).
-- **Free edition**: exists, but its limits and what is blocked without a license are still to be decided.
+- **Free edition**: individual use with every feature, no sign-up and no Admin Hub, limited to three mapped document families (profiles); the local vision fallback is included.
+- **Paid edition unlocks**: unlimited document families, background processing of whole folders, the vision fallback through a model API in the customer's perimeter, a central database by connection string, ERP integration through API and MCP, and governance through the Admin Hub.
 - **Costs that matter**: development, code signing and update distribution. Running costs per document are zero; the optional vision fallback uses the customer's own API key.
 
 ## Success Metrics
@@ -55,7 +56,7 @@ The complete product, as capabilities (the backlog's epics come from this list):
 5. **Vision fallback (optional, governed)**: when deterministic extraction fails a structural check, ask a vision model for the missing fields, with the customer's own key or the endpoint the Admin Hub provides.
 6. **Destination output**: stamp values, Code128 barcodes and QR codes onto destination PDFs and templates with automatic font fitting.
 7. **Profiles and storage**: create, edit, import and export mapping profiles (`.docmapper` files). Every profile and template is read from the database: a local SQLite file by default, or a central database the customer points to with a connection string, so a team can share the same profiles.
-8. **Data export**: export extracted data as CSV, JSON or XML with a configurable schema.
+8. **Data export and MCP server**: export extracted data as CSV, JSON or XML with a configurable schema, and an MCP server so any MCP client can list profiles, run extractions and read results on the user's computer.
 9. **ERP connectors**: direct connectors to ERP systems, added through the roadmap.
 10. **Desktop application**: Tauri desktop app with the Vue interface, installers, code signing and automatic updates.
 11. **Licensing and governance**: offline signed license, signed manifest, governance engine in the Rust core, Admin Hub integration for companies above five machines.
@@ -76,4 +77,4 @@ The complete product, as capabilities (the backlog's epics come from this list):
 
 ## Open Questions
 
-- Limits of the free edition and what is blocked without a license.
+None.

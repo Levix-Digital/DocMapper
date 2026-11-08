@@ -1,7 +1,7 @@
 ---
 id: 7
 title: Licensing and policy enforcement through the levix-platform crates
-status: proposed
+status: accepted
 date: '2026-11-08'
 version: null
 subsystems: [licensing]
@@ -34,4 +34,4 @@ DocMapper verifies a license key online (`cpx_live_` keys, domain check, Express
 
 - Enforcement happens below every surface, so the interface cannot bypass it.
 - Delivery follows the Admin Hub releases v0.2.0 to v0.5.0; the migration does not need it before module M9.
-- Free edition limits are still open.
+- The free edition (three document families, no Admin Hub) is enforced by the same license check.

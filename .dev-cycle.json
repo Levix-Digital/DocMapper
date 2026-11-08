@@ -19,7 +19,8 @@
     "style": "hexagonal",
     "core_path": "crates/docmapper-core",
     "surfaces": [
-      "desktop"
+      "desktop",
+      "mcp"
     ],
     "forbidden_core_imports": [
       "tauri",
@@ -29,7 +30,8 @@
       "pdfium_render",
       "keyring",
       "ort",
-      "docmapper_desktop"
+      "docmapper_desktop",
+      "docmapper_mcp"
     ]
   }
 }

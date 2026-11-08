@@ -45,9 +45,9 @@ flowchart LR
 |---|---|---|---|---|
 | [ADR-0009](docs/adr/0009-pdf-reading-with-pdfium-and-a-fixed-glyph-tolerance.md) | PDF reading with pdfium and a fixed glyph tolerance | accepted |  | 2026-11-08 |
 | [ADR-0008](docs/adr/0008-secrets-in-the-operating-system-keychain.md) | Secrets in the operating system keychain | accepted |  | 2026-11-08 |
-| [ADR-0007](docs/adr/0007-licensing-and-policy-enforcement-through-the-levix-platform.md) | Licensing and policy enforcement through the levix-platform crates | proposed |  | 2026-11-08 |
+| [ADR-0007](docs/adr/0007-licensing-and-policy-enforcement-through-the-levix-platform.md) | Licensing and policy enforcement through the levix-platform crates | accepted |  | 2026-11-08 |
 | [ADR-0006](docs/adr/0006-profiles-stored-in-a-database-local-sqlite-by-default-centra.md) | Profiles stored in a database: local SQLite by default, central database by connection string | accepted |  | 2026-11-08 |
-| [ADR-0005](docs/adr/0005-deterministic-extraction-first-vision-fallback-through-a-gen.md) | Deterministic extraction first, vision fallback through a generic model connector | proposed |  | 2026-11-08 |
+| [ADR-0005](docs/adr/0005-deterministic-extraction-first-vision-fallback-through-a-gen.md) | Deterministic extraction first, vision fallback through a generic model connector | accepted |  | 2026-11-08 |
 | [ADR-0004](docs/adr/0004-lsie-from-the-shared-levix-platform-crate.md) | LSIE from the shared levix-platform crate | accepted |  | 2026-11-08 |
 | [ADR-0003](docs/adr/0003-module-by-module-migration-with-the-typescript-code-as-parit.md) | Module-by-module migration with the TypeScript code as parity oracle | accepted |  | 2026-11-08 |
 | [ADR-0002](docs/adr/0002-hexagonal-architecture.md) | Hexagonal architecture | accepted |  | 2026-11-08 |
