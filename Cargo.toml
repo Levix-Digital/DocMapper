@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/docmapper-core",
+    "crates/docmapper-desktop",
     "crates/docmapper-parity",
 ]
 

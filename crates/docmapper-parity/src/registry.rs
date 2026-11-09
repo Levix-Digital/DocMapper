@@ -35,9 +35,11 @@ pub fn parse_registry(text: &str) -> Result<Registry, String> {
             let state = match state.as_str() {
                 Some("characterized") => ModuleState::Characterized,
                 Some("ported") => ModuleState::Ported,
-                _ => return Err(format!(
+                _ => {
+                    return Err(format!(
                     "module '{name}' has state {state}; expected \"characterized\" or \"ported\""
-                )),
+                ))
+                }
             };
             Ok((name.clone(), state))
         })

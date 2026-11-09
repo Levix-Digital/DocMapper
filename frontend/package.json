@@ -9,7 +9,7 @@
     "asbuild": "asc src/modules/core-wasm/assembly/index.ts --target release --outFile src/modules/core-wasm/build/release.wasm --optimize --exportRuntime",
     "test": "vitest run --project unit",
     "test:parity": "vitest run --project parity",
-    "tauri": "tauri"
+    "tauri": "node scripts/tauri.mjs"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.28.9",

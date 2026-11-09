@@ -1,0 +1,23 @@
+[package]
+name = "docmapper-desktop"
+description = "DocMapper desktop shell: wires the adapters to the core and exposes its commands"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+name = "docmapper_desktop"
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6", features = [] }
+
+[dependencies]
+docmapper-core.workspace = true
+tauri = { version = "2.12", features = [] }
+
+[lints]
+workspace = true
