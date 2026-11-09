@@ -32,4 +32,4 @@
 ## Notes
 
 - This is a developer-facing migration milestone: operations are named by their TypeScript function names because the TypeScript code is the parity reference (ADR-0003), not an implementation choice of this feature.
-- FR-009 (malformed file messages compared by kind) is the one point the product owner confirms at plan approval.
+- FR-009 records the product owner's approval (2026-11-09, at plan approval) of malformed file messages compared by kind only (ADR-0012).

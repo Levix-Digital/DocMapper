@@ -43,7 +43,7 @@
 ## R7. Malformed JSON and values outside Rust strings and f64
 
 - **Finding**: V8 `JSON.parse` messages (`Unexpected end of JSON input`, `Expected property name or '}' in JSON at position 1 (line 1 column 2)`, and about twenty more forms) are shown to the user in the import alert. Reproducing them means a JSON parser written to V8's error positions and wording.
-- **Decision (to confirm by the product owner)**: compare `SyntaxError` by name only (as ADR-0010 does for pattern errors), and give a Rust message with line and column. Lone surrogate escapes (`"\ud800"`) and numbers beyond the f64 range (`1e400`, which JavaScript turns into `Infinity` and stores as `null`) are refused by the Rust reader as a `SyntaxError`; they are left out of fixtures and fuzzing. One new ADR records both.
+- **Decision (approved by the product owner on 2026-11-09, ADR-0012)**: compare `SyntaxError` by name only (as ADR-0010 does for pattern errors), and give a Rust message with line and column. Lone surrogate escapes (`"\ud800"`) and numbers beyond the f64 range (`1e400`, which JavaScript turns into `Infinity` and stores as `null`) are refused by the Rust reader as a `SyntaxError`; they are left out of fixtures and fuzzing. One new ADR records both.
 - **Alternatives**: a V8-compatible JSON reader (large, for a message only); a WTF-16 string model in the core (all of the core would pay for a case no real `.dmap` file has).
 
 ## R8. Defects found (kept for parity, ADR-0003)

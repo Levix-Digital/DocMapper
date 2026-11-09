@@ -34,7 +34,7 @@ flowchart LR
 | [Model Services](docs/architecture/model-services.md) | Calls to the Gemini API for validation pattern suggestions and vision fallback extraction. |
 | [Parity Harness](docs/architecture/parity.md) | Fixtures, fixture writer, TypeScript oracle, Rust runner and id checker that prove each ported module gives the same outputs as the TypeScript code. |
 | [PDF Stamping](docs/architecture/stamping.md) | Writes values, Code128 barcodes and QR codes onto destination PDFs and the shipment template. |
-| [Profiles](docs/architecture/profiles.md) | Mapping profiles: the built-in CMR profile, storage, duplication and .docmapper import and export. |
+| [Profiles](docs/architecture/profiles.md) | Mapping profiles: the profile store, .dmap import and export, the typed model and the profile repository (browser storage today, SQLite in the core). |
 | [Spatial Extraction](docs/architecture/extraction.md) | Reads glyphs with pdf.js and resolves mapped fields with the LSIE engine. |
 | [Text Utilities](docs/architecture/text-utilities.md) | ECMAScript-exact Rust twins of the file name, validation pattern and dictionary helpers. |
 <!-- architecture-docs:subsystems:end -->
@@ -44,6 +44,7 @@ flowchart LR
 <!-- architecture-docs:adrs:start -->
 | ADR | Title | Status | Version | Date |
 |---|---|---|---|---|
+| [ADR-0012](docs/adr/0012-malformed-profile-files-compared-by-error-kind-json-outside.md) | Malformed profile files compared by error kind; JSON outside Rust strings and f64 refused | accepted |  | 2026-11-09 |
 | [ADR-0011](docs/adr/0011-unused-assemblyscript-cmr-core-removed-instead-of-ported.md) | Unused AssemblyScript CMR core removed instead of ported | accepted |  | 2026-11-09 |
 | [ADR-0010](docs/adr/0010-validation-pattern-errors-compared-by-presence-not-by-messag.md) | Validation pattern errors compared by presence, not by message | accepted |  | 2026-11-09 |
 | [ADR-0009](docs/adr/0009-pdf-reading-with-pdfium-and-a-fixed-glyph-tolerance.md) | PDF reading with pdfium and a fixed glyph tolerance | accepted |  | 2026-11-08 |

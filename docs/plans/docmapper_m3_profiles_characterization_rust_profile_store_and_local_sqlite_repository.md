@@ -4,10 +4,10 @@ project: docmapper
 title: 'M3 Profiles: characterization, Rust profile store and local SQLite repository'
 kind: feature
 version: v0.1.0
-status: in_progress
+status: completed
 author: LeviGuilherme
 created_at: '2026-11-09T18:07:32'
-updated_at: '2026-11-09T18:21:20'
+updated_at: '2026-11-09T18:34:41'
 session_id: null
 tags: []
 supersedes: null
@@ -20,17 +20,29 @@ backlog_items:
 spec_dir: specs/008-m3-profiles-storage
 milestones:
 - name: setup
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: characterization
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: rust-store
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: sqlite
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: fuzzing
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: docs
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 status_log:
 - at: '2026-11-09T18:07:32'
   by: LeviGuilherme
@@ -44,6 +56,28 @@ status_log:
   by: LeviGuilherme
   status: in_progress
   note: 'Approved by Levi on 2026-11-09: built-in CMR factory not ported, malformed file SyntaxError compared by kind (new ADR), two kept import defects as low bugs, interface wiring as a separate v0.1.0 item'
+- at: '2026-11-09T18:34:26'
+  by: LeviGuilherme
+  note: Milestone 'setup' completed
+- at: '2026-11-09T18:34:26'
+  by: LeviGuilherme
+  note: Milestone 'characterization' completed
+- at: '2026-11-09T18:34:27'
+  by: LeviGuilherme
+  note: Milestone 'rust-store' completed
+- at: '2026-11-09T18:34:27'
+  by: LeviGuilherme
+  note: Milestone 'sqlite' completed
+- at: '2026-11-09T18:34:28'
+  by: LeviGuilherme
+  note: Milestone 'fuzzing' completed
+- at: '2026-11-09T18:34:41'
+  by: LeviGuilherme
+  note: Milestone 'docs' completed
+- at: '2026-11-09T18:34:41'
+  by: LeviGuilherme
+  status: completed
+  note: All milestones completed
 ---
 
 # M3 Profiles: characterization, Rust profile store and local SQLite repository
@@ -69,7 +103,7 @@ Envelope of the Spec Kit feature `specs/008-m3-profiles-storage/` (spec, plan, r
 
 ## 1. Goal and decisions
 
-Characterize and port the profile store of the interface (`profile-store.ts`: create, list, find, save, delete, duplicate, `.dmap` export and import) as the parity module `profiles` (ADR-0003 steps a to c), with the profile model, the `ProfileRepository` port and the local SQLite repository of ADR-0006. Every fixture runs on an in-memory and on the SQLite repository, so the stored JSON of each profile is proven equal. Choices, with alternatives, are in `specs/008-m3-profiles-storage/research.md`: profiles kept as ordered JSON documents (import keeps unknown keys and key order), a typed read model for later modules, injected clock and random source read in the TypeScript order, a repository with list, save and delete, a separate `docmapper-sqlite` crate on `rusqlite` (bundled SQLite, WAL, numbered additive migrations, newer schema refused). The unused built-in CMR profile factory is not ported (a ready-made profile, as ADR-0011 for the CMR core). One exception to exact equality, to be confirmed by the product owner: malformed JSON in an imported file is compared by error kind (`SyntaxError`), not by V8's message, and JSON outside Rust strings and f64 is refused; recorded in a new ADR. Wiring the interface (application commands, shadow mode, removal of the browser store) is a new v0.1.0 item after this plan. Two TypeScript defects found are kept for parity and captured as low bugs.
+Characterize and port the profile store of the interface (`profile-store.ts`: create, list, find, save, delete, duplicate, `.dmap` export and import) as the parity module `profiles` (ADR-0003 steps a to c), with the profile model, the `ProfileRepository` port and the local SQLite repository of ADR-0006. Every fixture runs on an in-memory and on the SQLite repository, so the stored JSON of each profile is proven equal. Choices, with alternatives, are in `specs/008-m3-profiles-storage/research.md`: profiles kept as ordered JSON documents (import keeps unknown keys and key order), a typed read model for later modules, injected clock and random source read in the TypeScript order, a repository with list, save and delete, a separate `docmapper-sqlite` crate on `rusqlite` (bundled SQLite, WAL, numbered additive migrations, newer schema refused). The unused built-in CMR profile factory is not ported (a ready-made profile, as ADR-0011 for the CMR core). One exception to exact equality, approved by the product owner on 2026-11-09 (ADR-0012): malformed JSON in an imported file is compared by error kind (`SyntaxError`), not by V8's message, and JSON outside Rust strings and f64 is refused; recorded in a new ADR. Wiring the interface (application commands, shadow mode, removal of the browser store) is a new v0.1.0 item after this plan. Two TypeScript defects found are kept for parity and captured as low bugs.
 
 ## 2. Design (`software-design`)
 

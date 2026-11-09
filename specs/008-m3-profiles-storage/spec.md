@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-09
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Start milestone M3 of the Rust migration: profiles, .docmapper files and SQLite" (backlog FEAT-009, FEAT-010, FEAT-011; epic EPIC-004; ADR-0003, ADR-0006)
 
@@ -112,7 +112,7 @@ Differential fuzzing sends generated stores, names (case variants, `(Copy)` and 
 - **FR-006**: The core MUST define a typed profile model (boxes, fields, destination mappings, profile) that reads a stored profile for the later modules, and a `ProfileRepository` port that lists, saves (replace in place or append) and deletes profiles in their stored order.
 - **FR-007**: The SQLite repository MUST implement the port in a separate adapter crate, store each profile document and its position, use WAL mode, create and upgrade its schema by additive, numbered migrations and refuse a database newer than it knows.
 - **FR-008**: The export text MUST be the JavaScript `JSON.stringify(profile, null, 2)` text, byte for byte.
-- **FR-009**: For import text that is not valid JSON, both sides MUST fail with a `SyntaxError`; the message text is exempt from exact equality and the Rust side gives its own message (decision to record in an ADR, extending ADR-0010).
+- **FR-009**: For import text that is not valid JSON, both sides MUST fail with a `SyntaxError`; the message text is exempt from exact equality and the Rust side gives its own message (ADR-0012, approved by the product owner on 2026-11-09).
 - **FR-010**: Differential fuzzing MUST compare the store operations against the TypeScript oracle with generated inputs biased toward the edge cases above.
 - **FR-011**: The `profiles` module MUST be registered as ported, and the parity checker MUST pass.
 - **FR-012**: The core MUST NOT depend on `rusqlite` or any other forbidden crate.
