@@ -32,22 +32,6 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 
 ## Features
 
-### FEAT-007: Characterization tests and fixtures for the CMR core
-- **Priority**: high
-- **Epic**: EPIC-003
-- **Status**: open
-- **Found**: 2026-11-08
-- **Plan**: -
-- **Description**: Including unknown document type errors.
-
-### FEAT-008: Rust port of the CMR core
-- **Priority**: high
-- **Epic**: EPIC-003
-- **Status**: open
-- **Found**: 2026-11-08
-- **Plan**: -
-- **Description**: Replaces WasmService calls with a Tauri command behind a switch, shadow mode on.
-
 ### FEAT-009: Characterization tests and fixtures for profiles and .docmapper files
 - **Priority**: high
 - **Epic**: EPIC-004
@@ -394,12 +378,6 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Found**: 2026-11-08
 - **Description**: filename-formatter, testRegexPattern, flattenDictionary, sanitizePunctuation with exact parity.
 
-### EPIC-003: [migration] M2 CMR core
-- **Priority**: high
-- **Status**: open
-- **Found**: 2026-11-08
-- **Description**: AssemblyScript scanner, cleaning, dates, CMR parser and processDocument, byte-identical JSON text.
-
 ### EPIC-004: [migration] M3 Types, profiles and storage
 - **Priority**: high
 - **Status**: open
@@ -527,3 +505,28 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
 - **Closed**: 2026-11-09, plan docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
 - **Description**: regress, UTF-16 indexing, ECMAScript whitespace; fixtures and proptest fuzzing pass.
+
+### FEAT-007: Characterization tests and fixtures for the CMR core
+- **Priority**: high
+- **Epic**: EPIC-003
+- **Status**: dropped
+- **Found**: 2026-11-08
+- **Plan**: -
+- **Closed**: 2026-11-09, The AssemblyScript CMR core is not called by the interface; removed instead of ported (ADR-0011, decided by the product owner 2026-11-09)
+- **Description**: Including unknown document type errors.
+
+### FEAT-008: Rust port of the CMR core
+- **Priority**: high
+- **Epic**: EPIC-003
+- **Status**: dropped
+- **Found**: 2026-11-08
+- **Plan**: -
+- **Closed**: 2026-11-09, The AssemblyScript CMR core is not called by the interface; removed instead of ported (ADR-0011, decided by the product owner 2026-11-09)
+- **Description**: Replaces WasmService calls with a Tauri command behind a switch, shadow mode on.
+
+### EPIC-003: [migration] M2 CMR core
+- **Priority**: high
+- **Status**: dropped
+- **Found**: 2026-11-08
+- **Closed**: 2026-11-09, The AssemblyScript CMR core is not called by the interface; removed instead of ported (ADR-0011, decided by the product owner 2026-11-09)
+- **Description**: AssemblyScript scanner, cleaning, dates, CMR parser and processDocument, byte-identical JSON text.

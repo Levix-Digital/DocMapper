@@ -151,7 +151,6 @@ DocMapper runs as a desktop application (a Tauri shell over a Rust core) and, du
 
 ```bash
 npm ci --prefix frontend
-npm run asbuild --prefix frontend            # AssemblyScript module used by the interface
 npm run tauri --prefix frontend -- build     # desktop release build and installer for this platform
 ```
 

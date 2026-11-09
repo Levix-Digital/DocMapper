@@ -1,7 +1,7 @@
 <!-- dev-cycle-constitution
 generated-by: dev-cycle-protocol/constitution.py (do not edit; change a source and regenerate)
-sources-sha256: 6607c979202566bb49e8447469b6d51fcbf72305c5b479dec0b49d6860833683
-content-sha256: 32eae7ccadc0ce0a3829b34d250822a8a20eaa385d6a9505943bbe16fe180f6e
+sources-sha256: ea73a38508ac1d3f30183aad73ec4ad4db27ab6511e8bcabf3d451b1b7aeb323
+content-sha256: afbbfaacc03d3ce44ec1c152a2488020817f29dce81c5221ade6fbc1f29072d2
 -->
 # docmapper Constitution
 
@@ -175,6 +175,8 @@ Accepted decisions; a plan that contradicts one needs a new ADR that supersedes 
 - ADR-0007: Licensing and policy enforcement through the levix-platform crates (`docs/adr/0007-licensing-and-policy-enforcement-through-the-levix-platform.md`)
 - ADR-0008: Secrets in the operating system keychain (`docs/adr/0008-secrets-in-the-operating-system-keychain.md`)
 - ADR-0009: PDF reading with pdfium and a fixed glyph tolerance (`docs/adr/0009-pdf-reading-with-pdfium-and-a-fixed-glyph-tolerance.md`)
+- ADR-0010: Validation pattern errors compared by presence, not by message (`docs/adr/0010-validation-pattern-errors-compared-by-presence-not-by-messag.md`)
+- ADR-0011: Unused AssemblyScript CMR core removed instead of ported (`docs/adr/0011-unused-assemblyscript-cmr-core-removed-instead-of-ported.md`)
 
 ## Governance
 
@@ -182,4 +184,4 @@ Accepted decisions; a plan that contradicts one needs a new ADR that supersedes 
 - Amendments change the source, not this file: an ADR for decisions, the technical specification for requirements and constraints, `.dev-cycle.json` for the architecture style, the skills for principles. Then run `constitution.py generate` and commit the result with the change.
 - Gate 3 of the development cycle blocks a plan while this file is stale or edited by hand.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 1.1.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-09

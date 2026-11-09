@@ -8,7 +8,7 @@ subsystems: [parity]
 supersedes: []
 superseded_by: []
 amends: []
-amended_by: []
+amended_by: [11]
 ---
 
 # ADR-0003: Module-by-module migration with the TypeScript code as parity oracle
