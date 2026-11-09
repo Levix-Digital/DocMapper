@@ -1,0 +1,15 @@
+{
+  "id": "describe-large",
+  "module": "harness",
+  "function": "describe",
+  "input": [
+    1e+21,
+    "exponent"
+  ],
+  "output": {
+    "label": "exponent",
+    "half": 500000000000000000000,
+    "shifted": 1e+21,
+    "sign": "non-negative"
+  }
+}

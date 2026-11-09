@@ -1,0 +1,15 @@
+{
+  "id": "describe-integer",
+  "module": "harness",
+  "function": "describe",
+  "input": [
+    4,
+    "four"
+  ],
+  "output": {
+    "label": "four",
+    "half": 2,
+    "shifted": 4.1,
+    "sign": "non-negative"
+  }
+}

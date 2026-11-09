@@ -1,0 +1,12 @@
+{
+  "id": "measure-empty",
+  "module": "harness",
+  "function": "measure",
+  "input": [
+    ""
+  ],
+  "error": {
+    "name": "RangeError",
+    "message": "text is empty"
+  }
+}
