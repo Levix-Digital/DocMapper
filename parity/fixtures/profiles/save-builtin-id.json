@@ -1,0 +1,65 @@
+{
+  "id": "save-builtin-id",
+  "module": "profiles",
+  "function": "saveProfile",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "profile-a",
+          "name": "Invoice",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "builtin-cmr-standard",
+          "name": "Kept",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ]
+    }
+  ],
+  "output": {
+    "returned": null,
+    "stored": [
+      {
+        "id": "profile-a",
+        "name": "Invoice",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      },
+      {
+        "id": "builtin-cmr-standard",
+        "name": "Kept",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-11-09T12:00:00.000Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      }
+    ]
+  }
+}

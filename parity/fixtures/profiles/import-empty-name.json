@@ -1,0 +1,24 @@
+{
+  "id": "import-empty-name",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"name\": \"\", \"fields\": [], \"destinationMappings\": []}"
+      ]
+    }
+  ],
+  "error": {
+    "name": "Error",
+    "message": "Invalid .dmap file format: Missing name, fields, or destinationMappings."
+  }
+}

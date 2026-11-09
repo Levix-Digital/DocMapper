@@ -1,0 +1,24 @@
+{
+  "id": "import-empty-text",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        ""
+      ]
+    }
+  ],
+  "error": {
+    "name": "SyntaxError",
+    "message": "Unexpected end of JSON input"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "export-basic",
+  "module": "profiles",
+  "function": "exportProfileAsDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "profile-a",
+          "name": "Invoice",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "fileName": "Invoice.dmap",
+      "contents": "{\n  \"id\": \"profile-a\",\n  \"name\": \"Invoice\",\n  \"version\": 1,\n  \"createdAt\": \"2026-01-02T03:04:05.006Z\",\n  \"updatedAt\": \"2026-01-02T03:04:05.006Z\",\n  \"fields\": [],\n  \"destinationMappings\": [],\n  \"outputFileNamePattern\": \"{originalName}_{seq:001}\"\n}"
+    },
+    "stored": []
+  }
+}

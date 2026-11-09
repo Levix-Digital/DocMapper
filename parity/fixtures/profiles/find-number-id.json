@@ -1,0 +1,46 @@
+{
+  "id": "find-number-id",
+  "module": "profiles",
+  "function": "getProfileById",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "7",
+          "name": "Seven",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        7
+      ]
+    }
+  ],
+  "output": {
+    "returned": null,
+    "stored": [
+      {
+        "id": "7",
+        "name": "Seven",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      }
+    ]
+  }
+}

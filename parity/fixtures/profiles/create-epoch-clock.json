@@ -1,0 +1,33 @@
+{
+  "id": "create-epoch-clock",
+  "module": "profiles",
+  "function": "createEmptyProfile",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 0,
+        "step": 0
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "x"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "id": "profile-0-4fzzz",
+      "name": "x",
+      "version": 1,
+      "createdAt": "1970-01-01T00:00:00.000Z",
+      "updatedAt": "1970-01-01T00:00:00.000Z",
+      "fields": [],
+      "destinationMappings": [],
+      "outputFileNamePattern": "{originalName}_{seq:001}"
+    },
+    "stored": []
+  }
+}

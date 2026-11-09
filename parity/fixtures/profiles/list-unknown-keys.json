@@ -1,0 +1,52 @@
+{
+  "id": "list-unknown-keys",
+  "module": "profiles",
+  "function": "getAllProfiles",
+  "input": [
+    {
+      "stored": [
+        {
+          "2": "two",
+          "zeta": 1,
+          "id": "p",
+          "name": "n",
+          "__proto__": {
+            "x": 1
+          }
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": []
+    }
+  ],
+  "output": {
+    "returned": [
+      {
+        "2": "two",
+        "zeta": 1,
+        "id": "p",
+        "name": "n",
+        "__proto__": {
+          "x": 1
+        }
+      }
+    ],
+    "stored": [
+      {
+        "2": "two",
+        "zeta": 1,
+        "id": "p",
+        "name": "n",
+        "__proto__": {
+          "x": 1
+        }
+      }
+    ]
+  }
+}

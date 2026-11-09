@@ -1,0 +1,26 @@
+{
+  "id": "export-missing-name",
+  "module": "profiles",
+  "function": "exportProfileAsDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "p"
+        }
+      ]
+    }
+  ],
+  "error": {
+    "name": "TypeError",
+    "message": "Cannot read properties of undefined (reading 'replace')"
+  }
+}

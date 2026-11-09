@@ -1,0 +1,73 @@
+{
+  "id": "duplicate-key-order",
+  "module": "profiles",
+  "function": "duplicateProfile",
+  "input": [
+    {
+      "stored": [
+        {
+          "name": "Odd",
+          "fields": [],
+          "id": "o",
+          "extra": {
+            "k": [
+              1,
+              2
+            ]
+          }
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "o"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "name": "Odd (Copy)",
+      "fields": [],
+      "id": "profile-1794225600000-4fzzz",
+      "extra": {
+        "k": [
+          1,
+          2
+        ]
+      },
+      "createdAt": "2026-11-09T12:00:00.001Z",
+      "updatedAt": "2026-11-09T12:00:00.002Z"
+    },
+    "stored": [
+      {
+        "name": "Odd",
+        "fields": [],
+        "id": "o",
+        "extra": {
+          "k": [
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "name": "Odd (Copy)",
+        "fields": [],
+        "id": "profile-1794225600000-4fzzz",
+        "extra": {
+          "k": [
+            1,
+            2
+          ]
+        },
+        "createdAt": "2026-11-09T12:00:00.001Z",
+        "updatedAt": "2026-11-09T12:00:00.003Z"
+      }
+    ]
+  }
+}

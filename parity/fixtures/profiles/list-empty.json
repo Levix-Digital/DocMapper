@@ -1,0 +1,22 @@
+{
+  "id": "list-empty",
+  "module": "profiles",
+  "function": "getAllProfiles",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": []
+    }
+  ],
+  "output": {
+    "returned": [],
+    "stored": []
+  }
+}

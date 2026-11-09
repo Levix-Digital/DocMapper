@@ -4,6 +4,7 @@
 
 import type { ModuleTable } from '../shared/outcome'
 import * as harness from '../selftest/harness'
+import * as profiles from '../profiles/harness'
 import { formatOutputFileNameAt } from '../text/fixed-clock'
 import { flattenDictionary, sanitizePunctuation } from '../text/translation-text'
 import { testRegexPattern } from '../text/validation-pattern'
@@ -18,5 +19,15 @@ export const MODULES: ModuleTable = {
         testRegexPattern,
         flattenDictionary,
         sanitizePunctuation,
+    },
+    profiles: {
+        createEmptyProfile: profiles.createEmptyProfile,
+        getAllProfiles: profiles.getAllProfiles,
+        getProfileById: profiles.getProfileById,
+        saveProfile: profiles.saveProfile,
+        deleteProfile: profiles.deleteProfile,
+        duplicateProfile: profiles.duplicateProfile,
+        exportProfileAsDocMapper: profiles.exportProfileAsDocMapper,
+        importProfileFromDocMapper: profiles.importProfileFromDocMapper,
     },
 }

@@ -1,0 +1,33 @@
+{
+  "id": "create-random-small",
+  "module": "profiles",
+  "function": "createEmptyProfile",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.000001
+      ],
+      "args": [
+        "x"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "id": "profile-1794225600000-0001o",
+      "name": "x",
+      "version": 1,
+      "createdAt": "2026-11-09T12:00:00.001Z",
+      "updatedAt": "2026-11-09T12:00:00.002Z",
+      "fields": [],
+      "destinationMappings": [],
+      "outputFileNamePattern": "{originalName}_{seq:001}"
+    },
+    "stored": []
+  }
+}

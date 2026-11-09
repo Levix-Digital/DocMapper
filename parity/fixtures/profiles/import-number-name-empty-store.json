@@ -1,0 +1,38 @@
+{
+  "id": "import-number-name-empty-store",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"name\": 7, \"fields\": [], \"destinationMappings\": []}"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "name": 7,
+      "fields": [],
+      "destinationMappings": [],
+      "id": "profile-1794225600000-4fzzz",
+      "updatedAt": "2026-11-09T12:00:00.001Z"
+    },
+    "stored": [
+      {
+        "name": 7,
+        "fields": [],
+        "destinationMappings": [],
+        "id": "profile-1794225600000-4fzzz",
+        "updatedAt": "2026-11-09T12:00:00.002Z"
+      }
+    ]
+  }
+}
