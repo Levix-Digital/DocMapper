@@ -8,38 +8,6 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 
 ## Features
 
-### FEAT-001: Cargo workspace with docmapper-core and docmapper-desktop crates
-- **Priority**: high
-- **Epic**: EPIC-001
-- **Status**: in_progress
-- **Found**: 2026-11-08
-- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
-- **Description**: Hexagonal layout from .dev-cycle.json; check_design passes.
-
-### FEAT-002: Tauri 2 shell running the current Vue interface
-- **Priority**: high
-- **Epic**: EPIC-001
-- **Status**: in_progress
-- **Found**: 2026-11-08
-- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
-- **Description**: Browser build keeps working until M7.
-
-### FEAT-003: Parity harness: fixture format, fixture writer, Node oracle and id checker
-- **Priority**: high
-- **Epic**: EPIC-001
-- **Status**: in_progress
-- **Found**: 2026-11-08
-- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
-- **Description**: parity/fixtures/<module>/<case>.json with {input, output}; CI fails when an id exists on one side only.
-
-### FEAT-004: CI with Rust and TypeScript jobs
-- **Priority**: high
-- **Epic**: EPIC-001
-- **Status**: in_progress
-- **Found**: 2026-11-08
-- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
-- **Description**: cargo fmt, clippy, test; Vitest; parity checker.
-
 ### FEAT-005: Characterization tests and fixtures for the text utilities
 - **Priority**: high
 - **Epic**: EPIC-002
@@ -497,3 +465,39 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Description**: ADR-0001: final 100% Rust target; removes Vue, Vite and Node.js. After version 1.0.
 
 ## Closed
+
+### FEAT-001: Cargo workspace with docmapper-core and docmapper-desktop crates
+- **Priority**: high
+- **Epic**: EPIC-001
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Closed**: 2026-11-09, plan docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Description**: Hexagonal layout from .dev-cycle.json; check_design passes.
+
+### FEAT-002: Tauri 2 shell running the current Vue interface
+- **Priority**: high
+- **Epic**: EPIC-001
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Closed**: 2026-11-09, plan docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Description**: Browser build keeps working until M7.
+
+### FEAT-003: Parity harness: fixture format, fixture writer, Node oracle and id checker
+- **Priority**: high
+- **Epic**: EPIC-001
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Closed**: 2026-11-09, plan docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Description**: parity/fixtures/<module>/<case>.json with {input, output}; CI fails when an id exists on one side only.
+
+### FEAT-004: CI with Rust and TypeScript jobs
+- **Priority**: high
+- **Epic**: EPIC-001
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Closed**: 2026-11-09, plan docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
+- **Description**: cargo fmt, clippy, test; Vitest; parity checker.

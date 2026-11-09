@@ -18,6 +18,7 @@ Owns the screens and user interaction. Business rules are expected to live in th
 - `frontend/src/components/mapping`: `InteractivePdfCanvas.vue` (drawing label and value boxes), `DestinationPlacementCanvas.vue`, `FieldListDrawer.vue`, `ProfileManagementModal.vue`.
 - `frontend/src/components/layout`, `common` and `ui`: layout, language picker and basic controls.
 - Vue 3 with the Composition API, TypeScript, Tailwind CSS and Vite.
+- Runs in the desktop window of the [Desktop Shell](desktop-shell.md) and, until the browser version is removed, in the browser, from the same build.
 
 ## Behavior
 

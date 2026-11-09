@@ -4,10 +4,10 @@ project: docmapper
 title: 'M0 Foundation: Cargo workspace, Tauri shell, parity harness and CI'
 kind: feature
 version: v0.1.0
-status: in_progress
+status: completed
 author: LeviGuilherme
 created_at: '2026-11-09T12:11:08'
-updated_at: '2026-11-09T12:33:34'
+updated_at: '2026-11-09T12:50:28'
 session_id: null
 tags: []
 supersedes: null
@@ -21,15 +21,25 @@ backlog_items:
 spec_dir: specs/006-m0-foundation
 milestones:
 - name: setup
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: desktop-shell
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: parity-harness
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: ci
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: docs
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 status_log:
 - at: '2026-11-09T12:11:08'
   by: LeviGuilherme
@@ -43,6 +53,25 @@ status_log:
   by: LeviGuilherme
   status: in_progress
   note: Approved by Levi on 2026-11-09
+- at: '2026-11-09T12:50:23'
+  by: LeviGuilherme
+  note: Milestone 'setup' completed
+- at: '2026-11-09T12:50:25'
+  by: LeviGuilherme
+  note: Milestone 'desktop-shell' completed
+- at: '2026-11-09T12:50:26'
+  by: LeviGuilherme
+  note: Milestone 'parity-harness' completed
+- at: '2026-11-09T12:50:27'
+  by: LeviGuilherme
+  note: Milestone 'ci' completed
+- at: '2026-11-09T12:50:28'
+  by: LeviGuilherme
+  note: Milestone 'docs' completed
+- at: '2026-11-09T12:50:28'
+  by: LeviGuilherme
+  status: completed
+  note: All milestones completed
 ---
 
 # M0 Foundation: Cargo workspace, Tauri shell, parity harness and CI
