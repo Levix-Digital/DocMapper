@@ -22,7 +22,7 @@ Opens the interface in a desktop window, wires the adapters to the core and expo
 ## Behavior
 
 - **Development**: `npm run tauri --prefix frontend -- dev` starts the Vite dev server on port 5173 (fixed, `strictPort`) and opens the window on it.
-- **Release build**: `npm run tauri --prefix frontend -- build` builds the AssemblyScript module and the interface into `frontend/dist`, which the shell embeds, and bundles the app for the current platform.
+- **Release build**: `npm run tauri --prefix frontend -- build` builds the interface into `frontend/dist`, which the shell embeds, and bundles the app for the current platform.
 - **Commands**: `core_version` returns the core version.
 - **Permissions**: the window has only `core:default`; no file system, shell or other plugin. No content security policy is set yet, so the interface's current network calls (license check, translation, model API) work as in the browser; the policy is set when those calls move to Rust.
 - **Errors**: a start-up failure is written to stderr and ends the process with exit code 1.

@@ -43,3 +43,9 @@ Records what the TypeScript code does for a set of inputs, checks that the Rust 
 
 - Reads the TypeScript code of the modules under migration; used by the Rust tests of the core.
 - Run by the `parity` job of `.github/workflows/ci.yml`.
+
+## Decisions
+
+- [ADR-0003](../adr/0003-module-by-module-migration-with-the-typescript-code-as-parit.md): module-by-module migration with the TypeScript code as parity oracle.
+- [ADR-0010](../adr/0010-validation-pattern-errors-compared-by-presence-not-by-messag.md): invalid pattern messages compared by presence.
+- [ADR-0011](../adr/0011-unused-assemblyscript-cmr-core-removed-instead-of-ported.md): the unused AssemblyScript CMR core is removed, not ported (no module M2).

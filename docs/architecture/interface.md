@@ -27,7 +27,7 @@ Owns the screens and user interaction. Business rules are expected to live in th
 
 ## Interfaces
 
-- Calls Profiles, Batch Processing, Spatial Extraction, Model Services, CMR Core and Localization.
+- Calls Profiles, Batch Processing, Spatial Extraction, Model Services and Localization.
 
 ## Decisions
 
