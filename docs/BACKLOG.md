@@ -11,33 +11,33 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 ### FEAT-001: Cargo workspace with docmapper-core and docmapper-desktop crates
 - **Priority**: high
 - **Epic**: EPIC-001
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
 - **Description**: Hexagonal layout from .dev-cycle.json; check_design passes.
 
 ### FEAT-002: Tauri 2 shell running the current Vue interface
 - **Priority**: high
 - **Epic**: EPIC-001
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
 - **Description**: Browser build keeps working until M7.
 
 ### FEAT-003: Parity harness: fixture format, fixture writer, Node oracle and id checker
 - **Priority**: high
 - **Epic**: EPIC-001
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
 - **Description**: parity/fixtures/<module>/<case>.json with {input, output}; CI fails when an id exists on one side only.
 
 ### FEAT-004: CI with Rust and TypeScript jobs
 - **Priority**: high
 - **Epic**: EPIC-001
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
 - **Description**: cargo fmt, clippy, test; Vitest; parity checker.
 
 ### FEAT-005: Characterization tests and fixtures for the text utilities
@@ -391,6 +391,14 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Found**: 2026-11-08
 - **Plan**: -
 - **Description**: Encrypted to the device public key (Admin Hub FEAT-030, v0.5.0), never shown to users, stored in the keychain.
+
+### FEAT-049: Release workflows: pre-release on -rc tags and promote workflow
+- **Priority**: high
+- **Epic**: EPIC-014
+- **Status**: open
+- **Found**: 2026-11-09, plan docmapper_m0_foundation
+- **Plan**: -
+- **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate.
 
 ## Improvements
 

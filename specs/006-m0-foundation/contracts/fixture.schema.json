@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parity fixture",
+  "type": "object",
+  "required": ["id", "module", "function", "input"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "module": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "function": { "type": "string", "minLength": 1 },
+    "input": { "type": "array" },
+    "output": {},
+    "error": {
+      "type": "object",
+      "required": ["name", "message"],
+      "properties": { "name": { "type": "string" }, "message": { "type": "string" } },
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    { "required": ["output"], "not": { "required": ["error"] } },
+    { "required": ["error"], "not": { "required": ["output"] } }
+  ],
+  "additionalProperties": false
+}
