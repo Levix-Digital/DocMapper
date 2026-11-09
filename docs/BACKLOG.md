@@ -35,25 +35,25 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 ### FEAT-009: Characterization tests and fixtures for profiles and .docmapper files
 - **Priority**: high
 - **Epic**: EPIC-004
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
 - **Description**: Parity on the stored JSON of each profile.
 
 ### FEAT-010: Rust profile model and ProfileRepository port
 - **Priority**: high
 - **Epic**: EPIC-004
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
 - **Description**: Ids and clock injected.
 
 ### FEAT-011: Local SQLite repository
 - **Priority**: high
 - **Epic**: EPIC-004
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
 - **Description**: WAL mode, additive migrations.
 
 ### FEAT-012: Central PostgreSQL repository by connection string
