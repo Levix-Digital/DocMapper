@@ -1,0 +1,12 @@
+[package]
+name = "docmapper-core"
+description = "DocMapper domain: profiles, extraction, batch, validation, stamping layout and enforcement points"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lints]
+workspace = true

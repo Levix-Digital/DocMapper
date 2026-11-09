@@ -1,0 +1,15 @@
+{
+  "id": "describe-fraction",
+  "module": "harness",
+  "function": "describe",
+  "input": [
+    0.3,
+    "tenths"
+  ],
+  "output": {
+    "label": "tenths",
+    "half": 0.15,
+    "shifted": 0.4,
+    "sign": "non-negative"
+  }
+}

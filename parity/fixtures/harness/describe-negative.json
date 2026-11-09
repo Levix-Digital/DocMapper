@@ -1,0 +1,15 @@
+{
+  "id": "describe-negative",
+  "module": "harness",
+  "function": "describe",
+  "input": [
+    -7.25,
+    "below"
+  ],
+  "output": {
+    "label": "below",
+    "half": -3.625,
+    "shifted": -7.15,
+    "sign": "negative"
+  }
+}

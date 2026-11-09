@@ -129,3 +129,12 @@ Thumbs.db
 # Project specific
 temp-assets/
 frontend/src/modules/core-wasm/build/
+# Rust
+target/
+
+# Tauri generated schemas
+crates/docmapper-desktop/gen/
+
+# Emitted by vue-tsc -b for the Vite configuration
+frontend/vite.config.js
+frontend/vite.config.d.ts

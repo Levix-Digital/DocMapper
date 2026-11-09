@@ -6,7 +6,10 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "asbuild": "asc src/modules/core-wasm/assembly/index.ts --target release --outFile src/modules/core-wasm/build/release.wasm --optimize --exportRuntime"
+    "asbuild": "asc src/modules/core-wasm/assembly/index.ts --target release --outFile src/modules/core-wasm/build/release.wasm --optimize --exportRuntime",
+    "test": "vitest run --project unit",
+    "test:parity": "vitest run --project parity",
+    "tauri": "node scripts/tauri.mjs"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.28.9",
@@ -20,6 +23,7 @@
     "vue": "^3.5.25"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^24.10.1",
     "@types/qrcode": "^1.5.6",
@@ -29,10 +33,12 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.3.5",
     "terser": "^5.44.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.2.6",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.5.0",
+    "vitest": "^4.0.15",
     "vue-tsc": "^3.1.5"
   }
 }

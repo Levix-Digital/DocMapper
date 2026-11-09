@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/docmapper-core",
+    "crates/docmapper-desktop",
+    "crates/docmapper-parity",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+repository = "https://github.com/Levix-Digital/DocMapper"
+rust-version = "1.97"
+
+[workspace.dependencies]
+docmapper-core = { path = "crates/docmapper-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "warn"

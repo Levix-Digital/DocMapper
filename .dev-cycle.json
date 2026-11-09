@@ -6,7 +6,9 @@
   "devops": {
     "branching": "trunk",
     "production_branch": "main",
-    "version_files": []
+    "version_files": [
+      "Cargo.toml"
+    ]
   },
   "speckit": {
     "enabled": true,
@@ -33,5 +35,14 @@
       "docmapper_desktop",
       "docmapper_mcp"
     ]
-  }
+  },
+  "test_commands": [
+    "cargo fmt --all --check",
+    "cargo clippy --workspace --all-targets -- -D warnings",
+    "cargo test --workspace",
+    "npm test --prefix frontend",
+    "npm run test:parity --prefix frontend",
+    "cargo test -p docmapper-parity -- --include-ignored",
+    "cargo run -q -p docmapper-parity --bin parity-check"
+  ]
 }

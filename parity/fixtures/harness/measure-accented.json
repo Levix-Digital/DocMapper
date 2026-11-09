@@ -1,0 +1,12 @@
+{
+  "id": "measure-accented",
+  "module": "harness",
+  "function": "measure",
+  "input": [
+    "São Paulo"
+  ],
+  "output": {
+    "length": 9,
+    "upper": "SÃO PAULO"
+  }
+}

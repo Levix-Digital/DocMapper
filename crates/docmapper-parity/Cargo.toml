@@ -1,0 +1,18 @@
+[package]
+name = "docmapper-parity"
+description = "Parity harness of the migration: fixtures, runner, oracle client and id checker"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+serde_json.workspace = true
+
+[dev-dependencies]
+proptest = "1"
+
+[lints]
+workspace = true

@@ -141,6 +141,43 @@ If a document experiences catastrophic structural deformation that violates geom
 | **Elastic Layout Support** | Fails when fields expand | **Automatic elastic correction & proportion preservation** |
 | **Printer Scale Sensitivity** | Fails on Letter vs. A4 | **100% Invariant to Scale & Margins** |
 
+## Installation
+
+DocMapper runs as a desktop application (a Tauri shell over a Rust core) and, during the migration to Rust, also in the browser from the same interface code. There are no installers yet (they come with version 1.0); build it from source.
+
+- Rust through [rustup](https://rustup.rs): the toolchain pinned in `rust-toolchain.toml` installs itself on the first `cargo` command.
+- Node.js 22 and npm (the interface and the parity tools).
+- Linux only: the system packages for the desktop window, `sudo apt-get install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`. Windows needs the WebView2 runtime (part of Windows 11) and macOS needs the Xcode command line tools.
+
+```bash
+npm ci --prefix frontend
+npm run asbuild --prefix frontend            # AssemblyScript module used by the interface
+npm run tauri --prefix frontend -- build     # desktop release build and installer for this platform
+```
+
+## Usage
+
+```bash
+npm run tauri --prefix frontend -- dev       # desktop app with the live interface
+npm run dev --prefix frontend                # browser version on http://localhost:5173
+```
+
+The release build is at `target/release/docmapper-desktop` (`.exe` on Windows), with its bundle under `target/release/bundle`. The interface checks its license online as before: set `VITE_LICENSE_SERVER` and `VITE_LICENSE_KEY` (see `.env.example`) for both versions.
+
+## Development
+
+```bash
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+npm test --prefix frontend                   # TypeScript unit tests
+npm run test:parity --prefix frontend        # characterization cases against the committed fixtures
+cargo test -p docmapper-parity -- --include-ignored   # Rust parity tests and fuzzing against the TypeScript oracle
+cargo run -q -p docmapper-parity --bin parity-check   # fails when a case id exists on one side only
+```
+
+After changing a characterization case, write its fixtures with `PARITY_UPDATE=1 npm run test:parity --prefix frontend` and review the diff before committing. How the harness works and how to add a module: [Parity Harness](docs/architecture/parity.md). Every pull request runs these checks in CI.
+
 ## License
 
 Private repository of Levix Digital. Proprietary software: customers with an active agreement

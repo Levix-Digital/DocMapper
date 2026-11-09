@@ -1,0 +1,12 @@
+{
+  "id": "measure-ascii",
+  "module": "harness",
+  "function": "measure",
+  "input": [
+    "cmr 42"
+  ],
+  "output": {
+    "length": 6,
+    "upper": "CMR 42"
+  }
+}
