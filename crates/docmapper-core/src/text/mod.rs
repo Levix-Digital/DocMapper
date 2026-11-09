@@ -2,7 +2,7 @@
 //! semantics (migration module M1, parity module `text`).
 
 pub mod ecmascript;
-mod file_name;
+pub(crate) mod file_name;
 pub mod js_value;
 mod property_map;
 mod translation;

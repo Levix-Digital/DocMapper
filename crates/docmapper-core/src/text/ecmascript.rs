@@ -105,6 +105,100 @@ pub fn eq_ignore_ascii_case_chars(text: &str, literal: &str) -> bool {
     text.eq_ignore_ascii_case(literal)
 }
 
+/// `Number.prototype.toString(radix)` for a finite number and a radix from 2
+/// to 36: V8's `DoubleToRadixCString`, with its f64 operations in the same
+/// order, so the digits are the same (fraction digits up to the precision of
+/// the input, rounded half to even on the last one).
+pub fn number_to_radix_string(value: f64, radix: u32) -> String {
+    const DIGITS: &[u8; 36] = b"0123456789abcdefghijklmnopqrstuvwxyz";
+    debug_assert!((2..=36).contains(&radix) && value.is_finite());
+    let radix_f = f64::from(radix);
+    let negative = value < 0.0;
+    let value = value.abs();
+    let mut integer = value.floor();
+    let mut fraction = value - integer;
+    let mut delta = (0.5 * (next_double(value) - value)).max(next_double(0.0));
+    let mut fraction_digits: Vec<u8> = Vec::new();
+    let mut has_point = false;
+    if fraction >= delta {
+        has_point = true;
+        loop {
+            fraction *= radix_f;
+            delta *= radix_f;
+            // `fraction` is in [0, radix) here, so the cast keeps the digit.
+            let digit = fraction as u32;
+            fraction_digits.push(DIGITS[digit as usize]);
+            fraction -= f64::from(digit);
+            if (fraction > 0.5 || (fraction == 0.5 && digit & 1 == 1)) && fraction + delta > 1.0 {
+                // Carry into the digits already written.
+                loop {
+                    match fraction_digits.pop() {
+                        None => {
+                            integer += 1.0;
+                            has_point = false;
+                            break;
+                        }
+                        Some(c) => {
+                            let d = if c > b'9' {
+                                u32::from(c - b'a') + 10
+                            } else {
+                                u32::from(c - b'0')
+                            };
+                            if d + 1 < radix {
+                                fraction_digits.push(DIGITS[(d + 1) as usize]);
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            if fraction < delta {
+                break;
+            }
+        }
+    }
+    let mut integer_digits: Vec<u8> = Vec::new();
+    while double_exponent(integer / radix_f) > 0 {
+        integer /= radix_f;
+        integer_digits.push(b'0');
+    }
+    loop {
+        let remainder = integer % radix_f;
+        integer_digits.push(DIGITS[remainder as usize]);
+        integer = (integer - remainder) / radix_f;
+        if integer <= 0.0 {
+            break;
+        }
+    }
+    let mut text = String::with_capacity(integer_digits.len() + fraction_digits.len() + 2);
+    if negative {
+        text.push('-');
+    }
+    text.extend(integer_digits.iter().rev().map(|b| char::from(*b)));
+    if has_point {
+        text.push('.');
+        text.extend(fraction_digits.iter().map(|b| char::from(*b)));
+    }
+    text
+}
+
+/// The next f64 above a finite, non-negative `value`.
+fn next_double(value: f64) -> f64 {
+    f64::from_bits(value.to_bits() + 1)
+}
+
+/// The exponent of `value` written as a 53-bit integer significand times a
+/// power of two (V8 `Double::Exponent`).
+fn double_exponent(value: f64) -> i32 {
+    let biased = ((value.to_bits() >> 52) & 0x7ff) as i32;
+    if biased == 0 {
+        -1074
+    } else {
+        biased - 1075
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -181,5 +275,35 @@ mod tests {
             "{originalname}"
         ));
         assert!(!eq_ignore_ascii_case_chars("\u{212A}", "k"));
+    }
+
+    #[test]
+    fn radix_text_matches_v8() {
+        let tiny = format!("0.{}3", "0".repeat(207));
+        // Expected values printed by Node.js 22 (`x.toString(36)`).
+        let cases: &[(f64, &str)] = &[
+            (0.0, "0"),
+            (0.5, "0.i"),
+            (0.25, "0.9"),
+            (0.123, "0.4feornbt361"),
+            (0.123456789, "0.4fzzzxjylrx"),
+            (0.000001, "0.0001ogs5wo29m8"),
+            (0.9999999999999999, "0.zzzzzzzzzza"),
+            (1.0, "1"),
+            (35.5, "z.i"),
+            (36.0, "10"),
+            (-0.75, "-0.r"),
+            (9007199254740993.0, "2gosa7pa2gw"),
+            (1e21, "5v1j4f4ds7c000"),
+        ];
+        for (value, expected) in cases {
+            assert_eq!(number_to_radix_string(*value, 36), *expected, "{value}");
+        }
+        assert_eq!(number_to_radix_string(5e-324, 36), tiny);
+        assert_eq!(
+            number_to_radix_string(0.1, 2),
+            "0.0001100110011001100110011001100110011001100110011001101"
+        );
+        assert_eq!(number_to_radix_string(255.0, 16), "ff");
     }
 }

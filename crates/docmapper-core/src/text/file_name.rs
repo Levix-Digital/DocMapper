@@ -79,7 +79,7 @@ impl CalendarDate {
 
 /// Year, month and day of a count of days since 1970-01-01 (proleptic
 /// Gregorian calendar; H. Hinnant's `civil_from_days`).
-fn civil_from_days(days: i64) -> (i64, u8, u8) {
+pub(crate) fn civil_from_days(days: i64) -> (i64, u8, u8) {
     let z = days + 719_468;
     let era = z.div_euclid(146_097);
     let day_of_era = z - era * 146_097;
