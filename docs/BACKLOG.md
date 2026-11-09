@@ -11,17 +11,17 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 ### FEAT-005: Characterization tests and fixtures for the text utilities
 - **Priority**: high
 - **Epic**: EPIC-002
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
 - **Description**: Full branch coverage in TypeScript.
 
 ### FEAT-006: Rust port of the text utilities with ECMAScript regex and string semantics
 - **Priority**: high
 - **Epic**: EPIC-002
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
 - **Description**: regress, UTF-16 indexing, ECMAScript whitespace; fixtures and proptest fuzzing pass.
 
 ### FEAT-007: Characterization tests and fixtures for the CMR core
