@@ -1,0 +1,13 @@
+{
+  "id": "pattern-group-name-lone-surrogate",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<\\ud835>x)",
+    "x"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /(?<\\ud835>x)/: Invalid capture group name"
+  }
+}

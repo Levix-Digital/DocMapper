@@ -1,0 +1,13 @@
+{
+  "id": "pattern-repeated-group-name-escaped",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<a>x)|(?<\\u0061>y)",
+    "x"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /(?<a>x)|(?<\\u0061>y)/: Duplicate capture group name"
+  }
+}

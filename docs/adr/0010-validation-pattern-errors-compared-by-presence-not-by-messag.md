@@ -15,7 +15,7 @@ amended_by: []
 
 ## Context
 
-ADR-0003 requires the Rust port of each module to give exactly the outputs of the TypeScript code. `testRegexPattern` returns `{matches, error?}`, and for an invalid pattern `error` holds the message of the JavaScript engine (V8: `Invalid regular expression: /(/: Unterminated group`). The Rust port uses the `regress` crate (named by ADR-0003), whose messages differ (`Unbalanced parenthesis`). V8 and `regress` agree on which patterns are invalid (checked by fixtures and differential fuzzing), but not on the words. No caller reads `error`: `mapping-runner.ts` and `gemini-service.ts` read only `matches`.
+ADR-0003 requires the Rust port of each module to give exactly the outputs of the TypeScript code. `testRegexPattern` returns `{matches, error?}`, and for an invalid pattern `error` holds the message of the JavaScript engine (V8: `Invalid regular expression: /(/: Unterminated group`). The Rust port uses the `regress` crate (named by ADR-0003), whose messages differ (`Unbalanced parenthesis`). With the rewrites and early checks of the core (legacy escapes, group names, quantified word boundaries, modifier groups, repeated group names), V8 and `regress` agree on which patterns are invalid for every characterization case and for the patterns the fuzzing grammar generates; they do not agree on the words. No caller reads `error`: `mapping-runner.ts` and `gemini-service.ts` read only `matches`.
 
 ## Decision
 

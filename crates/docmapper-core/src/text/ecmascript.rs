@@ -41,6 +41,9 @@ pub fn to_lower_case(text: &str) -> String {
 
 /// The `length` of a JavaScript string: its UTF-16 code units.
 pub fn utf16_len(text: &str) -> u64 {
+    if text.is_ascii() {
+        return text.len() as u64;
+    }
     text.chars().map(|c| c.len_utf16() as u64).sum()
 }
 
@@ -62,8 +65,7 @@ pub fn pad_start(text: &str, max_length: f64, fill: char) -> Result<String, Stri
     // ToLength truncates a fraction.
     let target = max_length.trunc() as u64;
     let missing = usize::try_from(target.saturating_sub(length)).map_err(|_| StringTooLong)?;
-    let mut padded = String::with_capacity(missing + text.len());
-    padded.extend(std::iter::repeat_n(fill, missing));
+    let mut padded = fill.to_string().repeat(missing);
     padded.push_str(text);
     Ok(padded)
 }

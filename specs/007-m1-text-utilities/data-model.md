@@ -21,7 +21,8 @@ A UTC calendar date from 1970-01-01 to 9999-12-31, built from Unix milliseconds 
 | Variant | When | JavaScript error it stands for |
 |---|---|---|
 | `InheritedMemberToken { token }` | A field token names an `Object.prototype` member absent from the extracted data | `TypeError: extractedData[trimmed].trim is not a function` |
-| `StringTooLong { length }` | A `{seq:N}` width pads past 536,870,888 UTF-16 units | `RangeError: Invalid string length` |
+| `StringTooLong` | The name, or any step building it (padding, a replacement, the extension), passes 536,870,888 UTF-16 units | `RangeError: Invalid string length` |
+| `IndexOutOfRange { doc_index }` | The document index is above 2^53 − 2 (outside what callers pass) | none (refused before any JavaScript-visible step) |
 
 The core does not hold JavaScript message texts; the parity tests map each variant to its JavaScript name and message.
 
@@ -34,8 +35,12 @@ The core does not hold JavaScript message texts; the parity tests map each varia
 
 ## PropertyMap<V>
 
-An ordered map with ECMAScript property order: canonical array-index keys (0 to 2^32 − 2, no leading zeros) first in ascending numeric order, then the other keys in first-insertion order. Setting an existing key keeps its position. `set_ordinary` ignores the key `__proto__` when the value is not an object, as an assignment to a plain object does.
+An ordered map with ECMAScript property order: canonical array-index keys (0 to 2^32 − 2, no leading zeros) first in ascending numeric order, then the other keys in first-insertion order. Setting an existing key keeps its position. `assign_primitive` ignores the key `__proto__` when the value is not an object, as an assignment to a plain object does.
 
 ## FlatDictionary
 
-`PropertyMap<String>`: dot-separated paths to text, the output of `flatten_dictionary`. Leaves convert as `String(value)`: text as is, numbers as `Number.prototype.toString`, booleans as `true`/`false`, arrays as `Array.prototype.join(',')` with `null` as empty text and objects as `[object Object]`; `null` leaves are skipped; objects recurse.
+`PropertyMap<String>`: dot-separated paths to text, the output of `flatten_dictionary` (which returns `Result<FlatDictionary, LeafWithoutText>`). Leaves convert as `String(value)`: text as is, numbers as `Number.prototype.toString`, booleans as `true`/`false`, arrays as `Array.prototype.join(',')` with `null` as empty text and objects as `[object Object]`; `null` leaves are skipped; objects recurse.
+
+## LeafWithoutText
+
+The error of `flatten_dictionary` when a leaf has no text: an array holding an object with an own `toString` key, where JavaScript throws `TypeError: Cannot convert object to primitive value`. Carries the leaf's `path`.

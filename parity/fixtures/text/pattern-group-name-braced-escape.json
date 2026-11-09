@@ -1,0 +1,12 @@
+{
+  "id": "pattern-group-name-braced-escape",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<\\u{62}>x)\\k<b>",
+    "xx"
+  ],
+  "output": {
+    "matches": true
+  }
+}

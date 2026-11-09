@@ -56,6 +56,8 @@ group('text', () => {
     name('seq-width-zero', options('doc-{seq:0}', { docIndex: 41 }))
     name('seq-malformed', options('{seq:}{seq:x}{seq:12x}{seq :3}', { docIndex: 6 }))
     name('seq-width-too-large', options('{seq:99999999999}'))
+    name('seq-name-over-limit-after-extension', options('{seq:536870888}'))
+    name('seq-names-over-limit-together', options('{seq:300000000}{seq:300000000}'))
     name('seq-width-infinite', options(`{seq:${'9'.repeat(400)}}`))
     name('index', options('{index}-{INDEX}', { docIndex: 99 }))
     name('date', options('{date}_{Date}'))
@@ -118,6 +120,14 @@ group('text', () => {
     pattern('astral-class', '^[😀]$', '😀')
     pattern('escaped-surrogates', '^\\uD83D\\uDE00$', '😀')
     pattern('backslash-c-literal', '^\\c\\u*$', '\\cuu')
+    pattern('modifier-group', '(?i:a)', 'A')
+    pattern('group-name-braced-escape', '(?<\\u{62}>x)\\k<b>', 'xx')
+    pattern('group-reference-escape', '(?<a>x)\\k<\\u0061>', 'xx')
+    pattern('group-name-astral', '(?<𝒜>x)', 'x')
+    pattern('group-name-escaped-pair', '(?<\\ud835\\udc9c>x)', 'x')
+    pattern('group-name-lone-surrogate', '(?<\\ud835>x)', 'x')
+    pattern('repeated-group-name-escaped', '(?<a>x)|(?<\\u0061>y)', 'x')
+    pattern('reference-without-groups', '^\\k<\\u{2}>$', 'k<uu>')
     pattern('backslash-c-class-digit', '^[\\c1]$', '\u0011')
 
     // Dictionary flattening

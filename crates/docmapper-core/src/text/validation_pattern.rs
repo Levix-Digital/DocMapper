@@ -37,6 +37,12 @@ pub fn check_validation_pattern(pattern: &str, candidate: &str) -> PatternCheck 
 }
 
 const BACKSLASH: u32 = '\\' as u32;
+const GROUP_OPEN: [u32; 3] = ['(' as u32, '?' as u32, '<' as u32];
+const BACKREFERENCE_OPEN: [u32; 3] = ['\\' as u32, 'k' as u32, '<' as u32];
+const NAME_CLOSE: u32 = '>' as u32;
+/// Letters that start a modifier group (`(?i:...)`, `(?-m:...)`), which V8
+/// in Node.js 22 does not support.
+const MODIFIER_STARTS: [u32; 4] = ['i' as u32, 'm' as u32, 's' as u32, '-' as u32];
 const LETTER_U: u32 = 'u' as u32;
 const LETTER_C: u32 = 'c' as u32;
 /// Digits of a `\uHHHH` escape.
@@ -50,13 +56,36 @@ const HEX4_DIGITS: usize = 4;
 ///   `u` repeated 61 times; `regress` reads a code point);
 /// - a `\uHHHH` escape of a surrogate stands for that one code unit
 ///   (`regress` joins `\uD83D\uDE00` into one code point), so it is passed
-///   as the raw unit.
+///   as the raw unit;
+/// - `\c` without a control letter is a literal backslash.
+///
+/// Group names (`(?<name>` and, when the pattern has named groups,
+/// `\k<name>`) are identifiers read as code points, with `\u{...}` and
+/// surrogate pairs allowed even without the Unicode flag; they are passed
+/// decoded.
 fn pattern_code_units(units: &[u32]) -> Vec<u32> {
+    let has_named_groups = !group_names(units).is_empty();
     let mut result = Vec::with_capacity(units.len());
     let mut in_class = false;
     let mut i = 0;
     while i < units.len() {
         let unit = units[i];
+        if !in_class {
+            let reference = has_named_groups && units[i..].starts_with(&BACKREFERENCE_OPEN);
+            let name = if reference {
+                name_until_close(&units[i + BACKREFERENCE_OPEN.len()..])
+                    .map(|name| (BACKREFERENCE_OPEN.len(), name))
+            } else {
+                group_name_at(&units[i..]).map(|name| (GROUP_OPEN.len(), name))
+            };
+            if let Some((open, name)) = name {
+                result.extend_from_slice(&units[i..i + open]);
+                result.extend(decode_name(name).unwrap_or_else(|| name.to_vec()));
+                result.push(NAME_CLOSE);
+                i += open + name.len() + 1;
+                continue;
+            }
+        }
         if unit != BACKSLASH || i + 1 >= units.len() {
             if in_class {
                 in_class = unit != u32::from(b']');
@@ -104,10 +133,22 @@ fn is_control_letter(unit: Option<u32>, in_class: bool) -> bool {
 }
 
 /// Syntax errors JavaScript (V8 in Node.js 22) reports and `regress`
-/// accepts: a quantified word boundary (`\b*`, `\B{2}`) and a capture group
-/// name used twice, even in different alternatives.
+/// accepts: a quantified word boundary (`\b*`, `\B{2}`), a modifier group
+/// (`(?i:a)`) and a capture group name used twice, even in different
+/// alternatives or spelled with escapes.
 fn early_error(units: &[u32]) -> Option<&'static str> {
-    let mut names: Vec<&[u32]> = Vec::new();
+    let names = group_names(units);
+    let decoded: Vec<Vec<u32>> = names
+        .iter()
+        .map(|name| decode_name(name).unwrap_or_else(|| name.to_vec()))
+        .collect();
+    if decoded
+        .iter()
+        .enumerate()
+        .any(|(index, name)| decoded[..index].contains(name))
+    {
+        return Some("Duplicate capture group name");
+    }
     let mut in_class = false;
     let mut i = 0;
     while i < units.len() {
@@ -127,22 +168,105 @@ fn early_error(units: &[u32]) -> Option<&'static str> {
             in_class = unit != u32::from(b']');
         } else if unit == u32::from(b'[') {
             in_class = true;
-        } else if let Some(name) = group_name_at(&units[i..]) {
-            if names.contains(&name) {
-                return Some("Duplicate capture group name");
-            }
-            names.push(name);
+        } else if units[i..].starts_with(&GROUP_OPEN[..2])
+            && units
+                .get(i + 2)
+                .is_some_and(|next| MODIFIER_STARTS.contains(next))
+        {
+            return Some("Invalid group");
         }
         i += 1;
     }
     None
 }
 
+/// The raw names of the `(?<name>` groups outside classes, in order.
+fn group_names(units: &[u32]) -> Vec<&[u32]> {
+    let mut names = Vec::new();
+    let mut in_class = false;
+    let mut i = 0;
+    while i < units.len() {
+        let unit = units[i];
+        if unit == BACKSLASH {
+            let literal_backslash = units.get(i + 1) == Some(&LETTER_C)
+                && !is_control_letter(units.get(i + 2).copied(), in_class);
+            i += if literal_backslash { 1 } else { 2 };
+            continue;
+        }
+        if in_class {
+            in_class = unit != u32::from(b']');
+        } else if unit == u32::from(b'[') {
+            in_class = true;
+        } else if let Some(name) = group_name_at(&units[i..]) {
+            names.push(name);
+        }
+        i += 1;
+    }
+    names
+}
+
+/// The units up to the first `>`.
+fn name_until_close(units: &[u32]) -> Option<&[u32]> {
+    let end = units.iter().position(|unit| *unit == NAME_CLOSE)?;
+    Some(&units[..end])
+}
+
+/// A group name as code points: `\uHHHH` and `\u{...}` escapes decoded and
+/// surrogate pairs joined. `None` when the name holds another escape (the
+/// regex engine then reports the name as invalid, as JavaScript does).
+fn decode_name(name: &[u32]) -> Option<Vec<u32>> {
+    let mut units = Vec::with_capacity(name.len());
+    let mut i = 0;
+    while i < name.len() {
+        if name[i] != BACKSLASH {
+            units.push(name[i]);
+            i += 1;
+            continue;
+        }
+        if name.get(i + 1) != Some(&LETTER_U) {
+            return None;
+        }
+        if name.get(i + 2) == Some(&u32::from(b'{')) {
+            let digits = name_until(&name[i + 3..], u32::from(b'}'))?;
+            let value = hex_value(digits).filter(|v| *v <= 0x10FFFF)?;
+            units.push(value);
+            i += 3 + digits.len() + 1;
+        } else {
+            units.push(hex4(name.get(i + 2..i + 2 + HEX4_DIGITS))?);
+            i += 2 + HEX4_DIGITS;
+        }
+    }
+    Some(join_surrogate_pairs(&units))
+}
+
+fn name_until(units: &[u32], close: u32) -> Option<&[u32]> {
+    let end = units.iter().position(|unit| *unit == close)?;
+    Some(&units[..end])
+}
+
+fn join_surrogate_pairs(units: &[u32]) -> Vec<u32> {
+    let mut points = Vec::with_capacity(units.len());
+    let mut i = 0;
+    while i < units.len() {
+        let high = units[i];
+        match units.get(i + 1) {
+            Some(&low) if (0xD800..=0xDBFF).contains(&high) && (0xDC00..=0xDFFF).contains(&low) => {
+                points.push(0x10000 + ((high - 0xD800) << 10) + (low - 0xDC00));
+                i += 2;
+            }
+            _ => {
+                points.push(high);
+                i += 1;
+            }
+        }
+    }
+    points
+}
+
 /// The name of a `(?<name>` group starting at the first unit.
 fn group_name_at(units: &[u32]) -> Option<&[u32]> {
-    let rest = units.strip_prefix(&[u32::from(b'('), u32::from(b'?'), u32::from(b'<')])?;
-    let end = rest.iter().position(|unit| *unit == u32::from(b'>'))?;
-    let name = &rest[..end];
+    let rest = units.strip_prefix(&GROUP_OPEN)?;
+    let name = name_until_close(rest)?;
     let lookbehind =
         matches!(name.first(), Some(&u) if u == u32::from(b'=') || u == u32::from(b'!'));
     (!lookbehind).then_some(name)
@@ -175,10 +299,16 @@ fn starts_with_quantifier(units: &[u32]) -> bool {
 }
 
 fn hex4(digits: Option<&[u32]>) -> Option<u32> {
-    digits?.iter().try_fold(0, |value, unit| {
-        char::from_u32(*unit)?
-            .to_digit(16)
-            .map(|digit| value * 16 + digit)
+    hex_value(digits?)
+}
+
+fn hex_value(digits: &[u32]) -> Option<u32> {
+    if digits.is_empty() {
+        return None;
+    }
+    digits.iter().try_fold(0u32, |value, unit| {
+        let digit = char::from_u32(*unit)?.to_digit(16)?;
+        value.checked_mul(16)?.checked_add(digit)
     })
 }
 
@@ -272,7 +402,39 @@ mod tests {
     }
 
     #[test]
+    fn modifier_groups_are_errors() {
+        for pattern in ["(?i:a)", "(?-i:a)", "(?m:^a)", "(?s:.)", "(?i-m:a)"] {
+            assert!(
+                check_validation_pattern(pattern, "a").error.is_some(),
+                "{pattern}"
+            );
+        }
+        assert!(check_validation_pattern("[(?i:a)]", "a").error.is_none());
+        assert!(check_validation_pattern("\\(?i:a)", "a").error.is_some());
+    }
+
+    #[test]
+    fn group_names_are_identifiers_with_unicode_escapes() {
+        assert!(matches("(?<\\u{62}>x)", "x"));
+        assert!(matches("(?<\\u{61}>x)\\k<a>", "xx"));
+        assert!(matches("(?<a>x)\\k<\\u{61}>", "xx"));
+        assert!(matches("(?<a>x)\\k<\\u0061>", "xx"));
+        assert!(matches("(?<𝒜>x)", "x"));
+        assert!(matches("(?<\\ud835\\udc9c>x)", "x"));
+        assert!(check_validation_pattern("(?<\\ud835>x)", "x")
+            .error
+            .is_some());
+        assert!(matches("^\\k<\\u{2}>$", "k<uu>"));
+    }
+
+    #[test]
     fn repeated_group_names_are_errors() {
+        for pattern in ["(?<a>x)|(?<\\u0061>y)", "(?<\\u{61}>x)|(?<a>y)"] {
+            assert!(
+                check_validation_pattern(pattern, "").error.is_some(),
+                "{pattern}"
+            );
+        }
         for pattern in ["(?<a>x)|(?<a>y)", "(?<a>x)(?:(?<a>y))"] {
             assert!(
                 check_validation_pattern(pattern, "").error.is_some(),

@@ -1,0 +1,18 @@
+{
+  "id": "name-seq-name-over-limit-after-extension",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{seq:536870888}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "error": {
+    "name": "RangeError",
+    "message": "Invalid string length"
+  }
+}

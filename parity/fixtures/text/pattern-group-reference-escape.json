@@ -1,0 +1,12 @@
+{
+  "id": "pattern-group-reference-escape",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<a>x)\\k<\\u0061>",
+    "xx"
+  ],
+  "output": {
+    "matches": true
+  }
+}

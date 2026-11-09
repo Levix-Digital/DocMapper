@@ -9,6 +9,8 @@ use super::ecmascript::{self, StringTooLong};
 use super::property_map::PropertyMap;
 use std::fmt;
 
+/// Largest document index whose 1-based index is a safe JavaScript integer.
+const MAX_DOC_INDEX: u64 = (1 << 53) - 2;
 /// Default width of `{seq}` and of the index in the default name.
 const DEFAULT_SEQ_WIDTH: f64 = 3.0;
 /// Extension every output name ends with.
@@ -103,8 +105,12 @@ pub enum FileNameError {
     /// A field token names an inherited object member (for example
     /// `{toString}`) that the extracted data does not hold.
     InheritedMemberToken { token: String },
-    /// A `{seq:N}` width pads the number past the longest string allowed.
+    /// The name, or a step building it, is longer than the longest string
+    /// JavaScript allows.
     StringTooLong,
+    /// The document index is above 2^53 - 2, where JavaScript would round
+    /// the 1-based index (callers pass list positions, far below it).
+    IndexOutOfRange { doc_index: u64 },
 }
 
 impl fmt::Display for FileNameError {
@@ -114,7 +120,12 @@ impl fmt::Display for FileNameError {
                 f,
                 "the file name token '{{{token}}}' names an inherited object member"
             ),
-            Self::StringTooLong => write!(f, "a {{seq}} width makes the file name too long"),
+            Self::StringTooLong => {
+                write!(f, "the file name is longer than the longest string allowed")
+            }
+            Self::IndexOutOfRange { doc_index } => {
+                write!(f, "the document index {doc_index} is above 2^53 - 2")
+            }
         }
     }
 }
@@ -135,6 +146,11 @@ pub fn format_output_file_name(
     options: &FileNameOptions,
     today: CalendarDate,
 ) -> Result<String, FileNameError> {
+    if options.doc_index > MAX_DOC_INDEX {
+        return Err(FileNameError::IndexOutOfRange {
+            doc_index: options.doc_index,
+        });
+    }
     let base_name = ecmascript::trim(&strip_extension(&options.original_file_name)).to_string();
     let index = options.doc_index + 1;
     let pattern = options
@@ -146,11 +162,11 @@ pub fn format_output_file_name(
     let raw = if pattern.is_empty() {
         default_name(&base_name, index)?
     } else {
-        let raw = replace_literal(pattern, "{originalName}", &base_name);
-        let raw = replace_seq(&raw, index)?;
-        let raw = replace_literal(&raw, "{index}", &index.to_string());
-        let raw = replace_literal(&raw, "{date}", &today.iso());
-        replace_field_tokens(&raw, &options.extracted_data)?
+        let raw = within_limit(replace_literal(pattern, "{originalName}", &base_name))?;
+        let raw = within_limit(replace_seq(&raw, index)?)?;
+        let raw = within_limit(replace_literal(&raw, "{index}", &index.to_string()))?;
+        let raw = within_limit(replace_literal(&raw, "{date}", &today.iso()))?;
+        within_limit(replace_field_tokens(&raw, &options.extracted_data)?)?
     };
 
     let mut sanitized = sanitize(&raw);
@@ -160,7 +176,17 @@ pub fn format_output_file_name(
     if ecmascript::to_lower_case(&sanitized).ends_with(PDF_EXTENSION) {
         Ok(sanitized)
     } else {
-        Ok(sanitized + PDF_EXTENSION)
+        Ok(within_limit(sanitized + PDF_EXTENSION)?)
+    }
+}
+
+/// Fails as JavaScript does when a step builds a string longer than V8
+/// allows (each step only grows the name, so checking its result is enough).
+fn within_limit(text: String) -> Result<String, StringTooLong> {
+    if ecmascript::utf16_len(&text) > ecmascript::MAX_STRING_LENGTH_UTF16 {
+        Err(StringTooLong)
+    } else {
+        Ok(text)
     }
 }
 
@@ -443,6 +469,29 @@ mod tests {
         assert_eq!(
             name(Some("{seq:99999999999}"), "a", &[]),
             Err(FileNameError::StringTooLong)
+        );
+    }
+
+    #[test]
+    fn the_whole_name_is_bounded_by_the_maximum_string_length() {
+        assert_eq!(
+            name(Some("{seq:536870888}"), "a", &[]),
+            Err(FileNameError::StringTooLong)
+        );
+        assert_eq!(within_limit("a".repeat(10)), Ok("a".repeat(10)));
+    }
+
+    #[test]
+    fn index_above_the_safe_range_is_refused() {
+        let options = FileNameOptions {
+            doc_index: u64::MAX,
+            ..FileNameOptions::default()
+        };
+        assert_eq!(
+            format_output_file_name(&options, date()),
+            Err(FileNameError::IndexOutOfRange {
+                doc_index: u64::MAX
+            })
         );
     }
 
