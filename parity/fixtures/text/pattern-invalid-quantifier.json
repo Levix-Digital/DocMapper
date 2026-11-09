@@ -1,0 +1,13 @@
+{
+  "id": "pattern-invalid-quantifier",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "a**",
+    "a"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /a**/: Nothing to repeat"
+  }
+}

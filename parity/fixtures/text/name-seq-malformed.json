@@ -1,0 +1,15 @@
+{
+  "id": "name-seq-malformed",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{seq:}{seq:x}{seq:12x}{seq :3}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 6
+    },
+    1762695900000
+  ],
+  "output": "CMR 2025-118_007.pdf"
+}

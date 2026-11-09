@@ -1,0 +1,12 @@
+{
+  "id": "pattern-escaped-surrogates",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\uD83D\\uDE00$",
+    "😀"
+  ],
+  "output": {
+    "matches": true
+  }
+}

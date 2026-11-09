@@ -6,23 +6,31 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 
 ## Bugs
 
+### BUG-001: Output file name pattern token naming an inherited object member throws
+- **Severity**: low
+- **Epic**: EPIC-007
+- **Status**: open
+- **Found**: 2026-11-09, M1 characterization (specs/007-m1-text-utilities)
+- **Plan**: -
+- **Description**: formatOutputFileName: a token such as {toString}, {constructor} or {__proto__} that is not an extracted field finds the Object.prototype member and throws TypeError 'extractedData[trimmed].trim is not a function', so the whole document fails. Kept for parity in M1 (ADR-0003); fix after the switch in M6: look up own keys only.
+
+### BUG-002: Dollar patterns in the original file name are expanded in output names
+- **Severity**: low
+- **Epic**: EPIC-007
+- **Status**: open
+- **Found**: 2026-11-09, M1 characterization (specs/007-m1-text-utilities)
+- **Plan**: -
+- **Description**: formatOutputFileName inserts the original name with String.prototype.replace and a string replacement, so $&, $`, $' and $$ in the name are expanded (a$&b.pdf with {originalName} gives ab.pdf). Kept for parity in M1 (ADR-0003); fix after the switch in M6: insert the name literally.
+
+### BUG-003: Dictionary array holding an object with a toString key fails to flatten
+- **Severity**: low
+- **Epic**: EPIC-009
+- **Status**: open
+- **Found**: 2026-11-09, M1 differential fuzzing (specs/007-m1-text-utilities)
+- **Plan**: -
+- **Description**: flattenDictionary turns arrays into text with String(array); an object item with an own toString key throws TypeError 'Cannot convert object to primitive value'. Translation files do not hold such values today. Kept for parity in M1 (ADR-0003); fix after the switch in M8.
+
 ## Features
-
-### FEAT-005: Characterization tests and fixtures for the text utilities
-- **Priority**: high
-- **Epic**: EPIC-002
-- **Status**: in_progress
-- **Found**: 2026-11-08
-- **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
-- **Description**: Full branch coverage in TypeScript.
-
-### FEAT-006: Rust port of the text utilities with ECMAScript regex and string semantics
-- **Priority**: high
-- **Epic**: EPIC-002
-- **Status**: in_progress
-- **Found**: 2026-11-08
-- **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
-- **Description**: regress, UTF-16 indexing, ECMAScript whitespace; fixtures and proptest fuzzing pass.
 
 ### FEAT-007: Characterization tests and fixtures for the CMR core
 - **Priority**: high
@@ -501,3 +509,21 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
 - **Closed**: 2026-11-09, plan docmapper_m0_foundation_cargo_workspace_tauri_shell_parity_harness_and_ci
 - **Description**: cargo fmt, clippy, test; Vitest; parity checker.
+
+### FEAT-005: Characterization tests and fixtures for the text utilities
+- **Priority**: high
+- **Epic**: EPIC-002
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
+- **Closed**: 2026-11-09, plan docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
+- **Description**: Full branch coverage in TypeScript.
+
+### FEAT-006: Rust port of the text utilities with ECMAScript regex and string semantics
+- **Priority**: high
+- **Epic**: EPIC-002
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
+- **Closed**: 2026-11-09, plan docmapper_m1_text_utilities_characterization_and_rust_port_with_ecmascript_semantics
+- **Description**: regress, UTF-16 indexing, ECMAScript whitespace; fixtures and proptest fuzzing pass.

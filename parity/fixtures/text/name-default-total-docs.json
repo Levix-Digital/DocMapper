@@ -1,0 +1,15 @@
+{
+  "id": "name-default-total-docs",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 11,
+      "totalDocs": 12
+    },
+    1762695900000
+  ],
+  "output": "CMR 2025-118_012.pdf"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "name-index",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{index}-{INDEX}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 99
+    },
+    1762695900000
+  ],
+  "output": "100-100.pdf"
+}

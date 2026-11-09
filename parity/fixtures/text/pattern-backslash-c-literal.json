@@ -1,0 +1,12 @@
+{
+  "id": "pattern-backslash-c-literal",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\c\\u*$",
+    "\\cuu"
+  ],
+  "output": {
+    "matches": true
+  }
+}

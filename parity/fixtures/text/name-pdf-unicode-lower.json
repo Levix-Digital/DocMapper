@@ -1,0 +1,15 @@
+{
+  "id": "name-pdf-unicode-lower",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "ẞ.PDF",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "ẞ.PDF"
+}

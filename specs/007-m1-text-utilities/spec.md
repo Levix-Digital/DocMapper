@@ -76,6 +76,7 @@ Differential fuzzing sends generated inputs, biased toward the hard cases (Unico
 - Case conversion of non-ASCII text (for example `İ`, final sigma): the port uses the full Unicode case mapping JavaScript uses.
 - Dictionary keys that are canonical array indexes (for example `"10"` and `"2"`): JavaScript lists them first, in numeric order; the port reproduces that order in its output.
 - A top-level dictionary key `__proto__` with a text value: JavaScript drops it from the result; the port reproduces it.
+- A dictionary array holding an object with an own `toString` key: JavaScript throws a type error; the port reproduces it (captured in the backlog).
 - Dictionary values that are numbers, booleans, arrays or `null`: numbers and booleans become JavaScript text, arrays become comma-joined text, `null` is skipped; numbers use JavaScript formatting (for example `1e+21`, `0.1`).
 - An empty pattern, a pattern of only spaces or a pattern that sanitizes to nothing: the default name `<original>_<seq>.pdf` is used.
 - Validation patterns using legacy JavaScript syntax accepted without the Unicode flag (for example `a{`, `]`, `\8`, `\k`): accepted the same way by both sides.

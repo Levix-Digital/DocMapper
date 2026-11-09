@@ -1,0 +1,18 @@
+{
+  "id": "name-field-inherited-proto",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{ __proto__ }",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "error": {
+    "name": "TypeError",
+    "message": "extractedData[trimmed].trim is not a function"
+  }
+}

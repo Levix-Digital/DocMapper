@@ -1,0 +1,14 @@
+{
+  "id": "name-default-no-extension",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "originalFileName": "scan",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "scan_001.pdf"
+}

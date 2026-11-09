@@ -1,0 +1,12 @@
+{
+  "id": "pattern-astral-alternation",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "😀|(a)",
+    "😀"
+  ],
+  "output": {
+    "matches": true
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "pattern-quantified-boundary",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "\\b*",
+    ""
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /\\b*/: Nothing to repeat"
+  }
+}

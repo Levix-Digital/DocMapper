@@ -1,0 +1,18 @@
+{
+  "id": "name-field-inherited-member",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{toString}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "error": {
+    "name": "TypeError",
+    "message": "extractedData[trimmed].trim is not a function"
+  }
+}

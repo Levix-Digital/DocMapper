@@ -1,0 +1,12 @@
+{
+  "id": "pattern-named-group",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<y>\\d{4})-\\k<y>",
+    "2025-2025"
+  ],
+  "output": {
+    "matches": true
+  }
+}

@@ -27,4 +27,4 @@ Owns the interface texts in several languages: the base dictionaries, machine tr
 
 ## Decisions
 
-- [ADR-0003](../adr/0003-module-by-module-migration-with-the-typescript-code-as-parit.md): the pure helpers are ported in module M1, the network part in M8.
+- [ADR-0003](../adr/0003-module-by-module-migration-with-the-typescript-code-as-parit.md): the pure helpers are ported in module M1 ([Text Utilities](text-utilities.md), not wired yet), the network part in M8.

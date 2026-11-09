@@ -1,0 +1,15 @@
+{
+  "id": "name-pdf-added",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "final.pdf.bak",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "final.pdf.bak.pdf"
+}

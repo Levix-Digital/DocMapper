@@ -1,0 +1,12 @@
+{
+  "id": "pattern-lookbehind",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<=R)\\d+",
+    "R12"
+  ],
+  "output": {
+    "matches": true
+  }
+}

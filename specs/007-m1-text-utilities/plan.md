@@ -99,7 +99,7 @@ None.
 
 ### Backlog items and release
 
-FEAT-005 and FEAT-006 (epic EPIC-002), release v0.1.0 Desktop core. Two low bugs captured during discovery, to fix after the switch of the file-name formatter (M6, release v0.2.0, ADR-0003): a pattern token naming an inherited object member throws, and `$` patterns in the original file name are interpreted.
+FEAT-005 and FEAT-006 (epic EPIC-002), release v0.1.0 Desktop core. Low bugs kept for parity (ADR-0003) and fixed after each switch: BUG-001 (a pattern token naming an inherited object member throws) and BUG-002 (`$` patterns in the original file name are interpreted) in v0.2.0 with M6, as accepted by the product owner; BUG-003 (found by fuzzing: a dictionary array holding an object with a `toString` key throws) in v0.3.0 with M8.
 
 ### Tests (quality-assurance)
 

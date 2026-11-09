@@ -1,0 +1,17 @@
+{
+  "id": "name-field-own-proto",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{__proto__}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "__proto__": "own"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "own.pdf"
+}

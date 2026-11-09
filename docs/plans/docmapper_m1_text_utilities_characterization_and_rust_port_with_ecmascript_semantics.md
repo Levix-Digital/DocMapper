@@ -4,10 +4,10 @@ project: docmapper
 title: 'M1 Text utilities: characterization and Rust port with ECMAScript semantics'
 kind: feature
 version: v0.1.0
-status: in_progress
+status: completed
 author: LeviGuilherme
 created_at: '2026-11-09T16:37:50'
-updated_at: '2026-11-09T16:47:45'
+updated_at: '2026-11-09T17:05:15'
 session_id: null
 tags: []
 supersedes: null
@@ -19,15 +19,25 @@ backlog_items:
 spec_dir: specs/007-m1-text-utilities
 milestones:
 - name: setup
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: characterization
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: rust-port
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: fuzzing
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 - name: docs
-  done: false
+  done: true
+  done_at: '2026-11-09'
+  by: LeviGuilherme
 status_log:
 - at: '2026-11-09T16:37:50'
   by: LeviGuilherme
@@ -41,6 +51,25 @@ status_log:
   by: LeviGuilherme
   status: in_progress
   note: Approved by Levi on 2026-11-09, including the two kept defects as low bugs targeted at v0.2.0 (fix after the switch in M6)
+- at: '2026-11-09T17:05:10'
+  by: LeviGuilherme
+  note: Milestone 'setup' completed
+- at: '2026-11-09T17:05:11'
+  by: LeviGuilherme
+  note: Milestone 'characterization' completed
+- at: '2026-11-09T17:05:12'
+  by: LeviGuilherme
+  note: Milestone 'rust-port' completed
+- at: '2026-11-09T17:05:14'
+  by: LeviGuilherme
+  note: Milestone 'fuzzing' completed
+- at: '2026-11-09T17:05:15'
+  by: LeviGuilherme
+  note: Milestone 'docs' completed
+- at: '2026-11-09T17:05:15'
+  by: LeviGuilherme
+  status: completed
+  note: All milestones completed
 ---
 
 # M1 Text utilities: characterization and Rust port with ECMAScript semantics

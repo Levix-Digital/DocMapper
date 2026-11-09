@@ -1,0 +1,12 @@
+{
+  "id": "pattern-legacy-p",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "\\p{L}",
+    "p{L}"
+  ],
+  "output": {
+    "matches": true
+  }
+}

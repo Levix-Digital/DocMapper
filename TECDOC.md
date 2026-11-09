@@ -38,6 +38,7 @@ flowchart LR
 | [PDF Stamping](docs/architecture/stamping.md) | Writes values, Code128 barcodes and QR codes onto destination PDFs and the shipment template. |
 | [Profiles](docs/architecture/profiles.md) | Mapping profiles: the built-in CMR profile, storage, duplication and .docmapper import and export. |
 | [Spatial Extraction](docs/architecture/extraction.md) | Reads glyphs with pdf.js and resolves mapped fields with the LSIE engine. |
+| [Text Utilities](docs/architecture/text-utilities.md) | ECMAScript-exact Rust twins of the file name, validation pattern and dictionary helpers. |
 <!-- architecture-docs:subsystems:end -->
 
 ## Architecture Decision Records
@@ -45,6 +46,7 @@ flowchart LR
 <!-- architecture-docs:adrs:start -->
 | ADR | Title | Status | Version | Date |
 |---|---|---|---|---|
+| [ADR-0010](docs/adr/0010-validation-pattern-errors-compared-by-presence-not-by-messag.md) | Validation pattern errors compared by presence, not by message | accepted |  | 2026-11-09 |
 | [ADR-0009](docs/adr/0009-pdf-reading-with-pdfium-and-a-fixed-glyph-tolerance.md) | PDF reading with pdfium and a fixed glyph tolerance | accepted |  | 2026-11-08 |
 | [ADR-0008](docs/adr/0008-secrets-in-the-operating-system-keychain.md) | Secrets in the operating system keychain | accepted |  | 2026-11-08 |
 | [ADR-0007](docs/adr/0007-licensing-and-policy-enforcement-through-the-levix-platform.md) | Licensing and policy enforcement through the levix-platform crates | accepted |  | 2026-11-08 |

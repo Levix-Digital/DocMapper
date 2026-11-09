@@ -1,0 +1,15 @@
+{
+  "id": "name-seq-default",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "doc-{seq}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 6
+    },
+    1762695900000
+  ],
+  "output": "doc-007.pdf"
+}

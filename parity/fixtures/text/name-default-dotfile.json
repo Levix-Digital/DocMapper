@@ -1,0 +1,14 @@
+{
+  "id": "name-default-dotfile",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "originalFileName": ".pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "001.pdf"
+}

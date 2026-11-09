@@ -1,0 +1,14 @@
+{
+  "id": "flatten-empty-prefix",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "a": "x"
+    },
+    ""
+  ],
+  "output": {
+    "a": "x"
+  }
+}

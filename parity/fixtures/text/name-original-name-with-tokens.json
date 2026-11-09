@@ -1,0 +1,17 @@
+{
+  "id": "name-original-name-with-tokens",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{originalName}",
+      "originalFileName": "{seq}{index}{Ref}.pdf",
+      "extractedData": {
+        "Ref": "R1"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "0011R1.pdf"
+}

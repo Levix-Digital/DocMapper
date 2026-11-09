@@ -1,0 +1,13 @@
+{
+  "id": "pattern-invalid-named-reference",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<a>x)\\k<b>",
+    "x"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /(?<a>x)\\k<b>/: Invalid named capture referenced"
+  }
+}

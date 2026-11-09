@@ -1,0 +1,15 @@
+{
+  "id": "name-original-name-replacement-patterns",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{originalName}",
+      "originalFileName": "a$&b$$c$'d$`e$1$<n>.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "ab$cde$1$_n.pdf"
+}

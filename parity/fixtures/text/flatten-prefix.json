@@ -1,0 +1,18 @@
+{
+  "id": "flatten-prefix",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "a": "x",
+      "b": {
+        "c": "y"
+      }
+    },
+    "root"
+  ],
+  "output": {
+    "root.a": "x",
+    "root.b.c": "y"
+  }
+}

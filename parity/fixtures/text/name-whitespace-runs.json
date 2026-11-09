@@ -1,0 +1,15 @@
+{
+  "id": "name-whitespace-runs",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "a \t\n ﻿ b c",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "a b c.pdf"
+}

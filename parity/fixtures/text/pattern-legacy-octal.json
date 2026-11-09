@@ -1,0 +1,12 @@
+{
+  "id": "pattern-legacy-octal",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "\\01",
+    "\u0001"
+  ],
+  "output": {
+    "matches": true
+  }
+}

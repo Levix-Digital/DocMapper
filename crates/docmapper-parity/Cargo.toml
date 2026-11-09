@@ -12,6 +12,7 @@ publish = false
 serde_json.workspace = true
 
 [dev-dependencies]
+docmapper-core.workspace = true
 proptest = "1"
 
 [lints]

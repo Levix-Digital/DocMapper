@@ -1,0 +1,14 @@
+{
+  "id": "name-default-two-extensions",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "originalFileName": " report.tar.gz ",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "report.tar_001.pdf"
+}

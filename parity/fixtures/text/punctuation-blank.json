@@ -1,0 +1,10 @@
+{
+  "id": "punctuation-blank",
+  "module": "text",
+  "function": "sanitizePunctuation",
+  "input": [
+    "Name",
+    "﻿ "
+  ],
+  "output": ""
+}

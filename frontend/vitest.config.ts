@@ -5,6 +5,16 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
     test: {
         dir: '..',
+        // Branch coverage of the frozen reference copies (FR-002 of M1); on
+        // in `npm run test:parity`.
+        coverage: {
+            provider: 'v8',
+            allowExternal: true,
+            include: ['**/parity/text/**/*.ts'],
+            exclude: ['**/*.test.ts'],
+            reporter: ['text'],
+            thresholds: { branches: 100, functions: 100, lines: 100, statements: 100 },
+        },
         projects: [
             {
                 extends: true,

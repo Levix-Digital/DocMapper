@@ -1,0 +1,18 @@
+{
+  "id": "name-field-value-with-token",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{A}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "A": "{B}",
+        "B": "b"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "{B}.pdf"
+}

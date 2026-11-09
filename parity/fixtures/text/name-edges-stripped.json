@@ -1,0 +1,15 @@
+{
+  "id": "name-edges-stripped",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": " _._a_b._ . ",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "a_b.pdf"
+}

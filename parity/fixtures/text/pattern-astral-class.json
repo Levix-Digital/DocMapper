@@ -1,0 +1,12 @@
+{
+  "id": "pattern-astral-class",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^[😀]$",
+    "😀"
+  ],
+  "output": {
+    "matches": false
+  }
+}

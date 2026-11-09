@@ -1,0 +1,12 @@
+{
+  "id": "pattern-match",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\d{3}-\\d{2}$",
+    "123-45"
+  ],
+  "output": {
+    "matches": true
+  }
+}

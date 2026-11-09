@@ -1,0 +1,13 @@
+{
+  "id": "pattern-invalid-range",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "[b-a]",
+    "a"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /[b-a]/: Range out of order in character class"
+  }
+}
