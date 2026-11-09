@@ -1,0 +1,19 @@
+{
+  "id": "flatten-proto-nested",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "a": {
+        "__proto__": "kept"
+      },
+      "__proto__": {
+        "b": "kept"
+      }
+    }
+  ],
+  "output": {
+    "a.__proto__": "kept",
+    "__proto__.b": "kept"
+  }
+}

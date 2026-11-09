@@ -1,0 +1,12 @@
+{
+  "id": "pattern-backslash-c-class-digit",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^[\\c1]$",
+    "\u0011"
+  ],
+  "output": {
+    "matches": true
+  }
+}

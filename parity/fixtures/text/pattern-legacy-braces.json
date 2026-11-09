@@ -1,0 +1,12 @@
+{
+  "id": "pattern-legacy-braces",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "a{",
+    "a{"
+  ],
+  "output": {
+    "matches": true
+  }
+}

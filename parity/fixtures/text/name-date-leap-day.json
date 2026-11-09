@@ -1,0 +1,15 @@
+{
+  "id": "name-date-leap-day",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{date}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1709251199999
+  ],
+  "output": "2024-02-29.pdf"
+}

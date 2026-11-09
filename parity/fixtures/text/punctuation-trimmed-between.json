@@ -1,0 +1,10 @@
+{
+  "id": "punctuation-trimmed-between",
+  "module": "text",
+  "function": "sanitizePunctuation",
+  "input": [
+    "Name",
+    " Nome . ; "
+  ],
+  "output": "Nome"
+}

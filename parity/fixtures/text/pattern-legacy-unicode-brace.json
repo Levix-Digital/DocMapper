@@ -1,0 +1,12 @@
+{
+  "id": "pattern-legacy-unicode-brace",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\u{3}$",
+    "uuu"
+  ],
+  "output": {
+    "matches": true
+  }
+}

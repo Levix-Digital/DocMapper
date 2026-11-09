@@ -1,0 +1,12 @@
+{
+  "id": "pattern-anywhere",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "\\d",
+    "abc1"
+  ],
+  "output": {
+    "matches": true
+  }
+}

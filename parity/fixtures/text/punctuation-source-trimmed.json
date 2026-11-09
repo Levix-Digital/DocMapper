@@ -1,0 +1,10 @@
+{
+  "id": "punctuation-source-trimmed",
+  "module": "text",
+  "function": "sanitizePunctuation",
+  "input": [
+    "Name; ",
+    "Nome;"
+  ],
+  "output": "Nome;"
+}

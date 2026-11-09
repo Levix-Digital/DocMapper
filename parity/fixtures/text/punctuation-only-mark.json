@@ -1,0 +1,10 @@
+{
+  "id": "punctuation-only-mark",
+  "module": "text",
+  "function": "sanitizePunctuation",
+  "input": [
+    "x",
+    ";"
+  ],
+  "output": ""
+}

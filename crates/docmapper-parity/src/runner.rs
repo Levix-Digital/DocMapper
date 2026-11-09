@@ -44,15 +44,29 @@ fn describe(outcome: &Outcome) -> String {
 }
 
 /// Runs `fixtures` through `run` (which gets the function name and the input).
-pub fn run_fixtures<F>(fixtures: &[Fixture], mut run: F) -> Report
+pub fn run_fixtures<F>(fixtures: &[Fixture], run: F) -> Report
 where
     F: FnMut(&str, &[Value]) -> Outcome,
+{
+    run_fixtures_with(fixtures, run, keep_outcome)
+}
+
+/// Like [`run_fixtures`], but passes the expected and the actual outcome
+/// through `normalize` (which also gets the function name) before the exact
+/// comparison. Use it only for an exception to exact equality recorded in an
+/// ADR, such as a message text that is compared by presence.
+pub fn run_fixtures_with<F, N>(fixtures: &[Fixture], mut run: F, normalize: N) -> Report
+where
+    F: FnMut(&str, &[Value]) -> Outcome,
+    N: Fn(&str, &Outcome) -> Outcome,
 {
     let mut report = Report::default();
     for fixture in fixtures {
         report.checked.push(fixture.id.clone());
         let actual = run(&fixture.function, &fixture.input);
-        if let Err(reason) = compare_outcomes(&fixture.outcome, &actual) {
+        let expected = normalize(&fixture.function, &fixture.outcome);
+        let actual = normalize(&fixture.function, &actual);
+        if let Err(reason) = compare_outcomes(&expected, &actual) {
             report.failures.push(Failure {
                 id: fixture.id.clone(),
                 reason,
@@ -61,6 +75,10 @@ where
     }
     report.checked.sort();
     report
+}
+
+fn keep_outcome(_function: &str, outcome: &Outcome) -> Outcome {
+    outcome.clone()
 }
 
 /// Writes the Rust run record of a module.
@@ -86,13 +104,25 @@ pub fn assert_module<F>(module: &str, run: F)
 where
     F: FnMut(&str, &[Value]) -> Outcome,
 {
+    assert_module_with(module, run, keep_outcome);
+}
+
+/// Like [`assert_module`], with the normalization of [`run_fixtures_with`].
+///
+/// # Panics
+/// As [`assert_module`].
+pub fn assert_module_with<F, N>(module: &str, run: F, normalize: N)
+where
+    F: FnMut(&str, &[Value]) -> Outcome,
+    N: Fn(&str, &Outcome) -> Outcome,
+{
     let root = crate::workspace_root();
     let fixtures = load_module(&root, module).unwrap_or_else(|e| panic!("{e}"));
     assert!(
         !fixtures.is_empty(),
         "module '{module}' has no fixtures in parity/fixtures/{module}"
     );
-    let report = run_fixtures(&fixtures, run);
+    let report = run_fixtures_with(&fixtures, run, normalize);
     write_run_record(&root, module, &report.checked)
         .unwrap_or_else(|e| panic!("cannot write the Rust run record of '{module}': {e}"));
     if !report.failures.is_empty() {
@@ -166,5 +196,28 @@ mod tests {
             Outcome::Output(json!(4))
         });
         assert_eq!(seen, vec![("double".to_string(), vec![json!(2)])]);
+    }
+
+    #[test]
+    fn normalization_applies_to_both_sides_before_the_comparison() {
+        let fixtures = [fixture("n", Outcome::Output(json!({"error": "engine A"})))];
+        let mask = |function: &str, outcome: &Outcome| match outcome {
+            Outcome::Output(Value::Object(map))
+                if function == "double" && map.contains_key("error") =>
+            {
+                let mut map = map.clone();
+                map.insert("error".into(), json!("<message>"));
+                Outcome::Output(Value::Object(map))
+            }
+            other => other.clone(),
+        };
+        let other_text = run_fixtures_with(
+            &fixtures,
+            |_, _| Outcome::Output(json!({"error": "engine B"})),
+            mask,
+        );
+        assert!(other_text.failures.is_empty());
+        let missing = run_fixtures_with(&fixtures, |_, _| Outcome::Output(json!({})), mask);
+        assert_eq!(missing.failures.len(), 1);
     }
 }

@@ -15,7 +15,7 @@ Owns running a mapping profile over a list of PDF files and producing one result
 ## Structure
 
 - `frontend/src/services/mapping/mapping-runner.ts`: `executeBatchMapping(options)` with `BatchProcessingOptions` (files, profile, progress callback).
-- `frontend/src/services/mapping/filename-formatter.ts`: `formatOutputFileName`, which builds the output name from tokens such as `{originalName}`, `{seq:001}`, `{date}` and field values.
+- `frontend/src/services/mapping/filename-formatter.ts`: `formatOutputFileName`, which builds the output name from tokens such as `{originalName}`, `{seq:001}`, `{date}` and field values. Its Rust twin, with the validation pattern check, is in [Text Utilities](text-utilities.md), wired in when batch processing moves to Rust (M6).
 
 ```mermaid
 flowchart LR

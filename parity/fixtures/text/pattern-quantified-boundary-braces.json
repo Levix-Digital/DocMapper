@@ -1,0 +1,13 @@
+{
+  "id": "pattern-quantified-boundary-braces",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "a|\\B{2,}",
+    "a"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /a|\\B{2,}/: Nothing to repeat"
+  }
+}

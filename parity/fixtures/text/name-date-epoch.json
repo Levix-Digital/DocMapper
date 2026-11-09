@@ -1,0 +1,15 @@
+{
+  "id": "name-date-epoch",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{date}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    0
+  ],
+  "output": "1970-01-01.pdf"
+}

@@ -23,3 +23,8 @@ unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 unwrap_used = "warn"
+
+# The core's text tests build names near the 2^29 code unit limit of
+# JavaScript strings; an optimized core keeps them fast in test builds.
+[profile.dev.package.docmapper-core]
+opt-level = 2

@@ -1,0 +1,13 @@
+{
+  "id": "pattern-repeated-group-name",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<a>x)|(?<a>y)",
+    "x"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /(?<a>x)|(?<a>y)/: Duplicate capture group name"
+  }
+}

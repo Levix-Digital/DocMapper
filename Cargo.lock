@@ -684,6 +684,11 @@ dependencies = [
 [[package]]
 name = "docmapper-core"
 version = "0.1.0"
+dependencies = [
+ "regress",
+ "ryu-js",
+ "serde_json",
+]
 
 [[package]]
 name = "docmapper-desktop"
@@ -698,6 +703,7 @@ dependencies = [
 name = "docmapper-parity"
 version = "0.1.0"
 dependencies = [
+ "docmapper-core",
  "proptest",
  "serde_json",
 ]
@@ -2563,6 +2569,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
+name = "regress"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32eef8b209c3c1c15dbad02c1f30f9539f00dc7253e0cbcdaae442a50a09d7c1"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "reqwest"
 version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2641,6 +2656,12 @@ dependencies = [
  "tempfile",
  "wait-timeout",
 ]
+
+[[package]]
+name = "ryu-js"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04d056b875a9d2e6cb9a61d127afee9ac5999b9f87bcb32079d1318e505be714"
 
 [[package]]
 name = "same-file"

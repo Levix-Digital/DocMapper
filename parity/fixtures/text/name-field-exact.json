@@ -1,0 +1,17 @@
+{
+  "id": "name-field-exact",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{Invoice No}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "Invoice No": " INV-7 "
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "INV-7.pdf"
+}

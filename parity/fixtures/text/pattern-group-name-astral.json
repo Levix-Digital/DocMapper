@@ -1,0 +1,12 @@
+{
+  "id": "pattern-group-name-astral",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<𝒜>x)",
+    "x"
+  ],
+  "output": {
+    "matches": true
+  }
+}

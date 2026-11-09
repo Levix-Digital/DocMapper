@@ -1,0 +1,10 @@
+{
+  "id": "punctuation-removed",
+  "module": "text",
+  "function": "sanitizePunctuation",
+  "input": [
+    "Name",
+    "Nome:"
+  ],
+  "output": "Nome"
+}

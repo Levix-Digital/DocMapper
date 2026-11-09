@@ -1,0 +1,19 @@
+{
+  "id": "name-field-integer-keys-order",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{a}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "1": "one",
+        "A": "upper",
+        "a ": "x"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "upper.pdf"
+}

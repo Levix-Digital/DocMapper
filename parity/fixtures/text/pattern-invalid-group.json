@@ -1,0 +1,13 @@
+{
+  "id": "pattern-invalid-group",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(",
+    "("
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /(/: Unterminated group"
+  }
+}

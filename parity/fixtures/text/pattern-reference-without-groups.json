@@ -1,0 +1,12 @@
+{
+  "id": "pattern-reference-without-groups",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\k<\\u{2}>$",
+    "k<uu>"
+  ],
+  "output": {
+    "matches": true
+  }
+}

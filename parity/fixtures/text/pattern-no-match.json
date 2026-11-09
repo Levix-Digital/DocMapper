@@ -1,0 +1,12 @@
+{
+  "id": "pattern-no-match",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\d{3}$",
+    "1234"
+  ],
+  "output": {
+    "matches": false
+  }
+}

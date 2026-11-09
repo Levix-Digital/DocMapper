@@ -1,0 +1,27 @@
+{
+  "id": "flatten-arrays",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "a": [
+        1,
+        [
+          null,
+          3
+        ],
+        "x",
+        {
+          "k": 1
+        },
+        true
+      ],
+      "e": [],
+      "o": {}
+    }
+  ],
+  "output": {
+    "a": "1,,3,x,[object Object],true",
+    "e": ""
+  }
+}

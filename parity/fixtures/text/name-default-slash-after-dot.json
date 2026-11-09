@@ -1,0 +1,14 @@
+{
+  "id": "name-default-slash-after-dot",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "originalFileName": "dir.v2/scan",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "dir.v2_scan_001.pdf"
+}

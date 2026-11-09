@@ -1,0 +1,12 @@
+{
+  "id": "pattern-group-name-escaped-pair",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?<\\ud835\\udc9c>x)",
+    "x"
+  ],
+  "output": {
+    "matches": true
+  }
+}

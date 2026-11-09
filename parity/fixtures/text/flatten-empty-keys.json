@@ -1,0 +1,17 @@
+{
+  "id": "flatten-empty-keys",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "": {
+        "": "x",
+        "y": "z"
+      }
+    }
+  ],
+  "output": {
+    "": "x",
+    "y": "z"
+  }
+}

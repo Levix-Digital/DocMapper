@@ -1,0 +1,14 @@
+{
+  "id": "flatten-proto-top",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "__proto__": "dropped",
+      "a": "kept"
+    }
+  ],
+  "output": {
+    "a": "kept"
+  }
+}

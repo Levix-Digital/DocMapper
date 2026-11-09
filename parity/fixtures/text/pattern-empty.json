@@ -1,0 +1,12 @@
+{
+  "id": "pattern-empty",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "",
+    ""
+  ],
+  "output": {
+    "matches": true
+  }
+}

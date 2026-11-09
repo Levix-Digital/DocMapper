@@ -1,0 +1,18 @@
+{
+  "id": "name-field-unicode-case",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{İD}-{ΟΔΟΣ}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "i̇d": "dotted",
+        "οδος": "road"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "dotted-road.pdf"
+}

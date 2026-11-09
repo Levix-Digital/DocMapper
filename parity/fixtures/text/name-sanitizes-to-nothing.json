@@ -1,0 +1,15 @@
+{
+  "id": "name-sanitizes-to-nothing",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{missing}",
+      "originalFileName": "scan.pdf",
+      "extractedData": {},
+      "docIndex": 2
+    },
+    1762695900000
+  ],
+  "output": "scan_003.pdf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "name-field-nested-braces",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{a{b}c{}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "a{b": "v"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "vc{}.pdf"
+}

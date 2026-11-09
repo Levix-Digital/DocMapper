@@ -1,0 +1,17 @@
+{
+  "id": "name-field-blank-any-case",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "x{REF}y",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "ref": " "
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "xy.pdf"
+}

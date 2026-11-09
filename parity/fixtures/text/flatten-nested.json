@@ -1,0 +1,21 @@
+{
+  "id": "flatten-nested",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "nav": {
+        "brand": "DocMapper",
+        "menu": {
+          "open": "Open"
+        }
+      },
+      "title": "T"
+    }
+  ],
+  "output": {
+    "nav.brand": "DocMapper",
+    "nav.menu.open": "Open",
+    "title": "T"
+  }
+}

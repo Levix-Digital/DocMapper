@@ -1,0 +1,12 @@
+{
+  "id": "pattern-whitespace",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^\\s+$",
+    " ﻿ "
+  ],
+  "output": {
+    "matches": true
+  }
+}

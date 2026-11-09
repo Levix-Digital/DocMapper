@@ -1,0 +1,9 @@
+{
+  "id": "flatten-empty",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {}
+  ],
+  "output": {}
+}

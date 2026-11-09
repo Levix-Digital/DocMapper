@@ -1,0 +1,13 @@
+{
+  "id": "pattern-modifier-group",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "(?i:a)",
+    "A"
+  ],
+  "output": {
+    "matches": false,
+    "error": "Invalid regular expression: /(?i:a)/: Invalid group"
+  }
+}

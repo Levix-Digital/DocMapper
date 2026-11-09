@@ -1,0 +1,15 @@
+{
+  "id": "name-non-ecmascript-whitespace",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "ab᠎c",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {},
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "ab᠎c.pdf"
+}

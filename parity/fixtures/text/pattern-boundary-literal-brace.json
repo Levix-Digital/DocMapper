@@ -1,0 +1,12 @@
+{
+  "id": "pattern-boundary-literal-brace",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "\\b{,2}",
+    "{,2}"
+  ],
+  "output": {
+    "matches": false
+  }
+}

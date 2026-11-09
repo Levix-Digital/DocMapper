@@ -12,12 +12,12 @@ Each release: `## vX.Y.Z: <name>` with the fields `Status` (planned, in_progress
 ## v0.2.0: Full flow in Rust
 - **Status**: planned
 - **Goal**: PDF reading, batch processing and stamping run in Rust; the browser build and AssemblyScript are removed
-- **Items**: FEAT-019, FEAT-020, FEAT-021, FEAT-022, FEAT-023, FEAT-025, FEAT-026, FEAT-027
+- **Items**: FEAT-019, FEAT-020, FEAT-021, FEAT-022, FEAT-023, FEAT-025, FEAT-026, FEAT-027, BUG-001, BUG-002
 
 ## v0.3.0: Connected and governed
 - **Status**: planned
 - **Goal**: Model connector and local vision fallback, keychain secrets, central PostgreSQL, export and MCP server, offline license and Admin Hub policy enforcement
-- **Items**: FEAT-028, FEAT-029, FEAT-030, FEAT-034, FEAT-035, FEAT-036, FEAT-037, FEAT-038, FEAT-039, FEAT-044, FEAT-012, FEAT-014, FEAT-024, FEAT-046, FEAT-047, FEAT-048
+- **Items**: FEAT-028, FEAT-029, FEAT-030, FEAT-034, FEAT-035, FEAT-036, FEAT-037, FEAT-038, FEAT-039, FEAT-044, FEAT-012, FEAT-014, FEAT-024, FEAT-046, FEAT-047, FEAT-048, BUG-003
 
 ## v1.0.0: Desktop 1.0
 - **Status**: planned

@@ -1,0 +1,17 @@
+{
+  "id": "name-field-own-inherited-name",
+  "module": "text",
+  "function": "formatOutputFileName",
+  "input": [
+    {
+      "pattern": "{constructor}",
+      "originalFileName": "CMR 2025-118.pdf",
+      "extractedData": {
+        "constructor": "own"
+      },
+      "docIndex": 0
+    },
+    1762695900000
+  ],
+  "output": "own.pdf"
+}

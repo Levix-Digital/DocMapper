@@ -1,0 +1,21 @@
+{
+  "id": "flatten-object-with-to-string-in-array",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "a": {
+        "b": [
+          1,
+          {
+            "toString": "x"
+          }
+        ]
+      }
+    }
+  ],
+  "error": {
+    "name": "TypeError",
+    "message": "Cannot convert object to primitive value"
+  }
+}

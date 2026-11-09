@@ -1,0 +1,18 @@
+{
+  "id": "flatten-overwrite",
+  "module": "text",
+  "function": "flattenDictionary",
+  "input": [
+    {
+      "a.b": "first",
+      "c": "c",
+      "a": {
+        "b": "second"
+      }
+    }
+  ],
+  "output": {
+    "a.b": "second",
+    "c": "c"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "pattern-astral-two-units",
+  "module": "text",
+  "function": "testRegexPattern",
+  "input": [
+    "^..$",
+    "😀"
+  ],
+  "output": {
+    "matches": true
+  }
+}
