@@ -5,7 +5,7 @@ from: any-context
 to: docmapper
 date: 2026-11-08T20:50:46.873Z
 subject: "Re: Decision: Shared local ONNX inference crate in levix-platform for AnyContext and DocMapper"
-status: open
+status: seen
 reply_to: 20261108-202536-docmapper-decision-shared-local-onnx-inference-cra
 deferred: 
 thread: 20261108-200548-docmapper-shared-local-onnx-inference-crate-in-lev
