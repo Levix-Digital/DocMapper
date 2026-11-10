@@ -202,7 +202,7 @@ import {
 
 import Card from '../components/ui/Card.vue';
 import Button from '../components/ui/Button.vue';
-import { getAllProfiles } from '../services/mapping/profile-store';
+import { profileService } from '../services/mapping/profile-service';
 import { executeBatchMapping } from '../services/mapping/mapping-runner';
 import type { MappingProfile } from '../types/mapping';
 import { useRouter } from '../composables/useRouter';
@@ -232,8 +232,12 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const availableProfiles = ref<MappingProfile[]>([]);
 const selectedProfileId = ref<string>('');
 
-onMounted(() => {
-  availableProfiles.value = getAllProfiles();
+onMounted(async () => {
+  try {
+    availableProfiles.value = await profileService.getAllProfiles();
+  } catch (err: any) {
+    error.value = err?.message || String(err);
+  }
   if (availableProfiles.value.length > 0) {
     selectedProfileId.value = availableProfiles.value[0].id;
   }

@@ -11,14 +11,7 @@ import {
   Pencil
 } from 'lucide-vue-next';
 import type { MappingProfile } from '../../types/mapping';
-import {
-  getAllProfiles,
-  deleteProfile,
-  duplicateProfile,
-  exportProfileAsDocMapper,
-  importProfileFromDocMapper,
-  saveProfile,
-} from '../../services/mapping/profile-store';
+import { profileService } from '../../services/mapping/profile-service';
 import { useI18n } from '../../i18n';
 
 const { t } = useI18n();
@@ -40,8 +33,12 @@ const editingNameId = ref<string | null>(null);
 const editedName = ref('');
 const notification = ref<string | null>(null);
 
-function refresh() {
-  profiles.value = getAllProfiles();
+async function refresh() {
+  try {
+    profiles.value = await profileService.getAllProfiles();
+  } catch (err: any) {
+    showNotice(err?.message || String(err));
+  }
 }
 
 onMounted(refresh);
@@ -59,26 +56,39 @@ function handleEdit(p: MappingProfile) {
   emit('close');
 }
 
-function handleExport(p: MappingProfile) {
-  exportProfileAsDocMapper(p);
-  showNotice(`Exported ${p.name}.dmap successfully!`);
-}
-
-function handleDuplicate(id: string) {
-  const cloned = duplicateProfile(id);
-  refresh();
-  emit('profilesUpdated');
-  if (cloned) {
-    showNotice(`Created copy: ${cloned.name}`);
+async function handleExport(p: MappingProfile) {
+  try {
+    if (await profileService.exportProfile(p)) {
+      showNotice(`Exported ${p.name}.dmap successfully!`);
+    }
+  } catch (err: any) {
+    showNotice(err?.message || String(err));
   }
 }
 
-function handleDelete(id: string) {
-  if (confirm('Are you sure you want to delete this profile?')) {
-    deleteProfile(id);
-    refresh();
+async function handleDuplicate(id: string) {
+  try {
+    const cloned = await profileService.duplicateProfile(id);
+    await refresh();
     emit('profilesUpdated');
-    showNotice('Profile deleted.');
+    if (cloned) {
+      showNotice(`Created copy: ${cloned.name}`);
+    }
+  } catch (err: any) {
+    showNotice(err?.message || String(err));
+  }
+}
+
+async function handleDelete(id: string) {
+  if (confirm('Are you sure you want to delete this profile?')) {
+    try {
+      await profileService.deleteProfile(id);
+      await refresh();
+      emit('profilesUpdated');
+      showNotice('Profile deleted.');
+    } catch (err: any) {
+      showNotice(err?.message || String(err));
+    }
   }
 }
 
@@ -87,14 +97,18 @@ function startRename(p: MappingProfile) {
   editedName.value = p.name;
 }
 
-function saveRename(p: MappingProfile) {
-  if (editedName.value.trim() && editedName.value.trim() !== p.name) {
-    p.name = editedName.value.trim();
-    saveProfile(p);
-    refresh();
-    emit('profilesUpdated');
-  }
+async function saveRename(p: MappingProfile) {
+  const name = editedName.value.trim();
   editingNameId.value = null;
+  if (name && name !== p.name) {
+    try {
+      await profileService.saveProfile({ ...p, name });
+      await refresh();
+      emit('profilesUpdated');
+    } catch (err: any) {
+      showNotice(err?.message || String(err));
+    }
+  }
 }
 
 async function handleImportFile(event: Event) {
@@ -103,8 +117,8 @@ async function handleImportFile(event: Event) {
 
   try {
     const text = await file.text();
-    const imported = importProfileFromDocMapper(text);
-    refresh();
+    const imported = await profileService.importProfile(text);
+    await refresh();
     emit('profilesUpdated');
     emit('selectProfile', imported);
     showNotice(`Imported profile "${imported.name}" ready for use!`);
@@ -151,7 +165,7 @@ async function handleImportFile(event: Event) {
       <!-- Action Bar -->
       <div class="px-6 py-3 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ profiles.length }} Profiles in local browser storage
+          {{ t(profileService.storageKind === 'database' ? 'profileModal.storedInDatabase' : 'profileModal.storedInBrowser', { count: profiles.length }) }}
         </span>
 
         <!-- Import Button -->

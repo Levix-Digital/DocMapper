@@ -16,11 +16,7 @@ import {
   RotateCcw
 } from 'lucide-vue-next';
 import type { MappingProfile, FieldDefinition, BoundingBox, DestinationFieldMapping } from '../types/mapping';
-import {
-  saveProfile,
-  createEmptyProfile,
-  exportProfileAsDocMapper
-} from '../services/mapping/profile-store';
+import { profileService } from '../services/mapping/profile-service';
 import { formatOutputFileName } from '../services/mapping/filename-formatter';
 import { loadPdf, extractTextInBox, isPageScanned } from '../services/pdf/spatial-extractor';
 import { generateValidationPattern } from '../services/llm/gemini-service';
@@ -34,8 +30,17 @@ import { useI18n } from '../i18n';
 const { t } = useI18n();
 const activeTab = ref<'origin' | 'destination' | 'preview'>('origin');
 
-// Active Profile: 100% empty by default on startup
-const currentProfile = ref<MappingProfile>(createEmptyProfile());
+// Active Profile: 100% empty by default on startup. The profile service gives
+// the new empty profile asynchronously; this blank one stands in until then.
+const currentProfile = ref<MappingProfile>({
+  id: '',
+  name: '',
+  version: 1,
+  createdAt: '',
+  updatedAt: '',
+  fields: [],
+  destinationMappings: [],
+});
 const editingProfileId = ref<string | null>(null);
 const selectedFieldId = ref<string | null>(null);
 const activeDrawingType = ref<'value' | 'label' | 'none'>('none');
@@ -298,8 +303,7 @@ function saveCurrentProfile() {
   // In-memory edits only until user explicitly clicks Save Profile
 }
 
-function clearStudioToEmpty() {
-  currentProfile.value = createEmptyProfile();
+async function clearStudioToEmpty() {
   editingProfileId.value = null;
   selectedFieldId.value = null;
   activeDrawingType.value = 'none';
@@ -312,9 +316,14 @@ function clearStudioToEmpty() {
     previewPdfBlobUrl.value = null;
   }
   activeTab.value = 'origin';
+  try {
+    currentProfile.value = await profileService.createEmptyProfile();
+  } catch (err: any) {
+    showToast(err?.message || String(err));
+  }
 }
 
-function handleSaveProfile() {
+async function handleSaveProfile() {
   if (currentProfile.value.fields.length === 0 && !currentProfile.value.destinationTemplateBase64) {
     showToast(t('nav.saveValidationEmpty'));
     return;
@@ -324,17 +333,26 @@ function handleSaveProfile() {
   currentProfile.value.name = profileName;
 
   // Persist to storage
-  saveProfile(currentProfile.value);
+  try {
+    await profileService.saveProfile(toRaw(currentProfile.value));
+  } catch (err: any) {
+    showToast(err?.message || String(err));
+    return;
+  }
 
   // Clear all studio fields back to 100% empty
-  clearStudioToEmpty();
+  await clearStudioToEmpty();
 
   // Show success toast
   showToast(t('nav.savedAndClearedToast', { name: profileName }));
 }
 
-function exportCurrentProfile() {
-  exportProfileAsDocMapper(currentProfile.value);
+async function exportCurrentProfile() {
+  try {
+    await profileService.exportProfile(toRaw(currentProfile.value));
+  } catch (err: any) {
+    showToast(err?.message || String(err));
+  }
 }
 
 function onEditProfileFromHub(profile: MappingProfile) {
