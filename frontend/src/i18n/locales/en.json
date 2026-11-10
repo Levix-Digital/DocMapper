@@ -219,7 +219,8 @@
     "delete": "Delete Profile",
     "close": "Close",
     "storedInDatabase": "{count} profiles in the local database",
-    "storedInBrowser": "{count} profiles in local browser storage"
+    "storedInBrowser": "{count} profiles in local browser storage",
+    "confirmDelete": "Click delete again to remove this profile."
   },
   "common": {
     "loading": "Loading...",

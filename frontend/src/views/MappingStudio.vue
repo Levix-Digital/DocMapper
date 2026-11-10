@@ -58,6 +58,7 @@ const aiError = ref<string | null>(null);
 // Modal state
 const showProfileHub = ref(false);
 const toastMessage = ref<string | null>(null);
+const toastIsError = ref(false);
 
 // Preview PDF Blob
 const previewPdfBlobUrl = ref<string | null>(null);
@@ -68,8 +69,16 @@ onMounted(() => {
   clearStudioToEmpty();
 });
 
+// Browser dialogs (alert, confirm) do not show in the desktop window, so
+// errors are shown in the toast.
+function showErrorToast(msg: string) {
+  showToast(msg);
+  toastIsError.value = true;
+}
+
 function showToast(msg: string) {
   toastMessage.value = msg;
+  toastIsError.value = false;
   setTimeout(() => {
     toastMessage.value = null;
   }, 3500);
@@ -100,7 +109,7 @@ async function handleOriginUpload(event: Event) {
     await extractAllSampleFields();
     showToast(t('nav.loadedToast', { name: file.name }));
   } catch (err: any) {
-    alert(`Failed to parse sample PDF: ${err?.message || err}`);
+    showErrorToast(`Failed to parse sample PDF: ${err?.message || err}`);
   }
 }
 
@@ -319,7 +328,7 @@ async function clearStudioToEmpty() {
   try {
     currentProfile.value = await profileService.createEmptyProfile();
   } catch (err: any) {
-    showToast(err?.message || String(err));
+    showErrorToast(err?.message || String(err));
   }
 }
 
@@ -336,7 +345,7 @@ async function handleSaveProfile() {
   try {
     await profileService.saveProfile(toRaw(currentProfile.value));
   } catch (err: any) {
-    showToast(err?.message || String(err));
+    showErrorToast(err?.message || String(err));
     return;
   }
 
@@ -351,7 +360,7 @@ async function exportCurrentProfile() {
   try {
     await profileService.exportProfile(toRaw(currentProfile.value));
   } catch (err: any) {
-    showToast(err?.message || String(err));
+    showErrorToast(err?.message || String(err));
   }
 }
 
@@ -401,7 +410,7 @@ function insertNamingToken(token: string) {
 // Generate Sample Output Preview
 async function generateSamplePreview() {
   if (!currentProfile.value.destinationTemplateBase64) {
-    alert(t('preview.needTemplateAlert'));
+    showErrorToast(t('preview.needTemplateAlert'));
     return;
   }
 
@@ -427,7 +436,7 @@ async function generateSamplePreview() {
     previewPdfBlobUrl.value = URL.createObjectURL(blob);
     activeTab.value = 'preview';
   } catch (err: any) {
-    alert(`Failed to generate destination preview: ${err?.message || err}`);
+    showErrorToast(`Failed to generate destination preview: ${err?.message || err}`);
   } finally {
     isGeneratingPreview.value = false;
   }
@@ -506,9 +515,13 @@ async function generateSamplePreview() {
     <!-- Toast Notification -->
     <div
       v-if="toastMessage"
-      class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-2"
+      :class="toastIsError
+        ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+        : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'"
+      class="p-3 rounded-xl border text-xs font-semibold flex items-center gap-2"
     >
-      <CheckCircle class="w-4 h-4" />
+      <AlertCircle v-if="toastIsError" class="w-4 h-4" />
+      <CheckCircle v-else class="w-4 h-4" />
       <span>{{ toastMessage }}</span>
     </div>
 
