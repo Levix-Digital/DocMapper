@@ -40,6 +40,7 @@ const currentProfile = ref<MappingProfile>({
   updatedAt: '',
   fields: [],
   destinationMappings: [],
+  outputFileNamePattern: '{originalName}_{seq:001}',
 });
 const editingProfileId = ref<string | null>(null);
 const selectedFieldId = ref<string | null>(null);
@@ -312,7 +313,25 @@ function saveCurrentProfile() {
   // In-memory edits only until user explicitly clicks Save Profile
 }
 
-async function clearStudioToEmpty() {
+/** Bumped by every change of the profile on screen, so a late empty profile never replaces a newer one. */
+let profileGeneration = 0;
+
+/**
+ * Replaces the studio with a new empty profile. The empty profile is fetched
+ * first and the screen is reset in one step; returns false (and shows why) when
+ * it cannot be created or another profile was opened meanwhile.
+ */
+async function clearStudioToEmpty(): Promise<boolean> {
+  const generation = ++profileGeneration;
+  let fresh: MappingProfile;
+  try {
+    fresh = await profileService.createEmptyProfile();
+  } catch (err: any) {
+    showErrorToast(err?.message || String(err));
+    return false;
+  }
+  if (generation !== profileGeneration) return false;
+  currentProfile.value = fresh;
   editingProfileId.value = null;
   selectedFieldId.value = null;
   activeDrawingType.value = 'none';
@@ -325,11 +344,7 @@ async function clearStudioToEmpty() {
     previewPdfBlobUrl.value = null;
   }
   activeTab.value = 'origin';
-  try {
-    currentProfile.value = await profileService.createEmptyProfile();
-  } catch (err: any) {
-    showErrorToast(err?.message || String(err));
-  }
+  return true;
 }
 
 async function handleSaveProfile() {
@@ -350,7 +365,7 @@ async function handleSaveProfile() {
   }
 
   // Clear all studio fields back to 100% empty
-  await clearStudioToEmpty();
+  if (!(await clearStudioToEmpty())) return;
 
   // Show success toast
   showToast(t('nav.savedAndClearedToast', { name: profileName }));
@@ -365,6 +380,7 @@ async function exportCurrentProfile() {
 }
 
 function onEditProfileFromHub(profile: MappingProfile) {
+  profileGeneration++;
   currentProfile.value = JSON.parse(JSON.stringify(profile));
   editingProfileId.value = profile.id;
   if (profile.fields.length > 0) {

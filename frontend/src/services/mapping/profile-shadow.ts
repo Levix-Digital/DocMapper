@@ -79,8 +79,9 @@ function valueAt(value: unknown, path: string): unknown {
  * The database store, with every operation also run on the browser store and
  * the two results compared (ADR-0003 step d). The database result is what the
  * screens get; browser store failures are only logged. Ids of the two stores
- * are matched through the profiles each operation returns and by position in
- * the stored lists. Export is not compared (its text is proven byte for byte
+ * are matched only through the profiles an operation returns on both sides
+ * (create, duplicate, import), never by position, so a browser profile is
+ * never changed in place of another. Export is not compared (its text is proven byte for byte
  * by the M3 parity fixtures, and the browser export downloads a file).
  */
 export function createShadowService(
@@ -111,20 +112,33 @@ export function createShadowService(
     operation: string,
     result: T,
     runBrowser: () => Promise<T>,
-    pair?: (db: T, br: T) => void,
+    options: { pair?: (db: T, br: T) => void; compareStored?: boolean } = {},
   ): Promise<void> {
+    let browserResult: T;
     try {
-      const browserResult = await runBrowser();
-      pair?.(result, browserResult);
-      compare(operation, 'returned', result, browserResult);
-      const [dbList, brList] = await Promise.all([database.getAllProfiles(), browser.getAllProfiles()]);
-      dbList.forEach((p, i) => {
-        if (brList[i]) ids.set(p.id, brList[i].id);
-      });
-      compare(operation, 'stored', dbList, brList);
+      browserResult = await runBrowser();
     } catch (error) {
       log(SHADOW_LOG_PREFIX, { operation, browserError: String(error) });
+      return;
     }
+    options.pair?.(result, browserResult);
+    compare(operation, 'returned', result, browserResult);
+    if (options.compareStored === false) return;
+    let dbList: MappingProfile[];
+    let brList: MappingProfile[];
+    try {
+      dbList = await database.getAllProfiles();
+    } catch (error) {
+      log(SHADOW_LOG_PREFIX, { operation, databaseError: String(error) });
+      return;
+    }
+    try {
+      brList = await browser.getAllProfiles();
+    } catch (error) {
+      log(SHADOW_LOG_PREFIX, { operation, browserError: String(error) });
+      return;
+    }
+    compare(operation, 'stored', dbList, brList);
   }
 
   const asProfile = (value: unknown) => value as MappingProfile | undefined;
@@ -133,17 +147,23 @@ export function createShadowService(
     storageKind: database.storageKind,
     async createEmptyProfile(name) {
       const result = await database.createEmptyProfile(name);
-      await shadow('createEmptyProfile', result, () => browser.createEmptyProfile(name), remember);
+      await shadow('createEmptyProfile', result, () => browser.createEmptyProfile(name), {
+        pair: remember,
+        compareStored: false,
+      });
       return result;
     },
     async getAllProfiles() {
       const result = await database.getAllProfiles();
-      await shadow('getAllProfiles', result, () => browser.getAllProfiles());
+      // The returned lists are the stored lists.
+      await shadow('getAllProfiles', result, () => browser.getAllProfiles(), { compareStored: false });
       return result;
     },
     async getProfileById(id) {
       const result = await database.getProfileById(id);
-      await shadow('getProfileById', result, () => browser.getProfileById(browserId(id)));
+      await shadow('getProfileById', result, () => browser.getProfileById(browserId(id)), {
+        compareStored: false,
+      });
       return result;
     },
     async saveProfile(profile) {
@@ -158,14 +178,14 @@ export function createShadowService(
     },
     async duplicateProfile(id) {
       const result = await database.duplicateProfile(id);
-      await shadow('duplicateProfile', result, () => browser.duplicateProfile(browserId(id)), (db, br) =>
-        remember(asProfile(db), asProfile(br)),
-      );
+      await shadow('duplicateProfile', result, () => browser.duplicateProfile(browserId(id)), {
+        pair: (db, br) => remember(asProfile(db), asProfile(br)),
+      });
       return result;
     },
     async importProfile(text) {
       const result = await database.importProfile(text);
-      await shadow('importProfile', result, () => browser.importProfile(text), remember);
+      await shadow('importProfile', result, () => browser.importProfile(text), { pair: remember });
       return result;
     },
     exportProfile: profile => database.exportProfile(profile),

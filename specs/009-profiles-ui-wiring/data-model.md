@@ -28,7 +28,7 @@ Mapping: `StoreError::InvalidFile` → `invalid_file`; `Syntax` → `syntax`; `T
 | `deleteProfile(id)` | `Promise<boolean>` |
 | `duplicateProfile(id)` | `Promise<MappingProfile \| undefined>` |
 | `importProfile(text)` | `Promise<MappingProfile>` |
-| `exportProfile(profile)` | `Promise<boolean>` (false when the user cancelled) |
+| `exportProfile(profile)` | `Promise<string \| null>` (the saved file's name; null when the user cancelled) |
 | `storageKind` | `'database' \| 'browser'` |
 
 ## Shadow difference (log only)

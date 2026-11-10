@@ -54,10 +54,14 @@ async function refresh() {
 
 onMounted(refresh);
 
+let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+let pendingDeleteTimer: ReturnType<typeof setTimeout> | undefined;
+
 function showNotice(msg: string) {
   notification.value = msg;
   notificationIsError.value = false;
-  setTimeout(() => {
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => {
     notification.value = null;
   }, 3500);
 }
@@ -70,8 +74,9 @@ function handleEdit(p: MappingProfile) {
 
 async function handleExport(p: MappingProfile) {
   try {
-    if (await profileService.exportProfile(p)) {
-      showNotice(`Exported ${p.name}.dmap successfully!`);
+    const fileName = await profileService.exportProfile(p);
+    if (fileName !== null) {
+      showNotice(`Exported ${fileName} successfully!`);
     }
   } catch (err: any) {
     showError(err);
@@ -96,12 +101,14 @@ async function handleDelete(id: string) {
     pendingDeleteId.value = id;
     showNotice(t('profileModal.confirmDelete'));
     notificationIsError.value = true;
-    setTimeout(() => {
-      if (pendingDeleteId.value === id) pendingDeleteId.value = null;
+    clearTimeout(pendingDeleteTimer);
+    pendingDeleteTimer = setTimeout(() => {
+      pendingDeleteId.value = null;
     }, 3500);
     return;
   }
   pendingDeleteId.value = null;
+  clearTimeout(pendingDeleteTimer);
   try {
     await profileService.deleteProfile(id);
     await refresh();

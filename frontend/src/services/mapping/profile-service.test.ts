@@ -50,7 +50,7 @@ describe('desktop backend', () => {
     expect(await service.deleteProfile('p1')).toBe(true);
     expect(await service.duplicateProfile('p1')).toBe(profile);
     expect(await service.importProfile('{}')).toBe(profile);
-    expect(await service.exportProfile(profile)).toBe(true);
+    expect(await service.exportProfile(profile)).toBe('A.dmap');
     expect(calls).toEqual([
       ['profiles_create_empty', {}],
       ['profiles_create_empty', { name: 'Named' }],
@@ -67,7 +67,7 @@ describe('desktop backend', () => {
   it('reports a cancelled export and a missing duplicate', async () => {
     const { invoke } = recordingInvoke({ profiles_export: null, profiles_duplicate: null });
     const service = createDesktopService(invoke);
-    expect(await service.exportProfile(profile)).toBe(false);
+    expect(await service.exportProfile(profile)).toBeNull();
     expect(await service.duplicateProfile('x')).toBeUndefined();
   });
 
@@ -137,7 +137,7 @@ describe('browser backend', () => {
       body: { appendChild: vi.fn(), removeChild: vi.fn() },
     });
     vi.stubGlobal('URL', { createObjectURL: () => 'blob:x', revokeObjectURL: vi.fn() });
-    expect(await createBrowserService().exportProfile({ ...profile, name: 'A b' })).toBe(true);
+    expect(await createBrowserService().exportProfile({ ...profile, name: 'A b' })).toBe('A_b.dmap');
     expect(anchor.download).toBe('A_b.dmap');
     expect(click).toHaveBeenCalled();
   });

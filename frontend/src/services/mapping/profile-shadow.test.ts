@@ -59,7 +59,7 @@ function separateStore(): ProfileService {
     deleteProfile: async id => run(() => browser.deleteProfile(id)),
     duplicateProfile: async id => run(() => browser.duplicateProfile(id)),
     importProfile: async text => run(() => browser.importProfile(text)),
-    exportProfile: vi.fn(async () => false),
+    exportProfile: vi.fn(async () => null),
   };
 }
 
@@ -114,6 +114,35 @@ describe('shadow service', () => {
     });
   });
 
+  it('never changes a browser profile it did not pair with a database profile', async () => {
+    browserItems.set(
+      'docmapper_mapping_profiles',
+      JSON.stringify([{ id: 'legacy', name: 'Legacy', fields: [], destinationMappings: [] }]),
+    );
+    const database = separateStore();
+    await database.importProfile(FILE);
+    const [stored] = await database.getAllProfiles();
+    const service = createShadowService(database, createBrowserService(), log);
+    await service.getAllProfiles();
+    await service.deleteProfile(stored.id);
+    const browserProfiles = JSON.parse(browserItems.get('docmapper_mapping_profiles') ?? '[]');
+    expect(browserProfiles.map((p: MappingProfile) => p.id)).toEqual(['legacy']);
+    expect(log).toHaveBeenCalled();
+  });
+
+  it('labels database failures of the stored comparison', async () => {
+    const database = separateStore();
+    const service = createShadowService(database, createBrowserService(), log);
+    database.getAllProfiles = async () => {
+      throw new Error('db down');
+    };
+    await service.importProfile(FILE);
+    expect(log).toHaveBeenCalledWith(SHADOW_LOG_PREFIX, {
+      operation: 'importProfile',
+      databaseError: 'Error: db down',
+    });
+  });
+
   it('logs browser store failures without throwing them', async () => {
     const browser = createBrowserService();
     browser.importProfile = async () => {
@@ -131,7 +160,7 @@ describe('shadow service', () => {
   it('exports through the database store only', async () => {
     const database = separateStore();
     const service = createShadowService(database, createBrowserService(), log);
-    expect(await service.exportProfile({ name: 'A' } as MappingProfile)).toBe(false);
+    expect(await service.exportProfile({ name: 'A' } as MappingProfile)).toBeNull();
     expect(database.exportProfile).toHaveBeenCalled();
   });
 

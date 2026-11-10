@@ -18,8 +18,8 @@ export interface ProfileService {
   deleteProfile(id: string): Promise<boolean>;
   duplicateProfile(id: string): Promise<MappingProfile | undefined>;
   importProfile(text: string): Promise<MappingProfile>;
-  /** Saves the profile as a `.dmap` file; false when the user cancelled. */
-  exportProfile(profile: MappingProfile): Promise<boolean>;
+  /** Saves the profile as a `.dmap` file: the saved file's name, or null when the user cancelled. */
+  exportProfile(profile: MappingProfile): Promise<string | null>;
 }
 
 /** Calls a desktop command (`invoke` of Tauri; replaced in tests). */
@@ -82,8 +82,10 @@ export function createDesktopService(invoke: Invoke = tauriInvoke): ProfileServi
     duplicateProfile: async id =>
       (await call<MappingProfile | null>('profiles_duplicate', { id })) ?? undefined,
     importProfile: text => call<MappingProfile>('profiles_import', { text }),
-    exportProfile: async profile =>
-      (await call<string | null>('profiles_export', { profile })) !== null,
+    exportProfile: async profile => {
+      const path = await call<string | null>('profiles_export', { profile });
+      return path === null ? null : (path.split(/[\\/]/).pop() ?? path);
+    },
   };
 }
 
@@ -100,7 +102,8 @@ export function createBrowserService(): ProfileService {
     importProfile: async text => browserStore.importProfileFromDocMapper(text),
     exportProfile: async profile => {
       browserStore.exportProfileAsDocMapper(profile);
-      return true;
+      // The name the browser store gives the download.
+      return `${profile.name.replace(/[^a-zA-Z0-9_\-]/g, '_')}.dmap`;
     },
   };
 }

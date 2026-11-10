@@ -15,7 +15,7 @@ Commands of `docmapper-desktop` the interface calls with `invoke` (Tauri 2). Arg
 
 Rules:
 
-- Commands run one at a time on the store (one mutex).
+- Profile commands are asynchronous Tauri commands (off the main thread) and run one at a time on the store (one mutex).
 - `profiles_save` with a value that is not a JSON object fails with `type` (`profile is not an object`); the interface never sends one.
 - `profiles_export` proposes `export_docmapper(profile).file_name` in the dialog, filters `.dmap` and writes `contents` as UTF-8; a write failure fails with kind `file` and the operating system's message.
 - `profiles_create_empty` treats a `null` name like a missing one (the default name); the interface never sends `null`.

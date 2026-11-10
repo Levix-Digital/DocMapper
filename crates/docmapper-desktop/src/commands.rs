@@ -1,7 +1,9 @@
 //! Commands the interface calls with `invoke` (contracts in
 //! `specs/006-m0-foundation/contracts/desktop-commands.md` and
 //! `specs/009-profiles-ui-wiring/contracts/desktop-profile-commands.md`). Each
-//! one is a thin handler over a core call.
+//! one is a thin handler over a core call. Profile commands run off the main
+//! thread (`async`), so database work never blocks the window; the store's
+//! mutex keeps them one at a time.
 
 use crate::profiles::{document_from, export_to, CommandError, ProfileState, SaveTarget};
 use serde_json::Value;
@@ -16,7 +18,7 @@ pub fn core_version() -> &'static str {
 }
 
 /// `createEmptyProfile(name)`: a missing or `null` name gives the default name.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_create_empty(
     state: State<'_, ProfileState>,
     name: Option<Value>,
@@ -25,13 +27,13 @@ pub fn profiles_create_empty(
 }
 
 /// `getAllProfiles()`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_list(state: State<'_, ProfileState>) -> Result<Vec<Value>, CommandError> {
     list(&state)
 }
 
 /// `getProfileById(id)`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_get(
     state: State<'_, ProfileState>,
     id: Value,
@@ -40,19 +42,19 @@ pub fn profiles_get(
 }
 
 /// `saveProfile(profile)`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_save(state: State<'_, ProfileState>, profile: Value) -> Result<(), CommandError> {
     save(&state, profile)
 }
 
 /// `deleteProfile(id)`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_delete(state: State<'_, ProfileState>, id: Value) -> Result<bool, CommandError> {
     delete(&state, &id)
 }
 
 /// `duplicateProfile(id)`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_duplicate(
     state: State<'_, ProfileState>,
     id: Value,
@@ -61,7 +63,7 @@ pub fn profiles_duplicate(
 }
 
 /// `importProfileFromDocMapper(text)`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn profiles_import(
     state: State<'_, ProfileState>,
     text: String,
