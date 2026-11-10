@@ -17,7 +17,15 @@ tauri-build = { version = "2.6", features = [] }
 
 [dependencies]
 docmapper-core.workspace = true
+docmapper-sqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 tauri = { version = "2.12", features = [] }
+tauri-plugin-dialog = "2.8"
+
+[dev-dependencies]
+rusqlite = "0.41"
+tempfile = "3"
 
 [lints]
 workspace = true
