@@ -1,0 +1,33 @@
+{
+  "id": "export-number-name",
+  "module": "profiles",
+  "function": "exportProfileAsDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "p",
+          "name": 12,
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ]
+    }
+  ],
+  "error": {
+    "name": "TypeError",
+    "message": "profile.name.replace is not a function"
+  }
+}

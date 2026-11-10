@@ -1,0 +1,66 @@
+{
+  "id": "delete-missing",
+  "module": "profiles",
+  "function": "deleteProfile",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "profile-a",
+          "name": "Invoice",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        },
+        {
+          "id": "profile-b",
+          "name": "Bill of lading",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "profile-z"
+      ]
+    }
+  ],
+  "output": {
+    "returned": true,
+    "stored": [
+      {
+        "id": "profile-a",
+        "name": "Invoice",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      },
+      {
+        "id": "profile-b",
+        "name": "Bill of lading",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      }
+    ]
+  }
+}

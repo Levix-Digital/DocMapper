@@ -10,7 +10,7 @@ export default defineConfig({
         coverage: {
             provider: 'v8',
             allowExternal: true,
-            include: ['**/parity/text/**/*.ts'],
+            include: ['**/parity/text/**/*.ts', '**/parity/profiles/**/*.ts'],
             exclude: ['**/*.test.ts'],
             reporter: ['text'],
             thresholds: { branches: 100, functions: 100, lines: 100, statements: 100 },

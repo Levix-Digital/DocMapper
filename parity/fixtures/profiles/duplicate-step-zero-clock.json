@@ -1,0 +1,65 @@
+{
+  "id": "duplicate-step-zero-clock",
+  "module": "profiles",
+  "function": "duplicateProfile",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "profile-a",
+          "name": "Invoice",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 0
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "profile-a"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "id": "profile-1794225600000-4fzzz",
+      "name": "Invoice (Copy)",
+      "version": 1,
+      "createdAt": "2026-11-09T12:00:00.000Z",
+      "updatedAt": "2026-11-09T12:00:00.000Z",
+      "fields": [],
+      "destinationMappings": [],
+      "outputFileNamePattern": "{originalName}_{seq:001}"
+    },
+    "stored": [
+      {
+        "id": "profile-a",
+        "name": "Invoice",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      },
+      {
+        "id": "profile-1794225600000-4fzzz",
+        "name": "Invoice (Copy)",
+        "version": 1,
+        "createdAt": "2026-11-09T12:00:00.000Z",
+        "updatedAt": "2026-11-09T12:00:00.000Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      }
+    ]
+  }
+}

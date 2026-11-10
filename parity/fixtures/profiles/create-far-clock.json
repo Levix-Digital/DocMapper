@@ -1,0 +1,33 @@
+{
+  "id": "create-far-clock",
+  "module": "profiles",
+  "function": "createEmptyProfile",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 253402300799000,
+        "step": 7
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "x"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "id": "profile-253402300799000-4fzzz",
+      "name": "x",
+      "version": 1,
+      "createdAt": "9999-12-31T23:59:59.007Z",
+      "updatedAt": "9999-12-31T23:59:59.014Z",
+      "fields": [],
+      "destinationMappings": [],
+      "outputFileNamePattern": "{originalName}_{seq:001}"
+    },
+    "stored": []
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "import-key-order",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"zeta\": 1, \"fields\": [], \"updatedAt\": \"old\", \"name\": \"K\", \"destinationMappings\": [], \"id\": \"keep-position\"}"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "zeta": 1,
+      "fields": [],
+      "updatedAt": "2026-11-09T12:00:00.001Z",
+      "name": "K",
+      "destinationMappings": [],
+      "id": "profile-1794225600000-4fzzz"
+    },
+    "stored": [
+      {
+        "zeta": 1,
+        "fields": [],
+        "updatedAt": "2026-11-09T12:00:00.002Z",
+        "name": "K",
+        "destinationMappings": [],
+        "id": "profile-1794225600000-4fzzz"
+      }
+    ]
+  }
+}

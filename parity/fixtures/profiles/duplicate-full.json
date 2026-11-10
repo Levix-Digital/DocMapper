@@ -1,0 +1,301 @@
+{
+  "id": "duplicate-full",
+  "module": "profiles",
+  "function": "duplicateProfile",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "profile-1762689600000-abcde",
+          "name": "CMR Rotterdam",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [
+            {
+              "id": "field-1",
+              "name": "Seal Number",
+              "color": "#ec4899",
+              "anchorText": "Plombe / Seal",
+              "labelBox": {
+                "x": 6.65,
+                "y": 30.7,
+                "width": 12.5,
+                "height": 0.8,
+                "page": 1
+              },
+              "valueBox": {
+                "x": 16,
+                "y": 36.3,
+                "width": 6.8,
+                "height": 0.6,
+                "page": 1
+              },
+              "validationPattern": "^[A-Z]{3}\\d+$",
+              "dataType": "alphanumeric",
+              "isRequired": true,
+              "sampleExtractedValue": "KSM1012290"
+            }
+          ],
+          "destinationMappings": [
+            {
+              "id": "dest-1",
+              "sourceType": "field",
+              "fieldId": "field-1",
+              "prefix": "Seal: ",
+              "targetBox": {
+                "x": 29,
+                "y": 21.3,
+                "width": 25,
+                "height": 2.7,
+                "page": 1
+              },
+              "renderFormat": "CODE128",
+              "fontSize": 10,
+              "horizontalAlign": "center",
+              "verticalAlign": "middle"
+            },
+            {
+              "id": "dest-2",
+              "sourceType": "custom",
+              "fieldId": null,
+              "customText": "Checked",
+              "targetBox": {
+                "x": 1e-7,
+                "y": 0.1,
+                "width": 100,
+                "height": 1e+21,
+                "page": 2
+              },
+              "renderFormat": "QR_CODE"
+            }
+          ],
+          "outputFileNamePattern": "{Seal Number}_{date}",
+          "destinationTemplateBase64": "JVBERi0xLjcK",
+          "destinationTemplateName": "Delivery note.pdf"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.75
+      ],
+      "args": [
+        "profile-1762689600000-abcde"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "id": "profile-1794225600000-r",
+      "name": "CMR Rotterdam (Copy)",
+      "version": 1,
+      "createdAt": "2026-11-09T12:00:00.001Z",
+      "updatedAt": "2026-11-09T12:00:00.002Z",
+      "fields": [
+        {
+          "id": "field-1",
+          "name": "Seal Number",
+          "color": "#ec4899",
+          "anchorText": "Plombe / Seal",
+          "labelBox": {
+            "x": 6.65,
+            "y": 30.7,
+            "width": 12.5,
+            "height": 0.8,
+            "page": 1
+          },
+          "valueBox": {
+            "x": 16,
+            "y": 36.3,
+            "width": 6.8,
+            "height": 0.6,
+            "page": 1
+          },
+          "validationPattern": "^[A-Z]{3}\\d+$",
+          "dataType": "alphanumeric",
+          "isRequired": true,
+          "sampleExtractedValue": "KSM1012290"
+        }
+      ],
+      "destinationMappings": [
+        {
+          "id": "dest-1",
+          "sourceType": "field",
+          "fieldId": "field-1",
+          "prefix": "Seal: ",
+          "targetBox": {
+            "x": 29,
+            "y": 21.3,
+            "width": 25,
+            "height": 2.7,
+            "page": 1
+          },
+          "renderFormat": "CODE128",
+          "fontSize": 10,
+          "horizontalAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "id": "dest-2",
+          "sourceType": "custom",
+          "fieldId": null,
+          "customText": "Checked",
+          "targetBox": {
+            "x": 1e-7,
+            "y": 0.1,
+            "width": 100,
+            "height": 1e+21,
+            "page": 2
+          },
+          "renderFormat": "QR_CODE"
+        }
+      ],
+      "outputFileNamePattern": "{Seal Number}_{date}",
+      "destinationTemplateBase64": "JVBERi0xLjcK",
+      "destinationTemplateName": "Delivery note.pdf"
+    },
+    "stored": [
+      {
+        "id": "profile-1762689600000-abcde",
+        "name": "CMR Rotterdam",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [
+          {
+            "id": "field-1",
+            "name": "Seal Number",
+            "color": "#ec4899",
+            "anchorText": "Plombe / Seal",
+            "labelBox": {
+              "x": 6.65,
+              "y": 30.7,
+              "width": 12.5,
+              "height": 0.8,
+              "page": 1
+            },
+            "valueBox": {
+              "x": 16,
+              "y": 36.3,
+              "width": 6.8,
+              "height": 0.6,
+              "page": 1
+            },
+            "validationPattern": "^[A-Z]{3}\\d+$",
+            "dataType": "alphanumeric",
+            "isRequired": true,
+            "sampleExtractedValue": "KSM1012290"
+          }
+        ],
+        "destinationMappings": [
+          {
+            "id": "dest-1",
+            "sourceType": "field",
+            "fieldId": "field-1",
+            "prefix": "Seal: ",
+            "targetBox": {
+              "x": 29,
+              "y": 21.3,
+              "width": 25,
+              "height": 2.7,
+              "page": 1
+            },
+            "renderFormat": "CODE128",
+            "fontSize": 10,
+            "horizontalAlign": "center",
+            "verticalAlign": "middle"
+          },
+          {
+            "id": "dest-2",
+            "sourceType": "custom",
+            "fieldId": null,
+            "customText": "Checked",
+            "targetBox": {
+              "x": 1e-7,
+              "y": 0.1,
+              "width": 100,
+              "height": 1e+21,
+              "page": 2
+            },
+            "renderFormat": "QR_CODE"
+          }
+        ],
+        "outputFileNamePattern": "{Seal Number}_{date}",
+        "destinationTemplateBase64": "JVBERi0xLjcK",
+        "destinationTemplateName": "Delivery note.pdf"
+      },
+      {
+        "id": "profile-1794225600000-r",
+        "name": "CMR Rotterdam (Copy)",
+        "version": 1,
+        "createdAt": "2026-11-09T12:00:00.001Z",
+        "updatedAt": "2026-11-09T12:00:00.003Z",
+        "fields": [
+          {
+            "id": "field-1",
+            "name": "Seal Number",
+            "color": "#ec4899",
+            "anchorText": "Plombe / Seal",
+            "labelBox": {
+              "x": 6.65,
+              "y": 30.7,
+              "width": 12.5,
+              "height": 0.8,
+              "page": 1
+            },
+            "valueBox": {
+              "x": 16,
+              "y": 36.3,
+              "width": 6.8,
+              "height": 0.6,
+              "page": 1
+            },
+            "validationPattern": "^[A-Z]{3}\\d+$",
+            "dataType": "alphanumeric",
+            "isRequired": true,
+            "sampleExtractedValue": "KSM1012290"
+          }
+        ],
+        "destinationMappings": [
+          {
+            "id": "dest-1",
+            "sourceType": "field",
+            "fieldId": "field-1",
+            "prefix": "Seal: ",
+            "targetBox": {
+              "x": 29,
+              "y": 21.3,
+              "width": 25,
+              "height": 2.7,
+              "page": 1
+            },
+            "renderFormat": "CODE128",
+            "fontSize": 10,
+            "horizontalAlign": "center",
+            "verticalAlign": "middle"
+          },
+          {
+            "id": "dest-2",
+            "sourceType": "custom",
+            "fieldId": null,
+            "customText": "Checked",
+            "targetBox": {
+              "x": 1e-7,
+              "y": 0.1,
+              "width": 100,
+              "height": 1e+21,
+              "page": 2
+            },
+            "renderFormat": "QR_CODE"
+          }
+        ],
+        "outputFileNamePattern": "{Seal Number}_{date}",
+        "destinationTemplateBase64": "JVBERi0xLjcK",
+        "destinationTemplateName": "Delivery note.pdf"
+      }
+    ]
+  }
+}

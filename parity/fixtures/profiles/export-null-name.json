@@ -1,0 +1,27 @@
+{
+  "id": "export-null-name",
+  "module": "profiles",
+  "function": "exportProfileAsDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "p",
+          "name": null
+        }
+      ]
+    }
+  ],
+  "error": {
+    "name": "TypeError",
+    "message": "Cannot read properties of null (reading 'replace')"
+  }
+}

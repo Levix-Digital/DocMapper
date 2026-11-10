@@ -1,0 +1,24 @@
+{
+  "id": "import-trailing-text",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"name\":\"Imported\",\"fields\":[],\"destinationMappings\":[]} x"
+      ]
+    }
+  ],
+  "error": {
+    "name": "SyntaxError",
+    "message": "Unexpected non-whitespace character after JSON at position 57 (line 1 column 58)"
+  }
+}

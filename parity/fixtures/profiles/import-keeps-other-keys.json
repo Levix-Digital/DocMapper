@@ -1,0 +1,54 @@
+{
+  "id": "import-keeps-other-keys",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"name\": \"V\", \"fields\": [{\"any\": true}], \"destinationMappings\": [\"x\"], \"version\": \"nine\", \"createdAt\": 5}"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "name": "V",
+      "fields": [
+        {
+          "any": true
+        }
+      ],
+      "destinationMappings": [
+        "x"
+      ],
+      "version": "nine",
+      "createdAt": 5,
+      "id": "profile-1794225600000-4fzzz",
+      "updatedAt": "2026-11-09T12:00:00.001Z"
+    },
+    "stored": [
+      {
+        "name": "V",
+        "fields": [
+          {
+            "any": true
+          }
+        ],
+        "destinationMappings": [
+          "x"
+        ],
+        "version": "nine",
+        "createdAt": 5,
+        "id": "profile-1794225600000-4fzzz",
+        "updatedAt": "2026-11-09T12:00:00.002Z"
+      }
+    ]
+  }
+}

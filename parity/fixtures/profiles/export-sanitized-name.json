@@ -1,0 +1,36 @@
+{
+  "id": "export-sanitized-name",
+  "module": "profiles",
+  "function": "exportProfileAsDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "p",
+          "name": "Nota fiscal / São Paulo: 2026*",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "fileName": "Nota_fiscal___S_o_Paulo__2026_.dmap",
+      "contents": "{\n  \"id\": \"p\",\n  \"name\": \"Nota fiscal / São Paulo: 2026*\",\n  \"version\": 1,\n  \"createdAt\": \"2026-01-02T03:04:05.006Z\",\n  \"updatedAt\": \"2026-01-02T03:04:05.006Z\",\n  \"fields\": [],\n  \"destinationMappings\": [],\n  \"outputFileNamePattern\": \"{originalName}_{seq:001}\"\n}"
+    },
+    "stored": []
+  }
+}

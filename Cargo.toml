@@ -4,6 +4,7 @@ members = [
     "crates/docmapper-core",
     "crates/docmapper-desktop",
     "crates/docmapper-parity",
+    "crates/docmapper-sqlite",
 ]
 
 [workspace.package]
@@ -15,6 +16,7 @@ rust-version = "1.97"
 
 [workspace.dependencies]
 docmapper-core = { path = "crates/docmapper-core" }
+docmapper-sqlite = { path = "crates/docmapper-sqlite" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 
@@ -27,4 +29,12 @@ unwrap_used = "warn"
 # The core's text tests build names near the 2^29 code unit limit of
 # JavaScript strings; an optimized core keeps them fast in test builds.
 [profile.dev.package.docmapper-core]
+opt-level = 2
+
+# The profile repository is timed in its tests (SC-004 of M3: 1,000 profiles
+# listed under 100 ms); its JSON reading is optimized in test builds too.
+[profile.dev.package.serde_json]
+opt-level = 2
+
+[profile.dev.package.docmapper-sqlite]
 opt-level = 2

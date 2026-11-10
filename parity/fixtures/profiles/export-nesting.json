@@ -1,0 +1,45 @@
+{
+  "id": "export-nesting",
+  "module": "profiles",
+  "function": "exportProfileAsDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        {
+          "id": "p",
+          "name": "n",
+          "a": [],
+          "o": {},
+          "m": [
+            [],
+            [
+              {}
+            ],
+            {
+              "x": [
+                true,
+                false,
+                null
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "fileName": "n.dmap",
+      "contents": "{\n  \"id\": \"p\",\n  \"name\": \"n\",\n  \"a\": [],\n  \"o\": {},\n  \"m\": [\n    [],\n    [\n      {}\n    ],\n    {\n      \"x\": [\n        true,\n        false,\n        null\n      ]\n    }\n  ]\n}"
+    },
+    "stored": []
+  }
+}

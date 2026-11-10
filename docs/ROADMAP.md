@@ -7,12 +7,12 @@ Each release: `## vX.Y.Z: <name>` with the fields `Status` (planned, in_progress
 ## v0.1.0: Desktop core
 - **Status**: planned
 - **Goal**: The app runs as a Tauri desktop app with text utilities, profiles in SQLite and LSIE in Rust, proven by parity fixtures
-- **Items**: FEAT-001, FEAT-002, FEAT-003, FEAT-004, FEAT-005, FEAT-006, FEAT-009, FEAT-010, FEAT-011, FEAT-013, FEAT-015, FEAT-016, FEAT-017, FEAT-018, FEAT-031, FEAT-032, FEAT-033, FEAT-049
+- **Items**: FEAT-001, FEAT-002, FEAT-003, FEAT-004, FEAT-005, FEAT-006, FEAT-009, FEAT-010, FEAT-011, FEAT-013, FEAT-015, FEAT-016, FEAT-017, FEAT-018, FEAT-031, FEAT-032, FEAT-033, FEAT-049, FEAT-050
 
 ## v0.2.0: Full flow in Rust
 - **Status**: planned
 - **Goal**: PDF reading, batch processing and stamping run in Rust; the browser build and AssemblyScript are removed
-- **Items**: FEAT-019, FEAT-020, FEAT-021, FEAT-022, FEAT-023, FEAT-025, FEAT-026, FEAT-027, BUG-001, BUG-002
+- **Items**: FEAT-019, FEAT-020, FEAT-021, FEAT-022, FEAT-023, FEAT-025, FEAT-026, FEAT-027, BUG-001, BUG-002, BUG-004, BUG-005
 
 ## v0.3.0: Connected and governed
 - **Status**: planned

@@ -1,6 +1,7 @@
 {
   "modules": {
     "harness": "ported",
-    "text": "ported"
+    "text": "ported",
+    "profiles": "ported"
   }
 }

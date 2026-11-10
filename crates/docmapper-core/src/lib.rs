@@ -1,6 +1,7 @@
 //! DocMapper core: the domain and the ports it needs. It depends on no
 //! framework or driver (`architecture.forbidden_core_imports`).
 
+pub mod profiles;
 pub mod text;
 
 /// Version of the core crate, as set in the workspace manifest.

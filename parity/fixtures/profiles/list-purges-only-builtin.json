@@ -1,0 +1,33 @@
+{
+  "id": "list-purges-only-builtin",
+  "module": "profiles",
+  "function": "getAllProfiles",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "builtin-cmr-standard",
+          "name": "Standard CMR (Built-in)",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": []
+    }
+  ],
+  "output": {
+    "returned": [],
+    "stored": []
+  }
+}

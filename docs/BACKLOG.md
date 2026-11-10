@@ -30,31 +30,23 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: -
 - **Description**: flattenDictionary turns arrays into text with String(array); an object item with an own toString key throws TypeError 'Cannot convert object to primitive value'. Translation files do not hold such values today. Kept for parity in M1 (ADR-0003); fix after the switch in M8.
 
+### BUG-004: Profile import accepts a name that is not text and breaks later imports
+- **Severity**: low
+- **Epic**: EPIC-004
+- **Status**: open
+- **Found**: 2026-11-09, M3 characterization (specs/008-m3-profiles-storage)
+- **Plan**: -
+- **Description**: importProfileFromDocMapper only checks that name is truthy: a number, true, an object or an array is stored as the name when no profile is stored, and every later import then throws TypeError 'p.name.toLowerCase is not a function'. Kept for parity in M3 (ADR-0003); fix after the switch of the profile store.
+
+### BUG-005: Profile import stores the other keys of the file without validation
+- **Severity**: low
+- **Epic**: EPIC-004
+- **Status**: open
+- **Found**: 2026-11-09, M3 characterization (specs/008-m3-profiles-storage)
+- **Plan**: -
+- **Description**: importProfileFromDocMapper keeps every key of the file besides id, name and updatedAt as it is (version, createdAt, field and mapping contents, unknown keys), so a .dmap file can store data that does not fit the profile model. Kept for parity in M3 (ADR-0003); fix after the switch of the profile store.
+
 ## Features
-
-### FEAT-009: Characterization tests and fixtures for profiles and .docmapper files
-- **Priority**: high
-- **Epic**: EPIC-004
-- **Status**: open
-- **Found**: 2026-11-08
-- **Plan**: -
-- **Description**: Parity on the stored JSON of each profile.
-
-### FEAT-010: Rust profile model and ProfileRepository port
-- **Priority**: high
-- **Epic**: EPIC-004
-- **Status**: open
-- **Found**: 2026-11-08
-- **Plan**: -
-- **Description**: Ids and clock injected.
-
-### FEAT-011: Local SQLite repository
-- **Priority**: high
-- **Epic**: EPIC-004
-- **Status**: open
-- **Found**: 2026-11-08
-- **Plan**: -
-- **Description**: WAL mode, additive migrations.
 
 ### FEAT-012: Central PostgreSQL repository by connection string
 - **Priority**: medium
@@ -360,6 +352,14 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: -
 - **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate.
 
+### FEAT-050: Interface wired to the Rust profile store through application commands
+- **Priority**: high
+- **Epic**: EPIC-004
+- **Status**: open
+- **Found**: 2026-11-09, M3 plan (specs/008-m3-profiles-storage)
+- **Plan**: -
+- **Description**: ADR-0003 steps d and e for the profiles module: desktop commands over ProfileStore and the SQLite repository in the application data directory, the interface calling them with a shadow mode that compares the stored JSON with the browser store and logs differences, then removal of the browser store. Decided by the product owner on 2026-11-09 as a separate item after M3.
+
 ## Improvements
 
 ## Adjustments
@@ -530,3 +530,30 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Found**: 2026-11-08
 - **Closed**: 2026-11-09, The AssemblyScript CMR core is not called by the interface; removed instead of ported (ADR-0011, decided by the product owner 2026-11-09)
 - **Description**: AssemblyScript scanner, cleaning, dates, CMR parser and processDocument, byte-identical JSON text.
+
+### FEAT-009: Characterization tests and fixtures for profiles and .docmapper files
+- **Priority**: high
+- **Epic**: EPIC-004
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
+- **Closed**: 2026-11-09, plan docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
+- **Description**: Parity on the stored JSON of each profile.
+
+### FEAT-010: Rust profile model and ProfileRepository port
+- **Priority**: high
+- **Epic**: EPIC-004
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
+- **Closed**: 2026-11-09, plan docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
+- **Description**: Ids and clock injected.
+
+### FEAT-011: Local SQLite repository
+- **Priority**: high
+- **Epic**: EPIC-004
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
+- **Closed**: 2026-11-09, plan docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
+- **Description**: WAL mode, additive migrations.

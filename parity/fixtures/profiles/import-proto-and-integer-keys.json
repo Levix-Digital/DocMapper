@@ -1,0 +1,48 @@
+{
+  "id": "import-proto-and-integer-keys",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"__proto__\": {\"a\": 1}, \"10\": \"ten\", \"2\": \"two\", \"name\": \"P\", \"fields\": [], \"destinationMappings\": []}"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "2": "two",
+      "10": "ten",
+      "__proto__": {
+        "a": 1
+      },
+      "name": "P",
+      "fields": [],
+      "destinationMappings": [],
+      "id": "profile-1794225600000-4fzzz",
+      "updatedAt": "2026-11-09T12:00:00.001Z"
+    },
+    "stored": [
+      {
+        "2": "two",
+        "10": "ten",
+        "__proto__": {
+          "a": 1
+        },
+        "name": "P",
+        "fields": [],
+        "destinationMappings": [],
+        "id": "profile-1794225600000-4fzzz",
+        "updatedAt": "2026-11-09T12:00:00.002Z"
+      }
+    ]
+  }
+}

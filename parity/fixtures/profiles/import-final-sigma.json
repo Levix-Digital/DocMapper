@@ -1,0 +1,59 @@
+{
+  "id": "import-final-sigma",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "x",
+          "name": "οδος",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"name\":\"ΟΔΟΣ\",\"fields\":[],\"destinationMappings\":[]}"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "name": "ΟΔΟΣ (1)",
+      "fields": [],
+      "destinationMappings": [],
+      "id": "profile-1794225600000-4fzzz",
+      "updatedAt": "2026-11-09T12:00:00.001Z"
+    },
+    "stored": [
+      {
+        "id": "x",
+        "name": "οδος",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      },
+      {
+        "name": "ΟΔΟΣ (1)",
+        "fields": [],
+        "destinationMappings": [],
+        "id": "profile-1794225600000-4fzzz",
+        "updatedAt": "2026-11-09T12:00:00.002Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+[package]
+name = "docmapper-sqlite"
+description = "Local SQLite repository of DocMapper profiles (ADR-0006)"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+docmapper-core.workspace = true
+rusqlite = { version = "0.41", features = ["bundled"] }
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

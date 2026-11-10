@@ -1,0 +1,79 @@
+{
+  "id": "import-name-taken-twice",
+  "module": "profiles",
+  "function": "importProfileFromDocMapper",
+  "input": [
+    {
+      "stored": [
+        {
+          "id": "x",
+          "name": "IMPORTED",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        },
+        {
+          "id": "y",
+          "name": "imported (1)",
+          "version": 1,
+          "createdAt": "2026-01-02T03:04:05.006Z",
+          "updatedAt": "2026-01-02T03:04:05.006Z",
+          "fields": [],
+          "destinationMappings": [],
+          "outputFileNamePattern": "{originalName}_{seq:001}"
+        }
+      ],
+      "clock": {
+        "start": 1794225600000,
+        "step": 1
+      },
+      "random": [
+        0.123456789
+      ],
+      "args": [
+        "{\"name\":\"Imported\",\"fields\":[],\"destinationMappings\":[]}"
+      ]
+    }
+  ],
+  "output": {
+    "returned": {
+      "name": "Imported (2)",
+      "fields": [],
+      "destinationMappings": [],
+      "id": "profile-1794225600000-4fzzz",
+      "updatedAt": "2026-11-09T12:00:00.001Z"
+    },
+    "stored": [
+      {
+        "id": "x",
+        "name": "IMPORTED",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      },
+      {
+        "id": "y",
+        "name": "imported (1)",
+        "version": 1,
+        "createdAt": "2026-01-02T03:04:05.006Z",
+        "updatedAt": "2026-01-02T03:04:05.006Z",
+        "fields": [],
+        "destinationMappings": [],
+        "outputFileNamePattern": "{originalName}_{seq:001}"
+      },
+      {
+        "name": "Imported (2)",
+        "fields": [],
+        "destinationMappings": [],
+        "id": "profile-1794225600000-4fzzz",
+        "updatedAt": "2026-11-09T12:00:00.002Z"
+      }
+    ]
+  }
+}
