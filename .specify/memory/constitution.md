@@ -1,7 +1,7 @@
 <!-- dev-cycle-constitution
 generated-by: dev-cycle-protocol/constitution.py (do not edit; change a source and regenerate)
-sources-sha256: ea73a38508ac1d3f30183aad73ec4ad4db27ab6511e8bcabf3d451b1b7aeb323
-content-sha256: afbbfaacc03d3ce44ec1c152a2488020817f29dce81c5221ade6fbc1f29072d2
+sources-sha256: a21d0c3b6d440e427c3a728822200a9d91e6ac1177362093855d5b319f8a0f5a
+content-sha256: b8eccbead1687b8cf936f9b991c40345da80384b164429b3cd1f5b54950ba652
 -->
 # docmapper Constitution
 
@@ -177,6 +177,7 @@ Accepted decisions; a plan that contradicts one needs a new ADR that supersedes 
 - ADR-0009: PDF reading with pdfium and a fixed glyph tolerance (`docs/adr/0009-pdf-reading-with-pdfium-and-a-fixed-glyph-tolerance.md`)
 - ADR-0010: Validation pattern errors compared by presence, not by message (`docs/adr/0010-validation-pattern-errors-compared-by-presence-not-by-messag.md`)
 - ADR-0011: Unused AssemblyScript CMR core removed instead of ported (`docs/adr/0011-unused-assemblyscript-cmr-core-removed-instead-of-ported.md`)
+- ADR-0012: Malformed profile files compared by error kind; JSON outside Rust strings and f64 refused (`docs/adr/0012-malformed-profile-files-compared-by-error-kind-json-outside.md`)
 
 ## Governance
 
@@ -184,4 +185,4 @@ Accepted decisions; a plan that contradicts one needs a new ADR that supersedes 
 - Amendments change the source, not this file: an ADR for decisions, the technical specification for requirements and constraints, `.dev-cycle.json` for the architecture style, the skills for principles. Then run `constitution.py generate` and commit the result with the change.
 - Gate 3 of the development cycle blocks a plan while this file is stale or edited by hand.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-09
+**Version**: 1.2.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-10

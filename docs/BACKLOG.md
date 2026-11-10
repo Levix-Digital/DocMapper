@@ -59,9 +59,9 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 ### FEAT-013: Import of profiles from the browser version
 - **Priority**: medium
 - **Epic**: EPIC-004
-- **Status**: open
+- **Status**: planned
 - **Found**: 2026-11-08
-- **Plan**: -
+- **Plan**: docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
 - **Description**: Through .docmapper export and import.
 
 ### FEAT-014: Free edition limit of three document families
@@ -355,9 +355,9 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 ### FEAT-050: Interface wired to the Rust profile store through application commands
 - **Priority**: high
 - **Epic**: EPIC-004
-- **Status**: open
+- **Status**: planned
 - **Found**: 2026-11-09, M3 plan (specs/008-m3-profiles-storage)
-- **Plan**: -
+- **Plan**: docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
 - **Description**: ADR-0003 steps d and e for the profiles module: desktop commands over ProfileStore and the SQLite repository in the application data directory, the interface calling them with a shadow mode that compares the stored JSON with the browser store and logs differences, then removal of the browser store. Decided by the product owner on 2026-11-09 as a separate item after M3.
 
 ## Improvements
