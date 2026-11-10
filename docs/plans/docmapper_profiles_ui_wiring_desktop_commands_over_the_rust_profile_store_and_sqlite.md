@@ -4,10 +4,10 @@ project: docmapper
 title: 'Profiles UI wiring: desktop commands over the Rust profile store and SQLite'
 kind: feature
 version: v0.1.0
-status: active
+status: completed
 author: LeviGuilherme
 created_at: '2026-11-10T12:55:49'
-updated_at: '2026-11-10T12:56:17'
+updated_at: '2026-11-10T17:18:52'
 session_id: null
 tags: []
 supersedes: null
@@ -19,15 +19,25 @@ backlog_items:
 spec_dir: specs/009-profiles-ui-wiring
 milestones:
 - name: setup
-  done: false
+  done: true
+  done_at: '2026-11-10'
+  by: LeviGuilherme
 - name: commands
-  done: false
+  done: true
+  done_at: '2026-11-10'
+  by: LeviGuilherme
 - name: interface
-  done: false
+  done: true
+  done_at: '2026-11-10'
+  by: LeviGuilherme
 - name: shadow
-  done: false
+  done: true
+  done_at: '2026-11-10'
+  by: LeviGuilherme
 - name: docs
-  done: false
+  done: true
+  done_at: '2026-11-10'
+  by: LeviGuilherme
 status_log:
 - at: '2026-11-10T12:55:49'
   by: LeviGuilherme
@@ -40,6 +50,25 @@ status_log:
 - at: '2026-11-10T12:56:34'
   by: LeviGuilherme
   note: 'Approved with open bugs before new work BUG-001, BUG-002, BUG-003, BUG-004, BUG-005: BUG-001, BUG-002, BUG-004 and BUG-005 are scheduled for v0.2.0 and BUG-003 for v0.3.0 by the product owner (2026-11-09)'
+- at: '2026-11-10T17:16:56'
+  by: LeviGuilherme
+  note: Milestone 'setup' completed
+- at: '2026-11-10T17:17:00'
+  by: LeviGuilherme
+  note: Milestone 'commands' completed
+- at: '2026-11-10T17:17:01'
+  by: LeviGuilherme
+  note: Milestone 'interface' completed
+- at: '2026-11-10T17:17:01'
+  by: LeviGuilherme
+  note: Milestone 'shadow' completed
+- at: '2026-11-10T17:18:52'
+  by: LeviGuilherme
+  note: Milestone 'docs' completed
+- at: '2026-11-10T17:18:52'
+  by: LeviGuilherme
+  status: completed
+  note: All milestones completed
 ---
 
 # Profiles UI wiring: desktop commands over the Rust profile store and SQLite

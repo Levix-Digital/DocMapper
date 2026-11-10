@@ -161,7 +161,9 @@ npm run tauri --prefix frontend -- dev       # desktop app with the live interfa
 npm run dev --prefix frontend                # browser version on http://localhost:5173
 ```
 
-The release build is at `target/release/docmapper-desktop` (`.exe` on Windows), with its bundle under `target/release/bundle`. The interface checks its license online as before: set `VITE_LICENSE_SERVER` and `VITE_LICENSE_KEY` (see `.env.example`) for both versions.
+The release build is at `target/release/docmapper-desktop` (`.exe` on Windows), with its bundle under `target/release/bundle`.
+
+The desktop app keeps mapping profiles in a local database, `docmapper.sqlite3`, in the application data folder (`~/.local/share/digital.levix.docmapper` on Linux, `~/Library/Application Support/digital.levix.docmapper` on macOS, `%APPDATA%\digital.levix.docmapper` on Windows). The browser version keeps them in the browser's storage. To bring profiles from the browser version to the desktop app, export each one as a `.dmap` file in the browser (Profiles, Export) and import it in the desktop app (Profiles, Import). The interface checks its license online as before: set `VITE_LICENSE_SERVER` and `VITE_LICENSE_KEY` (see `.env.example`) for both versions.
 
 ## Development
 

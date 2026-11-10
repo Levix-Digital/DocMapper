@@ -34,7 +34,7 @@ flowchart LR
 | [Model Services](docs/architecture/model-services.md) | Calls to the Gemini API for validation pattern suggestions and vision fallback extraction. |
 | [Parity Harness](docs/architecture/parity.md) | Fixtures, fixture writer, TypeScript oracle, Rust runner and id checker that prove each ported module gives the same outputs as the TypeScript code. |
 | [PDF Stamping](docs/architecture/stamping.md) | Writes values, Code128 barcodes and QR codes onto destination PDFs and the shipment template. |
-| [Profiles](docs/architecture/profiles.md) | Mapping profiles: the profile store, .dmap import and export, the typed model and the profile repository (browser storage today, SQLite in the core). |
+| [Profiles](docs/architecture/profiles.md) | Mapping profiles: the profile store, .dmap import and export, the typed model and the profile repository (local SQLite in the desktop app, browser storage in the browser version). |
 | [Spatial Extraction](docs/architecture/extraction.md) | Reads glyphs with pdf.js and resolves mapped fields with the LSIE engine. |
 | [Text Utilities](docs/architecture/text-utilities.md) | ECMAScript-exact Rust twins of the file name, validation pattern and dictionary helpers. |
 <!-- architecture-docs:subsystems:end -->

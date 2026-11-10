@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-10
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Wire the Vue interface to the Rust profiles, .dmap and SQLite repository through application commands" (backlog FEAT-050 and FEAT-013; epic EPIC-004; ADR-0003 steps d and e, ADR-0006)
 

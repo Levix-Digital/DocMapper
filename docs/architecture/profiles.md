@@ -1,12 +1,12 @@
 ---
 title: Profiles
-summary: 'Mapping profiles: the profile store, .dmap import and export, the typed model and the profile repository (browser storage today, SQLite in the core).'
-code: [frontend/src/services/mapping/profile-store.ts, frontend/src/types/mapping.ts, crates/docmapper-core/src/profiles, crates/docmapper-sqlite]
+summary: 'Mapping profiles: the profile store, .dmap import and export, the typed model and the profile repository (local SQLite in the desktop app, browser storage in the browser version).'
+code: [frontend/src/services/mapping/profile-service.ts, frontend/src/services/mapping/profile-shadow.ts, frontend/src/services/mapping/profile-store.ts, frontend/src/types/mapping.ts, crates/docmapper-core/src/profiles, crates/docmapper-sqlite, crates/docmapper-desktop/src/profiles.rs]
 ---
 
 # Profiles
 
-Mapping profiles: the profile store, `.dmap` import and export, the typed model and the profile repository (browser storage today, SQLite in the core).
+Mapping profiles: the profile store, `.dmap` import and export, the typed model and the profile repository (local SQLite in the desktop app, browser storage in the browser version).
 
 ## Responsibilities
 
@@ -15,7 +15,9 @@ Owns mapping profiles: their types, create, list, find, save, delete and duplica
 ## Structure
 
 - `frontend/src/types/mapping.ts`: `MappingProfile`, `FieldDefinition` (label box, value box, validation pattern, required flag), destination mappings and `ExtractionResult`.
-- `frontend/src/services/mapping/profile-store.ts`: the store the interface uses today, over the browser's `localStorage`: `createEmptyProfile`, `getAllProfiles`, `getProfileById`, `saveProfile`, `deleteProfile`, `duplicateProfile`, `exportProfileAsDocMapper`, `importProfileFromDocMapper`. It also holds `createBuiltinCmrProfile`, which no screen calls; it is not ported.
+- `frontend/src/services/mapping/profile-service.ts`: `ProfileService`, the only entry the screens use (asynchronous): the desktop backend calls the profile commands of the [Desktop Shell](desktop-shell.md); the browser backend wraps `profile-store.ts`. The backend is chosen once at start-up (`isTauri()`); command errors become `Error`s named after their kind (`SyntaxError`, `TypeError`, `RangeError`, `DatabaseError`, `FileError`, `Error` for an invalid file).
+- `frontend/src/services/mapping/profile-shadow.ts`: the shadow mode of ADR-0003 (see Behavior).
+- `frontend/src/services/mapping/profile-store.ts`: the browser version's store, over the browser's `localStorage`, removed with the browser version (FEAT-027): `createEmptyProfile`, `getAllProfiles`, `getProfileById`, `saveProfile`, `deleteProfile`, `duplicateProfile`, `exportProfileAsDocMapper`, `importProfileFromDocMapper`. It also holds `createBuiltinCmrProfile`, which no screen calls; it is not ported.
 - `crates/docmapper-core/src/profiles` (migration module M3, parity module `profiles`), the Rust twin:
   - `store.rs`: `ProfileStore` over a repository, a clock and a random source, one method per TypeScript operation, and `StoreError` (`InvalidFile`, `Syntax`, `Type`, `Range`, `Repository`).
   - `export.rs`: `export_docmapper` gives the file name and text; the caller saves the file.
@@ -35,11 +37,12 @@ Owns mapping profiles: their types, create, list, find, save, delete and duplica
 - Duplicate names a copy `<name> (Copy)`, then `(Copy 2)`, `(Copy 3)`, the first not used (case-sensitive), and returns the copy as built; the stored copy has a later `updatedAt`.
 - Export writes `JSON.stringify(profile, null, 2)` to `<name>.dmap`, where every UTF-16 unit of the name outside `A-Z a-z 0-9 _ -` becomes `_`.
 - Import reads `.dmap` (and legacy `.docmapper`) text, requires a truthy `name` and `fields` and `destinationMappings` lists (`Invalid .dmap file format: ...` otherwise), gives the profile a new id, a name not used yet ignoring case (`<name> (1)`, `(2)`, ...) and a new `updatedAt`, and saves it. Malformed JSON is a `SyntaxError` (the Rust message is its own, ADR-0012). Known kept defects: a truthy name that is not text is accepted when no profile is stored and breaks later imports, and other keys are kept without validation (backlog bugs, fixed after the switch).
+- **Shadow mode** (desktop app, off by default): with `docmapper_profile_shadow` set to `1` in the window's storage at start-up, every operation also runs on the browser store of the window and the two results are compared: the returned value, then the stored lists. Top-level `id`, `createdAt` and `updatedAt` are compared by presence only (each store generates its own), database ids are mapped to browser ids through returned profiles and list positions, and the first difference (key order included) is written to the console as `[profiles shadow]` with its JSON path and both values. Browser store failures are logged, never shown; export is not compared (its text is proven by the parity fixtures).
 - The SQLite repository keeps one row per profile (`profile(id, position, document)`, the document as compact JSON), opens files in WAL mode with a 5-second busy timeout, creates and upgrades its schema with numbered, additive migrations tracked by `PRAGMA user_version`, refuses a database written by a newer DocMapper before writing anything, and reports a stored document that is not a JSON object as corrupt with its position. Documents without a text id are refused by both repositories; the interface never saves one.
 
 ## Interfaces
 
-- The Mapping Studio and the profile management screens call the TypeScript store today. A v0.1.0 item wires them to the Rust store through application commands, with the shadow mode of ADR-0003, then removes the browser store.
+- The Mapping Studio, the profile management window and the Processor call `ProfileService`; in the desktop app every profile operation runs in the Rust store over `docmapper.sqlite3` in the application data directory, through the commands of the [Desktop Shell](desktop-shell.md).
 - LSIE (M4), batch processing (M6) and stamping (M7) read profiles through `MappingProfile::from_document`.
 
 ## Decisions

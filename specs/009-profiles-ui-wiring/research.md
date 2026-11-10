@@ -31,7 +31,7 @@
 
 ## R6: Shadow comparison
 
-- **Decision**: the shadow wrapper runs each operation on the desktop backend (the result returned to the screen) and then on the browser store, and compares the returned value and the stored list after the call. Before comparing, every `id`, `createdAt` and `updatedAt` at the top level of a profile is replaced by a placeholder, and ids passed to the browser store are mapped through a table built from the positions of both lists. Differences go to `console.warn` with the prefix `[profiles shadow]`, the operation, the first differing JSON path and both values. Browser store errors are logged, never shown. Export in shadow mode compares the file name and text the browser store would build, without downloading.
+- **Decision**: the shadow wrapper runs each operation on the desktop backend (the result returned to the screen) and then on the browser store, and compares the returned value and the stored list after the call. Before comparing, every `id`, `createdAt` and `updatedAt` at the top level of a profile is replaced by a placeholder, and ids passed to the browser store are mapped through a table built from the positions of both lists. Differences go to `console.warn` with the prefix `[profiles shadow]`, the operation, the first differing JSON path and both values. Browser store errors are logged, never shown. Export is not compared: the browser export downloads a file, and the export text is already proven byte for byte by the M3 parity fixtures.
 - **Rationale**: FR-007; the two stores generate ids and times from different clocks and random sources, so those values can only be compared by position and presence; everything else, key order included, must be equal.
 - **Alternatives**: injecting the core's clock and random values into the browser store (changes the browser store, which M3 froze as the oracle); comparing only lists (misses returned values such as duplicate names).
 
@@ -42,5 +42,11 @@
 
 ## R8: Tests of the interface
 
-- **Decision**: Vitest unit tests (project `unit`) for the service: backend choice, the desktop backend with a mocked `invoke` (`@tauri-apps/api/mocks` `mockIPC`), error mapping, the shadow comparison (normalization, id mapping, a planted difference logged, browser errors swallowed). Rust tests for the commands call the command functions with a store over an in-memory SQLite repository and a fixed clock and random source; the dialog is behind a small `SaveTarget` trait so tests write to a temporary directory.
+- **Decision**: Vitest unit tests (project `unit`, Node environment) for the service: backend choice, the desktop backend with an injected `invoke` that records commands and returns or rejects payloads, the browser backend over an in-memory storage stub, error mapping, the shadow comparison (normalization, id mapping, a planted difference logged, browser errors swallowed). Rust tests for the commands call the command functions with a store over an in-memory SQLite repository and a fixed clock and random source; the dialog is behind a small `SaveTarget` trait so tests write to a temporary directory.
 - **Rationale**: the window cannot run in CI; the commands and the service are the only new code with logic.
+
+## R9: Browser dialogs in the desktop window
+
+- **Finding** (desktop window under Linux, 2026-11-10): `window.alert` and `window.confirm` show nothing in the Tauri window; `confirm` returns `true` at once, so a profile was deleted without confirmation and a failed import showed no message.
+- **Decision**: the screens show errors in their notice bars (red) and the delete button asks for a second click within 3.5 seconds; the Mapping Studio's other `alert` calls (sample PDF, preview) use the same notice. The file input is cleared after each import so the same file can be imported again.
+- **Alternatives**: the dialog plugin's message and ask dialogs from JavaScript (grants the window a dialog permission and differs between the two builds).

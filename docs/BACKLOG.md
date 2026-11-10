@@ -56,14 +56,6 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: -
 - **Description**: Connection string stored in the keychain; no silent fallback to local.
 
-### FEAT-013: Import of profiles from the browser version
-- **Priority**: medium
-- **Epic**: EPIC-004
-- **Status**: planned
-- **Found**: 2026-11-08
-- **Plan**: docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
-- **Description**: Through .docmapper export and import.
-
 ### FEAT-014: Free edition limit of three document families
 - **Priority**: high
 - **Epic**: EPIC-004
@@ -174,7 +166,7 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Status**: open
 - **Found**: 2026-11-08
 - **Plan**: -
-- **Description**: After M7, per ADR-0001.
+- **Description**: After M7, per ADR-0001. Removes the browser profile store (`frontend/src/services/mapping/profile-store.ts`) and the browser backend of `profile-service.ts` with it (FEAT-050 left them only for the browser version).
 
 ### FEAT-028: Generic VisionModel connector for any model API
 - **Priority**: medium
@@ -351,14 +343,6 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Found**: 2026-11-09, plan docmapper_m0_foundation
 - **Plan**: -
 - **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate.
-
-### FEAT-050: Interface wired to the Rust profile store through application commands
-- **Priority**: high
-- **Epic**: EPIC-004
-- **Status**: planned
-- **Found**: 2026-11-09, M3 plan (specs/008-m3-profiles-storage)
-- **Plan**: docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
-- **Description**: ADR-0003 steps d and e for the profiles module: desktop commands over ProfileStore and the SQLite repository in the application data directory, the interface calling them with a shadow mode that compares the stored JSON with the browser store and logs differences, then removal of the browser store. Decided by the product owner on 2026-11-09 as a separate item after M3.
 
 ## Improvements
 
@@ -557,3 +541,21 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
 - **Closed**: 2026-11-09, plan docmapper_m3_profiles_characterization_rust_profile_store_and_local_sqlite_repository
 - **Description**: WAL mode, additive migrations.
+
+### FEAT-050: Interface wired to the Rust profile store through application commands
+- **Priority**: high
+- **Epic**: EPIC-004
+- **Status**: done
+- **Found**: 2026-11-09, M3 plan (specs/008-m3-profiles-storage)
+- **Plan**: docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
+- **Closed**: 2026-11-10, plan docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
+- **Description**: ADR-0003 steps d and e for the profiles module: desktop commands over ProfileStore and the SQLite repository in the application data directory, the interface calling them with a shadow mode that compares the stored JSON with the browser store and logs differences, then removal of the browser store. Decided by the product owner on 2026-11-09 as a separate item after M3.
+
+### FEAT-013: Import of profiles from the browser version
+- **Priority**: medium
+- **Epic**: EPIC-004
+- **Status**: done
+- **Found**: 2026-11-08
+- **Plan**: docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
+- **Closed**: 2026-11-10, plan docmapper_profiles_ui_wiring_desktop_commands_over_the_rust_profile_store_and_sqlite
+- **Description**: Through .docmapper export and import.

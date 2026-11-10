@@ -18,5 +18,6 @@ Rules:
 - Commands run one at a time on the store (one mutex).
 - `profiles_save` with a value that is not a JSON object fails with `type` (`profile is not an object`); the interface never sends one.
 - `profiles_export` proposes `export_docmapper(profile).file_name` in the dialog, filters `.dmap` and writes `contents` as UTF-8; a write failure fails with kind `file` and the operating system's message.
+- `profiles_create_empty` treats a `null` name like a missing one (the default name); the interface never sends `null`.
 - The existing `core_version` command is unchanged.
 - The window's capabilities stay `core:default`.
