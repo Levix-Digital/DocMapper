@@ -16,11 +16,7 @@ import {
   RotateCcw
 } from 'lucide-vue-next';
 import type { MappingProfile, FieldDefinition, BoundingBox, DestinationFieldMapping } from '../types/mapping';
-import {
-  saveProfile,
-  createEmptyProfile,
-  exportProfileAsDocMapper
-} from '../services/mapping/profile-store';
+import { profileService } from '../services/mapping/profile-service';
 import { formatOutputFileName } from '../services/mapping/filename-formatter';
 import { loadPdf, extractTextInBox, isPageScanned } from '../services/pdf/spatial-extractor';
 import { generateValidationPattern } from '../services/llm/gemini-service';
@@ -34,8 +30,18 @@ import { useI18n } from '../i18n';
 const { t } = useI18n();
 const activeTab = ref<'origin' | 'destination' | 'preview'>('origin');
 
-// Active Profile: 100% empty by default on startup
-const currentProfile = ref<MappingProfile>(createEmptyProfile());
+// Active Profile: 100% empty by default on startup. The profile service gives
+// the new empty profile asynchronously; this blank one stands in until then.
+const currentProfile = ref<MappingProfile>({
+  id: '',
+  name: '',
+  version: 1,
+  createdAt: '',
+  updatedAt: '',
+  fields: [],
+  destinationMappings: [],
+  outputFileNamePattern: '{originalName}_{seq:001}',
+});
 const editingProfileId = ref<string | null>(null);
 const selectedFieldId = ref<string | null>(null);
 const activeDrawingType = ref<'value' | 'label' | 'none'>('none');
@@ -53,6 +59,7 @@ const aiError = ref<string | null>(null);
 // Modal state
 const showProfileHub = ref(false);
 const toastMessage = ref<string | null>(null);
+const toastIsError = ref(false);
 
 // Preview PDF Blob
 const previewPdfBlobUrl = ref<string | null>(null);
@@ -63,8 +70,16 @@ onMounted(() => {
   clearStudioToEmpty();
 });
 
+// Browser dialogs (alert, confirm) do not show in the desktop window, so
+// errors are shown in the toast.
+function showErrorToast(msg: string) {
+  showToast(msg);
+  toastIsError.value = true;
+}
+
 function showToast(msg: string) {
   toastMessage.value = msg;
+  toastIsError.value = false;
   setTimeout(() => {
     toastMessage.value = null;
   }, 3500);
@@ -95,7 +110,7 @@ async function handleOriginUpload(event: Event) {
     await extractAllSampleFields();
     showToast(t('nav.loadedToast', { name: file.name }));
   } catch (err: any) {
-    alert(`Failed to parse sample PDF: ${err?.message || err}`);
+    showErrorToast(`Failed to parse sample PDF: ${err?.message || err}`);
   }
 }
 
@@ -298,8 +313,25 @@ function saveCurrentProfile() {
   // In-memory edits only until user explicitly clicks Save Profile
 }
 
-function clearStudioToEmpty() {
-  currentProfile.value = createEmptyProfile();
+/** Bumped by every change of the profile on screen, so a late empty profile never replaces a newer one. */
+let profileGeneration = 0;
+
+/**
+ * Replaces the studio with a new empty profile. The empty profile is fetched
+ * first and the screen is reset in one step; returns false (and shows why) when
+ * it cannot be created or another profile was opened meanwhile.
+ */
+async function clearStudioToEmpty(): Promise<boolean> {
+  const generation = ++profileGeneration;
+  let fresh: MappingProfile;
+  try {
+    fresh = await profileService.createEmptyProfile();
+  } catch (err: any) {
+    showErrorToast(err?.message || String(err));
+    return false;
+  }
+  if (generation !== profileGeneration) return false;
+  currentProfile.value = fresh;
   editingProfileId.value = null;
   selectedFieldId.value = null;
   activeDrawingType.value = 'none';
@@ -312,9 +344,10 @@ function clearStudioToEmpty() {
     previewPdfBlobUrl.value = null;
   }
   activeTab.value = 'origin';
+  return true;
 }
 
-function handleSaveProfile() {
+async function handleSaveProfile() {
   if (currentProfile.value.fields.length === 0 && !currentProfile.value.destinationTemplateBase64) {
     showToast(t('nav.saveValidationEmpty'));
     return;
@@ -324,20 +357,30 @@ function handleSaveProfile() {
   currentProfile.value.name = profileName;
 
   // Persist to storage
-  saveProfile(currentProfile.value);
+  try {
+    await profileService.saveProfile(toRaw(currentProfile.value));
+  } catch (err: any) {
+    showErrorToast(err?.message || String(err));
+    return;
+  }
 
   // Clear all studio fields back to 100% empty
-  clearStudioToEmpty();
+  if (!(await clearStudioToEmpty())) return;
 
   // Show success toast
   showToast(t('nav.savedAndClearedToast', { name: profileName }));
 }
 
-function exportCurrentProfile() {
-  exportProfileAsDocMapper(currentProfile.value);
+async function exportCurrentProfile() {
+  try {
+    await profileService.exportProfile(toRaw(currentProfile.value));
+  } catch (err: any) {
+    showErrorToast(err?.message || String(err));
+  }
 }
 
 function onEditProfileFromHub(profile: MappingProfile) {
+  profileGeneration++;
   currentProfile.value = JSON.parse(JSON.stringify(profile));
   editingProfileId.value = profile.id;
   if (profile.fields.length > 0) {
@@ -383,7 +426,7 @@ function insertNamingToken(token: string) {
 // Generate Sample Output Preview
 async function generateSamplePreview() {
   if (!currentProfile.value.destinationTemplateBase64) {
-    alert(t('preview.needTemplateAlert'));
+    showErrorToast(t('preview.needTemplateAlert'));
     return;
   }
 
@@ -409,7 +452,7 @@ async function generateSamplePreview() {
     previewPdfBlobUrl.value = URL.createObjectURL(blob);
     activeTab.value = 'preview';
   } catch (err: any) {
-    alert(`Failed to generate destination preview: ${err?.message || err}`);
+    showErrorToast(`Failed to generate destination preview: ${err?.message || err}`);
   } finally {
     isGeneratingPreview.value = false;
   }
@@ -488,9 +531,13 @@ async function generateSamplePreview() {
     <!-- Toast Notification -->
     <div
       v-if="toastMessage"
-      class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-2"
+      :class="toastIsError
+        ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+        : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'"
+      class="p-3 rounded-xl border text-xs font-semibold flex items-center gap-2"
     >
-      <CheckCircle class="w-4 h-4" />
+      <AlertCircle v-if="toastIsError" class="w-4 h-4" />
+      <CheckCircle v-else class="w-4 h-4" />
       <span>{{ toastMessage }}</span>
     </div>
 

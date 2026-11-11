@@ -217,7 +217,10 @@
     "duplicate": "Duplicate",
     "export": "Export Profile",
     "delete": "Delete Profile",
-    "close": "Close"
+    "close": "Close",
+    "storedInDatabase": "{count} profiles in the local database",
+    "storedInBrowser": "{count} profiles in local browser storage",
+    "confirmDelete": "Click delete again to remove this profile."
   },
   "common": {
     "loading": "Loading...",

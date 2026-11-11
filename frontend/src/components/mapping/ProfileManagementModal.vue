@@ -7,18 +7,12 @@ import {
   Copy,
   Trash2,
   CheckCircle,
+  AlertCircle,
   FolderOpen,
   Pencil
 } from 'lucide-vue-next';
 import type { MappingProfile } from '../../types/mapping';
-import {
-  getAllProfiles,
-  deleteProfile,
-  duplicateProfile,
-  exportProfileAsDocMapper,
-  importProfileFromDocMapper,
-  saveProfile,
-} from '../../services/mapping/profile-store';
+import { profileService } from '../../services/mapping/profile-service';
 import { useI18n } from '../../i18n';
 
 const { t } = useI18n();
@@ -39,16 +33,35 @@ const profiles = ref<MappingProfile[]>([]);
 const editingNameId = ref<string | null>(null);
 const editedName = ref('');
 const notification = ref<string | null>(null);
+const notificationIsError = ref(false);
+/** Profile whose delete button was clicked once; a second click deletes it. */
+const pendingDeleteId = ref<string | null>(null);
 
-function refresh() {
-  profiles.value = getAllProfiles();
+// Browser dialogs (alert, confirm) do not show in the desktop window, so
+// errors and the delete confirmation are shown inside the window.
+function showError(err: any) {
+  showNotice(err?.message || String(err));
+  notificationIsError.value = true;
+}
+
+async function refresh() {
+  try {
+    profiles.value = await profileService.getAllProfiles();
+  } catch (err: any) {
+    showError(err);
+  }
 }
 
 onMounted(refresh);
 
+let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+let pendingDeleteTimer: ReturnType<typeof setTimeout> | undefined;
+
 function showNotice(msg: string) {
   notification.value = msg;
-  setTimeout(() => {
+  notificationIsError.value = false;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => {
     notification.value = null;
   }, 3500);
 }
@@ -59,26 +72,50 @@ function handleEdit(p: MappingProfile) {
   emit('close');
 }
 
-function handleExport(p: MappingProfile) {
-  exportProfileAsDocMapper(p);
-  showNotice(`Exported ${p.name}.dmap successfully!`);
-}
-
-function handleDuplicate(id: string) {
-  const cloned = duplicateProfile(id);
-  refresh();
-  emit('profilesUpdated');
-  if (cloned) {
-    showNotice(`Created copy: ${cloned.name}`);
+async function handleExport(p: MappingProfile) {
+  try {
+    const fileName = await profileService.exportProfile(p);
+    if (fileName !== null) {
+      showNotice(`Exported ${fileName} successfully!`);
+    }
+  } catch (err: any) {
+    showError(err);
   }
 }
 
-function handleDelete(id: string) {
-  if (confirm('Are you sure you want to delete this profile?')) {
-    deleteProfile(id);
-    refresh();
+async function handleDuplicate(id: string) {
+  try {
+    const cloned = await profileService.duplicateProfile(id);
+    await refresh();
+    emit('profilesUpdated');
+    if (cloned) {
+      showNotice(`Created copy: ${cloned.name}`);
+    }
+  } catch (err: any) {
+    showError(err);
+  }
+}
+
+async function handleDelete(id: string) {
+  if (pendingDeleteId.value !== id) {
+    pendingDeleteId.value = id;
+    showNotice(t('profileModal.confirmDelete'));
+    notificationIsError.value = true;
+    clearTimeout(pendingDeleteTimer);
+    pendingDeleteTimer = setTimeout(() => {
+      pendingDeleteId.value = null;
+    }, 3500);
+    return;
+  }
+  pendingDeleteId.value = null;
+  clearTimeout(pendingDeleteTimer);
+  try {
+    await profileService.deleteProfile(id);
+    await refresh();
     emit('profilesUpdated');
     showNotice('Profile deleted.');
+  } catch (err: any) {
+    showError(err);
   }
 }
 
@@ -87,29 +124,36 @@ function startRename(p: MappingProfile) {
   editedName.value = p.name;
 }
 
-function saveRename(p: MappingProfile) {
-  if (editedName.value.trim() && editedName.value.trim() !== p.name) {
-    p.name = editedName.value.trim();
-    saveProfile(p);
-    refresh();
-    emit('profilesUpdated');
-  }
+async function saveRename(p: MappingProfile) {
+  const name = editedName.value.trim();
   editingNameId.value = null;
+  if (name && name !== p.name) {
+    try {
+      await profileService.saveProfile({ ...p, name });
+      await refresh();
+      emit('profilesUpdated');
+    } catch (err: any) {
+      showError(err);
+    }
+  }
 }
 
 async function handleImportFile(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0];
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  // Cleared so choosing the same file again imports it again.
+  input.value = '';
   if (!file) return;
 
   try {
     const text = await file.text();
-    const imported = importProfileFromDocMapper(text);
-    refresh();
+    const imported = await profileService.importProfile(text);
+    await refresh();
     emit('profilesUpdated');
     emit('selectProfile', imported);
     showNotice(`Imported profile "${imported.name}" ready for use!`);
   } catch (err: any) {
-    alert(`Failed to import .dmap file: ${err?.message || err}`);
+    showError({ message: `Failed to import .dmap file: ${err?.message || err}` });
   }
 }
 </script>
@@ -142,16 +186,20 @@ async function handleImportFile(event: Event) {
       <!-- Notification Toast -->
       <div
         v-if="notification"
-        class="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800 px-6 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5"
+        :class="notificationIsError
+          ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+          : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'"
+        class="border-b px-6 py-2 text-xs font-semibold flex items-center gap-1.5"
       >
-        <CheckCircle class="w-4 h-4" />
+        <AlertCircle v-if="notificationIsError" class="w-4 h-4" />
+        <CheckCircle v-else class="w-4 h-4" />
         <span>{{ notification }}</span>
       </div>
 
       <!-- Action Bar -->
       <div class="px-6 py-3 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ profiles.length }} Profiles in local browser storage
+          {{ t(profileService.storageKind === 'database' ? 'profileModal.storedInDatabase' : 'profileModal.storedInBrowser', { count: profiles.length }) }}
         </span>
 
         <!-- Import Button -->
@@ -243,8 +291,9 @@ async function handleImportFile(event: Event) {
             <!-- Delete -->
             <button
               @click="handleDelete(p.id)"
-              class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500"
-              :title="t('profileModal.delete')"
+              class="p-2 rounded-lg"
+              :class="pendingDeleteId === p.id ? 'bg-red-500 text-white' : 'hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500'"
+              :title="pendingDeleteId === p.id ? t('profileModal.confirmDelete') : t('profileModal.delete')"
             >
               <Trash2 class="w-4 h-4" />
             </button>
