@@ -7,7 +7,7 @@ date: 2026-11-12T18:06:03.032Z
 subject: "Add the Levix Digital Website to your message registry"
 status: seen
 reply_to: 
-deferred: 
+deferred: "Registry change prepared locally (levix-website added and validated); commit and pull request wait for the project owner's approval."
 thread: 20261112-180603-levix-website-add-the-levix-digital-website-to-your-me
 cycle: 1
 round: 1
@@ -33,3 +33,5 @@ Your registry lists levix-website, or you answer that it should not.
 
 ### Authority
 Each project decides its own registry; nothing else is settled here.
+
+> seen (2026-11-12 18:09 UTC): deferred: Registry change prepared locally (levix-website added and validated); commit and pull request wait for the project owner's approval.
