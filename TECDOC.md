@@ -44,6 +44,7 @@ flowchart LR
 <!-- architecture-docs:adrs:start -->
 | ADR | Title | Status | Version | Date |
 |---|---|---|---|---|
+| [ADR-0013](docs/adr/0013-rust-interface-built-with-a-web-framework-leptos-for-the-desk.md) | Rust interface built with a web framework (Leptos) for the desktop and the browser | accepted |  | 2026-11-12 |
 | [ADR-0012](docs/adr/0012-malformed-profile-files-compared-by-error-kind-json-outside.md) | Malformed profile files compared by error kind; JSON outside Rust strings and f64 refused | accepted |  | 2026-11-09 |
 | [ADR-0011](docs/adr/0011-unused-assemblyscript-cmr-core-removed-instead-of-ported.md) | Unused AssemblyScript CMR core removed instead of ported | accepted |  | 2026-11-09 |
 | [ADR-0010](docs/adr/0010-validation-pattern-errors-compared-by-presence-not-by-messag.md) | Validation pattern errors compared by presence, not by message | accepted |  | 2026-11-09 |

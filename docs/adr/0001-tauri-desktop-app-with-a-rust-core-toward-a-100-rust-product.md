@@ -8,7 +8,7 @@ subsystems: [desktop, core]
 supersedes: []
 superseded_by: []
 amends: []
-amended_by: []
+amended_by: [13]
 ---
 
 # ADR-0001: Tauri desktop app with a Rust core, toward a 100% Rust product
