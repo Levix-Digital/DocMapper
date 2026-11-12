@@ -24,6 +24,11 @@
       "slug": "any-context",
       "name": "AnyContext",
       "url": "https://github.com/Levix-Digital/any-context"
+    },
+    {
+      "slug": "levix-website",
+      "name": "Levix Digital Website",
+      "url": "https://github.com/Levix-Digital/levix-digital-website.git"
     }
   ]
 }
