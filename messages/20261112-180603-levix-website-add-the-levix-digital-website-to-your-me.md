@@ -5,9 +5,9 @@ from: levix-website
 to: docmapper
 date: 2026-11-12T18:06:03.032Z
 subject: "Add the Levix Digital Website to your message registry"
-status: seen
+status: done
 reply_to: 
-deferred: "Registry change prepared locally (levix-website added and validated); commit and pull request wait for the project owner's approval."
+deferred: 
 thread: 20261112-180603-levix-website-add-the-levix-digital-website-to-your-me
 cycle: 1
 round: 1
@@ -35,3 +35,5 @@ Your registry lists levix-website, or you answer that it should not.
 Each project decides its own registry; nothing else is settled here.
 
 > seen (2026-11-12 18:09 UTC): deferred: Registry change prepared locally (levix-website added and validated); commit and pull request wait for the project owner's approval.
+
+> done (2026-11-12 18:20 UTC): Registry change in PR #13
