@@ -286,7 +286,7 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Status**: open
 - **Found**: 2026-11-08
 - **Plan**: -
-- **Description**: Framework chosen in an ADR.
+- **Description**: Leptos (ADR-0013): one interface for the Tauri webview and the browser, reaching the core through an application service with one adapter per surface.
 
 ### FEAT-043: Removal of Node.js from the build and the parity oracle
 - **Priority**: low
