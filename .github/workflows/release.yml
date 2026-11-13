@@ -1,15 +1,17 @@
 # Release: builds DocMapper's installers and publishes them for a version tag (ADR-0015).
-# - vX.Y.Z-rc.N tags (release candidates, pushed on main) publish a PRE-RELEASE, never latest.
+# - vX.Y.Z-rc.N tags (release candidates, cut by the candidate workflow after every green CI run
+#   on main, or pushed by hand) publish a PRE-RELEASE, never latest.
 # - vX.Y.Z final tags are created by the promote workflow, which calls this workflow directly
 #   (a tag pushed with GITHUB_TOKEN would not trigger it); they are published as latest.
 # - On a pull request that changes the packaging, or run by hand (Actions > Release > Run
 #   workflow) on any branch, it is a dry run: the installers are kept as the run's artifacts
 #   and nothing is published.
 # The tag must match the workspace version, and docs/releases/<tag>.md (on main, or in the
-# tagged commit) is the release body. Installer names never change between releases, so the
-# product site can link to the latest ones. Releases go to the repository in the
-# RELEASES_REPOSITORY variable (Levix-Digital/docmapper-releases) with the RELEASES_TOKEN secret
-# when it is set, to this repository otherwise.
+# tagged commit; for a candidate also docs/releases/vX.Y.Z-rc.md) is the release body.
+# Installer names never change between releases, so the product site can link to the latest
+# ones. Releases go to the repository in the RELEASES_REPOSITORY variable
+# (Levix-Digital/docmapper-releases) with the RELEASES_TOKEN secret when it is set, to this
+# repository otherwise.
 name: Release
 
 on:
@@ -91,15 +93,22 @@ jobs:
         env:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          NOTES="docs/releases/$TAG.md"
+          # A candidate takes its own notes, or the notes shared by the candidates of its version.
+          candidates=("docs/releases/$TAG.md")
+          case "$TAG" in
+            *-rc.*) candidates+=("docs/releases/${TAG%-rc.*}-rc.md") ;;
+          esac
           git fetch -q --depth 1 origin main
-          if git show "origin/main:$NOTES" > release-notes.md 2>/dev/null; then
-            echo "Release notes: $NOTES on main"
-          elif [ -f "$NOTES" ]; then
-            cp "$NOTES" release-notes.md
-            echo "Release notes: $NOTES in the tagged commit"
-          else
-            echo "::error::$NOTES is missing, on main and in the tagged commit (docs/releases/README.md)"; exit 1
+          NOTES=""
+          for path in "${candidates[@]}"; do
+            if git show "origin/main:$path" > release-notes.md 2>/dev/null; then
+              NOTES="$path"; echo "Release notes: $path on main"; break
+            elif [ -f "$path" ]; then
+              cp "$path" release-notes.md; NOTES="$path"; echo "Release notes: $path in the tagged commit"; break
+            fi
+          done
+          if [ -z "$NOTES" ]; then
+            echo "::error::no release notes: ${candidates[*]} missing on main and in the tagged commit (docs/releases/README.md)"; exit 1
           fi
           grep -q '[^[:space:]]' release-notes.md || { echo "::error::$NOTES is empty"; exit 1; }
 
