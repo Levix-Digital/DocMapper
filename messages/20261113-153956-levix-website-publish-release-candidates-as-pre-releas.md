@@ -5,9 +5,9 @@ from: levix-website
 to: docmapper
 date: 2026-11-13T15:39:56.875Z
 subject: "Publish release candidates as pre-releases in Levix-Digital/docmapper-releases"
-status: seen
+status: done
 reply_to: 
-deferred: "Release publishing is unrelated to the editions analysis; left for a release-workflow session."
+deferred: 
 thread: 20261113-153956-levix-website-publish-release-candidates-as-pre-releas
 cycle: 1
 round: 1
