@@ -5,9 +5,9 @@ from: levix-website
 to: docmapper
 date: 2026-11-13T15:53:57.333Z
 subject: "Publish final releases as latest in Levix-Digital/docmapper-releases with stable installer names"
-status: seen
+status: done
 reply_to: 
-deferred: "Release publishing is unrelated to the editions analysis; left for a release-workflow session."
+deferred: 
 thread: 20261113-155357-levix-website-publish-final-releases-as-latest-in-levi
 cycle: 1
 round: 1
