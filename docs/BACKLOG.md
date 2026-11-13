@@ -54,7 +54,7 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Status**: open
 - **Found**: 2026-11-08
 - **Plan**: -
-- **Description**: Connection string stored in the keychain; no silent fallback to local.
+- **Description**: ADR-0014: the PostgreSQL adapter of ProfileRepository is the storage of the Business server; desktops do not connect to a central database. Connection string kept as a server secret; no silent fallback.
 
 ### FEAT-014: Free edition limit of three document families
 - **Priority**: high
@@ -433,6 +433,12 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Status**: open
 - **Found**: 2026-11-08
 - **Description**: ADR-0001: final 100% Rust target; removes Vue, Vite and Node.js. After version 1.0.
+
+### EPIC-016: [product] Business edition server
+- **Priority**: medium
+- **Status**: open
+- **Found**: 2026-11-13
+- **Description**: ADR-0014: server surface hosted by the customer, used from the browser, with one shared PostgreSQL profile base, access levels from Admin Hub groups (operator, editor, curator, administrator), versioned profiles, batch jobs on the server, `.docmapper` import as draft, `server` client kind in the product manifest and enrollment as an Admin Hub product server. Access levels need Admin Hub v0.4.0. Release placement in the roadmap.
 
 ## Closed
 

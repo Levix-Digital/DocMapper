@@ -4,13 +4,13 @@ DocMapper is an on-premise desktop application: a Tauri shell with a hexagonal R
 
 ## Platforms and Stack
 
-- **Platforms**: Windows 10 and later (x64), macOS 12 and later (Apple silicon and Intel), Linux x64 (Ubuntu 22.04 and later). Installed per user; no server component.
+- **Platforms**: Windows 10 and later (x64), macOS 12 and later (Apple silicon and Intel), Linux x64 (Ubuntu 22.04 and later). The Personal and Pro editions are installed per user; the Business edition adds a server surface hosted by the customer ([ADR-0014](../adr/0014-editions-personal-and-pro-on-the-desktop-business-served-from.md)).
 - **Core**: Rust (stable, edition 2021), Cargo workspace in this repository ([ADR-0001](../adr/0001-tauri-desktop-app-with-a-rust-core-toward-a-100-rust-product.md), [ADR-0002](../adr/0002-hexagonal-architecture.md)).
 - **Desktop shell**: Tauri 2, exposing core use cases as commands.
 - **Interface during the migration**: Vue 3 (Composition API), TypeScript and Tailwind CSS, built with Vite; replaced by a Rust interface in a later epic, which removes Node.js from the product.
 - **Extraction**: the shared LSIE crate from levix-platform, consumed by git tag ([ADR-0004](../adr/0004-lsie-from-the-shared-levix-platform-crate.md)).
 - **PDF reading**: pdfium through `pdfium-render` ([ADR-0009](../adr/0009-pdf-reading-with-pdfium-and-a-fixed-glyph-tolerance.md)).
-- **Storage**: SQLite (`rusqlite`) locally; PostgreSQL as the central database in version 1.0 ([ADR-0006](../adr/0006-profiles-stored-in-a-database-local-sqlite-by-default-centra.md)).
+- **Storage**: SQLite (`rusqlite`) on the desktop; PostgreSQL as the shared base of the Business server ([ADR-0006](../adr/0006-profiles-stored-in-a-database-local-sqlite-by-default-centra.md)).
 - **Vision fallback**: a generic model connector over HTTP (`reqwest`) and, by default, local ONNX models (PP-OCRv5 for text, LiLT for key-value extraction) run through the shared levix-platform ONNX crate ([ADR-0005](../adr/0005-deterministic-extraction-first-vision-fallback-through-a-gen.md)).
 - **Secrets**: the operating system keychain through `keyring` ([ADR-0008](../adr/0008-secrets-in-the-operating-system-keychain.md)).
 - **Licensing and policy enforcement**: the levix-platform license crate and policy engine ([ADR-0007](../adr/0007-licensing-and-policy-enforcement-through-the-levix-platform.md)).

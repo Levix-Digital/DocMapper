@@ -8,7 +8,7 @@ subsystems: [storage]
 supersedes: []
 superseded_by: []
 amends: []
-amended_by: []
+amended_by: [14]
 ---
 
 # ADR-0006: Profiles stored in a database: local SQLite by default, central database by connection string
