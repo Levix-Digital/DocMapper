@@ -339,10 +339,10 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 ### FEAT-049: Release workflows: pre-release on -rc tags and promote workflow
 - **Priority**: high
 - **Epic**: EPIC-014
-- **Status**: open
+- **Status**: in_progress
 - **Found**: 2026-11-09, plan docmapper_m0_foundation
 - **Plan**: -
-- **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate.
+- **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate. ADR-0015: published in Levix-Digital/docmapper-releases with stable installer names, as agreed with the Levix Digital website.
 
 ## Improvements
 

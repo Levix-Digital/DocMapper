@@ -44,6 +44,7 @@ flowchart LR
 <!-- architecture-docs:adrs:start -->
 | ADR | Title | Status | Version | Date |
 |---|---|---|---|---|
+| [ADR-0015](docs/adr/0015-installers-built-by-the-tauri-bundler-and-published-in-docmap.md) | Installers built by the Tauri bundler and published in docmapper-releases | accepted | v0.1.0 | 2026-11-13 |
 | [ADR-0014](docs/adr/0014-editions-personal-and-pro-on-the-desktop-business-served-from.md) | Editions: Personal and Pro on the desktop, Business served from the customer's server | accepted |  | 2026-11-13 |
 | [ADR-0013](docs/adr/0013-rust-interface-built-with-a-web-framework-leptos-for-the-desk.md) | Rust interface built with a web framework (Leptos) for the desktop and the browser | accepted |  | 2026-11-12 |
 | [ADR-0012](docs/adr/0012-malformed-profile-files-compared-by-error-kind-json-outside.md) | Malformed profile files compared by error kind; JSON outside Rust strings and f64 refused | accepted |  | 2026-11-09 |

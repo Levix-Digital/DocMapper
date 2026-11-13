@@ -1,0 +1,255 @@
+# Release: builds DocMapper's installers and publishes them for a version tag (ADR-0015).
+# - vX.Y.Z-rc.N tags (release candidates, pushed on main) publish a PRE-RELEASE, never latest.
+# - vX.Y.Z final tags are created by the promote workflow, which calls this workflow directly
+#   (a tag pushed with GITHUB_TOKEN would not trigger it); they are published as latest.
+# - On a pull request that changes the packaging, or run by hand (Actions > Release > Run
+#   workflow) on any branch, it is a dry run: the installers are kept as the run's artifacts
+#   and nothing is published.
+# The tag must match the workspace version, and docs/releases/<tag>.md (on main, or in the
+# tagged commit) is the release body. Installer names never change between releases, so the
+# product site can link to the latest ones. Releases go to the repository in the
+# RELEASES_REPOSITORY variable (Levix-Digital/docmapper-releases) with the RELEASES_TOKEN secret
+# when it is set, to this repository otherwise.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag to build and publish
+        required: true
+        type: string
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/release.yml
+      - crates/docmapper-desktop/tauri.conf.json
+      - crates/docmapper-desktop/icons/**
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.tag || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: Check the tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      ref: ${{ steps.tag.outputs.ref }}
+    steps:
+      - name: Resolve the tag
+        id: tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          elif [ "$REF_TYPE" = "tag" ]; then
+            TAG="$REF_NAME"
+          else
+            TAG=""
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "ref=${TAG:+refs/tags/$TAG}" >> "$GITHUB_OUTPUT"
+          if [ -z "$TAG" ]; then
+            echo "Dry run on $REF_NAME: installers are kept as artifacts, nothing is published" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.ref || github.ref }}
+
+      - name: The tag matches the workspace version
+        if: steps.tag.outputs.tag != ''
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$'; then
+            echo "::error::'$TAG' is neither vX.Y.Z nor vX.Y.Z-rc.N"; exit 1
+          fi
+          VERSION="$(sed -n '/^\[workspace.package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml)"
+          BASE="${TAG#v}"
+          BASE="${BASE%-rc.*}"
+          if [ "$VERSION" != "$BASE" ]; then
+            echo "::error::$TAG does not match the workspace version $VERSION in Cargo.toml"; exit 1
+          fi
+
+      - name: Release notes
+        if: steps.tag.outputs.tag != ''
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          NOTES="docs/releases/$TAG.md"
+          git fetch -q --depth 1 origin main
+          if git show "origin/main:$NOTES" > release-notes.md 2>/dev/null; then
+            echo "Release notes: $NOTES on main"
+          elif [ -f "$NOTES" ]; then
+            cp "$NOTES" release-notes.md
+            echo "Release notes: $NOTES in the tagged commit"
+          else
+            echo "::error::$NOTES is missing, on main and in the tagged commit (docs/releases/README.md)"; exit 1
+          fi
+          grep -q '[^[:space:]]' release-notes.md || { echo "::error::$NOTES is empty"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        if: steps.tag.outputs.tag != ''
+        with:
+          name: release-notes
+          path: release-notes.md
+          if-no-files-found: error
+
+  package:
+    name: Test and package (${{ matrix.platform }})
+    needs: check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # The oldest supported Ubuntu: the binary links against its glibc, so the packages
+          # also run on Ubuntu 22.04 (a binary built on 24.04 needs glibc 2.39).
+          - platform: linux
+            os: ubuntu-22.04
+            args: --bundles deb,appimage
+          - platform: windows
+            os: windows-latest
+            args: --bundles nsis
+          - platform: macos
+            os: macos-latest
+            args: --bundles dmg --target universal-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check.outputs.ref || github.ref }}
+
+      - name: Install the WebKitGTK build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install the toolchain of rust-toolchain.toml
+        shell: bash
+        run: |
+          rustup toolchain install
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          fi
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+        working-directory: frontend
+
+      - name: Tests
+        run: cargo test --workspace
+
+      - name: Build the installers
+        shell: bash
+        run: npm run tauri --prefix frontend -- build ${{ matrix.args }} --ci
+
+      - name: The Linux binary runs on Ubuntu 22.04 (glibc 2.35)
+        if: runner.os == 'Linux'
+        run: |
+          needed=$(objdump -T target/release/docmapper-desktop | grep -o 'GLIBC_[0-9.]*' | sed 's/GLIBC_//' | sort -uV | tail -1)
+          echo "Highest glibc symbol version: $needed" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$(printf '%s\n' "$needed" 2.35 | sort -V | tail -1)" != "2.35" ]; then
+            echo "::error::the binary needs glibc $needed; Ubuntu 22.04 has 2.35"; exit 1
+          fi
+
+      # Stable names, the same in every release: the product site links to the latest ones.
+      - name: Collect the installers under their stable names
+        shell: bash
+        run: |
+          one() {
+            found=$(find target -path "*/release/bundle/$1/*" -name "*.$2" -type f)
+            count=$(printf '%s' "$found" | grep -c . || true)
+            if [ "$count" -ne 1 ]; then
+              echo "::error::expected one .$2 in bundle/$1, found $count: $found"; exit 1
+            fi
+            cp "$found" "dist/$3"
+          }
+          mkdir -p dist
+          case "$RUNNER_OS" in
+            Windows) one nsis exe docmapper-installer.exe ;;
+            macOS) one dmg dmg docmapper.dmg ;;
+            Linux)
+              one appimage AppImage docmapper-installer
+              one deb deb docmapper.deb
+              ;;
+          esac
+          for file in dist/*; do
+            echo "Package $(basename "$file"): $(( $(wc -c < "$file") / 1024 )) KiB" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.platform }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish the release
+    needs: [check, package]
+    if: needs.check.outputs.tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          path: dist
+          merge-multiple: true
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+
+      - name: Checksums
+        working-directory: dist
+        run: |
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish
+        env:
+          TAG: ${{ needs.check.outputs.tag }}
+          RELEASES_REPOSITORY: ${{ vars.RELEASES_REPOSITORY }}
+          RELEASES_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          WORKFLOW_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "$RELEASES_REPOSITORY" ]; then
+            if [ -z "$RELEASES_TOKEN" ]; then
+              echo "::error::RELEASES_REPOSITORY is set but the RELEASES_TOKEN secret is missing"; exit 1
+            fi
+            repo="$RELEASES_REPOSITORY"
+            export GH_TOKEN="$RELEASES_TOKEN"
+          else
+            repo="$GITHUB_REPOSITORY"
+            export GH_TOKEN="$WORKFLOW_TOKEN"
+          fi
+          case "$TAG" in
+            *-rc.*) flags=(--prerelease --latest=false) ;;
+            *) flags=(--latest) ;;
+          esac
+          gh release create "$TAG" dist/* --repo "$repo" --title "DocMapper $TAG" --notes-file release-notes.md "${flags[@]}"
+          echo "Published $TAG to $repo" | tee -a "$GITHUB_STEP_SUMMARY"
