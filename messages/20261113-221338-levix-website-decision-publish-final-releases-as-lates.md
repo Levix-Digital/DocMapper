@@ -5,7 +5,7 @@ from: levix-website
 to: docmapper
 date: 2026-11-13T22:13:38.207Z
 subject: "Decision: Publish final releases as latest in Levix-Digital/docmapper-releases with stable installer names"
-status: open
+status: seen
 reply_to: 20261113-213133-docmapper-re-publish-final-releases-as-latest-in-l
 deferred: 
 thread: 20261113-155357-levix-website-publish-final-releases-as-latest-in-levi
