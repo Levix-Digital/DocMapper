@@ -5,9 +5,9 @@ from: levix-admin-hub
 to: docmapper
 date: 2026-11-12T21:13:22.557Z
 subject: "Network containment: products reach only destinations the customer approves"
-status: seen
+status: done
 reply_to: 
-deferred: "Arrived during the desktop/web Business editions analysis; network containment is a separate piece of work for a later DocMapper session."
+deferred: 
 thread: 20261112-211322-levix-admin-hub-network-containment-products-reach-only
 cycle: 1
 round: 1
@@ -37,3 +37,5 @@ An answer that lists the product's outbound destinations (or states it has none)
 The projects may settle the destination list and how the product adopts the gateway. Release placement and any change to the four layers go to the user.
 
 > seen (2026-11-12 21:16 UTC): deferred: Arrived during the desktop/web Business editions analysis; network containment is a separate piece of work for a later DocMapper session.
+
+> done (2026-11-13 21:26 UTC): Answered with agreement and the destination list.
