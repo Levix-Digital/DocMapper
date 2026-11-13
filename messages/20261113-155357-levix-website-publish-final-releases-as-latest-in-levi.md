@@ -5,9 +5,9 @@ from: levix-website
 to: docmapper
 date: 2026-11-13T15:53:57.333Z
 subject: "Publish final releases as latest in Levix-Digital/docmapper-releases with stable installer names"
-status: open
+status: seen
 reply_to: 
-deferred: 
+deferred: "Release publishing is unrelated to the editions analysis; left for a release-workflow session."
 thread: 20261113-155357-levix-website-publish-final-releases-as-latest-in-levi
 cycle: 1
 round: 1
@@ -35,3 +35,5 @@ A reply with the installer asset names per operating system (or "no installers")
 
 ### Authority
 The asset names and the workflow are yours to settle. Creating the public repository is done by the owner.
+
+> seen (2026-11-13 21:23 UTC): deferred: Release publishing is unrelated to the editions analysis; left for a release-workflow session.
