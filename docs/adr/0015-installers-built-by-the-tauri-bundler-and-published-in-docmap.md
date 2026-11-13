@@ -23,6 +23,7 @@ DocMapper has a CI workflow but no release workflow (FEAT-049), and the first v0
 - `.github/workflows/release.yml` runs on `v*` tags and from the promote workflow, and as a dry run on pull requests that change the packaging and by hand. It tests and packages on the three platforms, and only after all of them succeed one job publishes the release with `SHA256SUMS.txt` through the GitHub CLI: candidates as pre-releases never marked latest, final versions marked latest. A dry run keeps the installers as run artifacts and publishes nothing.
 - The release body is `docs/releases/<tag>.md`, read from `main` (or from the tagged commit); a release without notes is not published.
 - The installer names are the same in every release: `docmapper-installer.exe` (Windows), `docmapper.dmg` (macOS), `docmapper-installer` (Linux AppImage), plus `docmapper.deb` and `SHA256SUMS.txt`.
+- `.github/workflows/candidate.yml` cuts the candidates: after every green CI run on `main` it tags the head `vX.Y.Z-rc.N` (workspace version, next N) and calls the release workflow, unless `vX.Y.Z` is released, the commit already has a candidate or the candidate notes are missing. Candidate notes are `docs/releases/vX.Y.Z-rc.N.md` or, shared by the version's candidates, `docs/releases/vX.Y.Z-rc.md`.
 - `.github/workflows/promote.yml` is the trunk release gate: in the `release` environment it tags the accepted candidate's commit `vX.Y.Z` and calls the release workflow.
 - Releases go to the repository named by the `RELEASES_REPOSITORY` variable (`Levix-Digital/docmapper-releases`) with the `RELEASES_TOKEN` secret, and to the source repository when the variable is not set.
 
@@ -31,6 +32,7 @@ DocMapper has a CI workflow but no release workflow (FEAT-049), and the first v0
 - **Tauri's default file names (with the version)**: no renaming step, but the site would need the version to build each link and every release would break links shared before.
 - **Generated release notes**: no notes file to write, but they would be generated in the releases repository, which has no pull requests, and testers need what changed, what to try and the known issues.
 - **A third-party release action**: a supply-chain dependency where the preinstalled GitHub CLI suffices; same choice as Aurora.
+- **Candidate tags pushed by hand**: one step less to automate, but every candidate would wait for someone to push a tag; AnyContext also tags on merge.
 - **Publishing from each build job**: a failed platform would leave a half-published release.
 
 ## Consequences
@@ -38,4 +40,4 @@ DocMapper has a CI workflow but no release workflow (FEAT-049), and the first v0
 - The site announces each candidate and updates its download links with no manual step on either side.
 - The installers are not signed until FEAT-041: Windows SmartScreen and macOS Gatekeeper warn on first launch.
 - The releases repository must exist with at least one commit, the `RELEASES_TOKEN` secret (contents write on it) and the `RELEASES_REPOSITORY` variable must be set, and the `release` environment should require the owner's approval.
-- Every release candidate needs its notes in `docs/releases/` before the tag is pushed (`docs/releases/README.md`).
+- Candidates need no manual step: a merge into `main` with the candidate notes in place publishes one. The owner's gates are the notes, the version bump and the promote approval (`docs/releases/README.md`).
