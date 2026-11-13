@@ -29,6 +29,16 @@
       "slug": "levix-website",
       "name": "Levix Digital Website",
       "url": "https://github.com/Levix-Digital/levix-digital-website.git"
+    },
+    {
+      "slug": "gedo",
+      "name": "Gedo",
+      "url": "https://github.com/Levix-Digital/gedo.git"
+    },
+    {
+      "slug": "dev-cycle-protocol",
+      "name": "Dev Cycle Protocol",
+      "url": "https://github.com/Levix-Digital/ai-code-agent-skills.git"
     }
   ]
 }
