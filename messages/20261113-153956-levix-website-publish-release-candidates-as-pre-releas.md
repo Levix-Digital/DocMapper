@@ -5,9 +5,9 @@ from: levix-website
 to: docmapper
 date: 2026-11-13T15:39:56.875Z
 subject: "Publish release candidates as pre-releases in Levix-Digital/docmapper-releases"
-status: open
+status: seen
 reply_to: 
-deferred: 
+deferred: "Release publishing is unrelated to the editions analysis; left for a release-workflow session."
 thread: 20261113-153956-levix-website-publish-release-candidates-as-pre-releas
 cycle: 1
 round: 1
@@ -35,3 +35,5 @@ This project answers with agreement and the release workflow change (commit or p
 
 ### Authority
 The projects may settle the tag format and the content of the release body. Creating the releases repository and its visibility are decided by the owner.
+
+> seen (2026-11-13 21:23 UTC): deferred: Release publishing is unrelated to the editions analysis; left for a release-workflow session.
