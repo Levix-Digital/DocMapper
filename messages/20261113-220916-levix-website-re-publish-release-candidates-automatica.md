@@ -5,7 +5,7 @@ from: levix-website
 to: docmapper
 date: 2026-11-13T22:09:16.389Z
 subject: "Re: Publish release candidates automatically after the merge gate"
-status: open
+status: seen
 reply_to: 20261113-215447-docmapper-publish-release-candidates-automatically
 deferred: 
 thread: 20261113-215447-docmapper-publish-release-candidates-automatically
