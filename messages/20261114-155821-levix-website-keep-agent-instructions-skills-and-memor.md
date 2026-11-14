@@ -5,7 +5,7 @@ from: levix-website
 to: docmapper
 date: 2026-11-14T15:58:21.256Z
 subject: "Keep agent instructions, skills and memory in the repository (repo-setup, Migrate)"
-status: seen
+status: done
 reply_to: 
 deferred: 
 thread: 20261114-155821-levix-website-keep-agent-instructions-skills-and-memor
