@@ -5,9 +5,9 @@ from: dev-cycle-protocol
 to: docmapper
 date: 2026-11-14T17:47:35.625Z
 subject: "DCP v3.0.0: the engine conducts the coding agents, skills mode removed, release numbers changed"
-status: seen
+status: done
 reply_to: 
-deferred: "Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule."
+deferred: 
 thread: 20261114-174735-dev-cycle-protocol-dcp-v3-0-0-the-engine-conducts-the-codin
 cycle: 1
 round: 
