@@ -344,6 +344,14 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: -
 - **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate. ADR-0015: published in Levix-Digital/docmapper-releases with stable installer names, as agreed with the Levix Digital website (both agreements approved by the owner on 2026-11-13). Candidates are cut automatically after every green CI run on main (candidate.yml); the same was proposed to every other project on 2026-11-13.
 
+### FEAT-051: Network gateway adoption and egress declaration in the product manifest
+- **Priority**: medium
+- **Epic**: EPIC-010
+- **Status**: open
+- **Found**: 2026-11-14, Admin Hub network containment decision of 2026-11-13 (Hub ADR-0009, levix-admin-hub#21; platform ADR-0002, ADR-0003, FEAT-026, levix-platform#7)
+- **Plan**: -
+- **Description**: The product manifest (FEAT-033; `server` client kind of EPIC-016) declares every outbound destination: customer-configured kinds `model_endpoint` (HTTPS, VisionModel connector), `admin_hub` (HTTPS), `database` (PostgreSQL over TCP, Business server only, ADR-0014) and `api` (HTTPS, ERP connectors), plus two fixed destinations flagged as outside the perimeter: the Levix catalog source for model downloads and updates (internal mirror or offline import in a closed perimeter) and the public machine translation endpoint (falls back to bundled languages when denied). Every outbound adapter (model connector, Hub channel client, catalog and update client, translation, ERP connectors, PostgreSQL repository of the Business server) opens its connection through the levix-platform network gateway, which covers plain TCP, with no direct socket; blocked connections are reported as metadata only (destination kind, rule, time, device) on the audit path of FEAT-046. Related: EPIC-009, EPIC-011, EPIC-014, EPIC-016. Both prerequisite pull requests are merged; release placement is set in the roadmap later.
+
 ## Improvements
 
 ## Adjustments
