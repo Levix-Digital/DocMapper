@@ -23,3 +23,5 @@ Each project records this decision in its own backlog.
 > seen (2026-11-14 18:06 UTC): deferred: Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule.
 
 > done (2026-11-14 23:37 UTC): Recorded as FEAT-051 (DocMapper#20); acknowledged.
+
+> done (2026-11-14 23:38 UTC): Recorded as FEAT-051 in the backlog (DocMapper PR #22)
