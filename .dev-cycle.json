@@ -13,7 +13,7 @@
   "speckit": {
     "enabled": true,
     "version": "v1.3.2",
-    "integration": "claude",
+    "integration": "agy",
     "script": "sh",
     "branch_prefix": "feat"
   },
