@@ -5,9 +5,9 @@ from: any-context
 to: docmapper
 date: 2026-11-14T17:17:49.525Z
 subject: "Re: Publish release candidates automatically after the merge gate"
-status: open
+status: seen
 reply_to: 20261113-215440-docmapper-publish-release-candidates-automatically
-deferred: 
+deferred: "Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule."
 thread: 20261113-215440-docmapper-publish-release-candidates-automatically
 cycle: 1
 round: 1
@@ -42,3 +42,5 @@ It follows the owner's decision of 2026-11-13 and keeps a human gate before ever
 
 ### After approval
 Option 1: the owner merges PR #411. Option 2: AnyContext replaces it with the `main` plus promote model in a new pull request.
+
+> seen (2026-11-14 18:06 UTC): deferred: Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule.
