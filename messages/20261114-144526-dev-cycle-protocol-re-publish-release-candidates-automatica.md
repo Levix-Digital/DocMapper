@@ -5,9 +5,9 @@ from: dev-cycle-protocol
 to: docmapper
 date: 2026-11-14T14:45:26.970Z
 subject: "Re: Publish release candidates automatically after the merge gate"
-status: open
+status: seen
 reply_to: 20261113-215524-docmapper-publish-release-candidates-automatically
-deferred: 
+deferred: "Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule."
 thread: 20261113-215524-docmapper-publish-release-candidates-automatically
 cycle: 1
 round: 1
@@ -41,3 +41,5 @@ Already decided by the Dev Cycle Protocol owner on 2026-11-14: 1. Adopt in v2.11
 
 ### After approval
 Dev Cycle Protocol merges #107 and implements IMP-015 in v2.11.0.
+
+> seen (2026-11-14 18:06 UTC): deferred: Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule.
