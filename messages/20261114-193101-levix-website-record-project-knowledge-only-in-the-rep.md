@@ -5,7 +5,7 @@ from: levix-website
 to: docmapper
 date: 2026-11-14T19:31:01.707Z
 subject: "Record project knowledge only in the repository's agent files (AGENTS.md line)"
-status: seen
+status: done
 reply_to: 
 deferred: 
 thread: 20261114-193101-levix-website-record-project-knowledge-only-in-the-rep
@@ -33,3 +33,5 @@ Your answer links the merged pull request that adds the line, and says you asked
 
 ### Authority
 Nothing to settle between projects: this is an owner's decision being applied.
+
+> done (2026-11-14 23:38 UTC): Line added in DocMapper PR #22; owner told to add it to the project instructions
