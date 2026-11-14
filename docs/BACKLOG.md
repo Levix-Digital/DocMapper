@@ -344,6 +344,14 @@ Each item: `### <ID>: <title>` with the fields `Severity` (bugs: critical, high,
 - **Plan**: -
 - **Description**: GitHub Actions pre-release for vX.Y.Z-rc.N tags and the promote workflow with the release environment (trunk model); needed before the first v0.1.0 candidate. ADR-0015: published in Levix-Digital/docmapper-releases with stable installer names, as agreed with the Levix Digital website (both agreements approved by the owner on 2026-11-13). Candidates are cut automatically after every green CI run on main (candidate.yml); the same was proposed to every other project on 2026-11-13.
 
+### FEAT-051: Network gateway adoption and egress declaration in the product manifest
+- **Priority**: medium
+- **Epic**: EPIC-010
+- **Status**: open
+- **Found**: 2026-11-14, network containment agreement with levix-admin-hub, approved by the owner 2026-11-13
+- **Plan**: -
+- **Description**: Owner decision of 2026-11-13 (network containment, Admin Hub ADR-0009, platform ADR-0002 and ADR-0003). The product manifest (FEAT-033) declares the outbound destinations: configurable kinds model_endpoint, admin_hub, database (PostgreSQL over TCP, Business server only) and api, plus the fixed catalog source for model downloads and signed updates and the public translation endpoint, both flagged as outside the customer's perimeter; the Business server client kind (EPIC-016) carries the same declaration. Every outbound adapter (model connector, Hub channel client, catalog and update client, translation, ERP connectors, PostgreSQL repository) opens its connection through the levix-platform network gateway (platform FEAT-026, which covers plain TCP), with no direct socket; blocked connections are reported as metadata only on the audit path of FEAT-046. In a closed perimeter machine translation falls back to the bundled languages and downloads and updates come from a mirror or offline import. Linked to FEAT-033, EPIC-009, EPIC-011, EPIC-014 and EPIC-016. Release placement is set in the roadmap later.
+
 ## Improvements
 
 ## Adjustments
