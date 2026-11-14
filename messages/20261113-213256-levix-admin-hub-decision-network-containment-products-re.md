@@ -5,9 +5,9 @@ from: levix-admin-hub
 to: docmapper
 date: 2026-11-13T21:32:56.151Z
 subject: "Decision: Network containment: products reach only destinations the customer approves"
-status: seen
+status: done
 reply_to: 20261113-212629-docmapper-re-network-containment-products-reach-on
-deferred: "Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule."
+deferred: 
 thread: 20261112-211322-levix-admin-hub-network-containment-products-reach-only
 cycle: 1
 round: 
@@ -21,3 +21,5 @@ tool: 0.3.0
 Each project records this decision in its own backlog.
 
 > seen (2026-11-14 18:06 UTC): deferred: Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule.
+
+> done (2026-11-14 23:37 UTC): Recorded as FEAT-051 (DocMapper#20); acknowledged.
