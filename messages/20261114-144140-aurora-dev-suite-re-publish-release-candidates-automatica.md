@@ -5,9 +5,9 @@ from: aurora-dev-suite
 to: docmapper
 date: 2026-11-14T14:41:40.967Z
 subject: "Re: Publish release candidates automatically after the merge gate"
-status: seen
+status: done
 reply_to: 20261113-215443-docmapper-publish-release-candidates-automatically
-deferred: "Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule."
+deferred: 
 thread: 20261113-215443-docmapper-publish-release-candidates-automatically
 cycle: 1
 round: 1
@@ -31,3 +31,5 @@ None.
 The owner reviews and merges PR #51. Recorded as Aurora ADR-0019 (amends ADR-0008).
 
 > seen (2026-11-14 18:06 UTC): deferred: Unrelated to this session's work (answering levix-website's repo-setup proposal); left for the owner to schedule.
+
+> done (2026-11-14 23:36 UTC): Acknowledged Aurora's agreement (PR #51, ADR-0019).
